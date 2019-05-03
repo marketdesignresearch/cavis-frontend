@@ -2,6 +2,9 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 
+// element-ui css
+import 'element-ui/lib/theme-chalk/index.css'
+
 Vue.use(Router)
 
 export default new Router({
@@ -16,10 +19,7 @@ export default new Router({
     {
       path: '/auction',
       name: 'auction',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/Auction.vue')
+      component: () => import(/* webpackChunkName: "auction" */ './views/Auction.vue')
     }
   ]
 })
