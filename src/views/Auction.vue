@@ -2,6 +2,8 @@
   <div>
     <h1>Auction View</h1>
 
+    <button class="btn btn-primary" @click="createAuction">Create Auction</button>
+
     <span v-for="(good, index) in goods" :key="'i' + index">
       <AuctionGood :good="good" />
     </span>
@@ -27,7 +29,7 @@ import Vue from 'vue'
 import { AuctionGoodComponent, IAuctionGood } from '@/components/auction/Good.vue'
 import AuctionBidder from '@/components/auction/Bidder.vue'
 import AuctionBid from '@/components/auction/Bid.vue'
-import auction from '../store/modules/auction'
+import auction, { ApiAuctionType } from '../store/modules/auction'
 import { Steps, Step } from 'element-ui'
 
 export default Vue.extend({
@@ -41,10 +43,23 @@ export default Vue.extend({
   },
   computed: {
     goods () {
-      return auction.state.goods
+      const storedAuction = auction.auctionById()(this.$route.params.id)
+      return storedAuction ? storedAuction.goods : []
     },
     bidders () {
-      return auction.state.bidders
+      const storedAuction = auction.auctionById()(this.$route.params.id)
+      return storedAuction ? storedAuction.bidders : []
+    }
+  },
+  methods: {
+    createAuction() {
+      auction.dispatchCreateAuction({ bidders: [
+        {"id":"B1","value":{"bundleValues":[]}},
+        {"id":"B2","value":{"bundleValues":[]}},
+        {"id":"B3","value":{"bundleValues":[]}}
+    ], goods: [
+      {"id":"item","availability":1,"dummyGood":false}
+      ]})
     }
   }
 })

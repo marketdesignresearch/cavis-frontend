@@ -1,14 +1,14 @@
+import { getStoreBuilder } from 'vuex-typex'
 import Vue from 'vue'
-import Vuex from 'vuex'
-import auction from './modules/auction'
+import Vuex, { Store } from 'vuex'
+
+import { AuctionState } from './modules/auction'
+import './modules/auction'
+
+export interface RootState {
+  auction: AuctionState
+}
 
 Vue.use(Vuex)
-
-export default new Vuex.Store({
-  modules: {
-    auction
-  },
-  state: {},
-  mutations: {},
-  actions: {}
-})
+const store: Store<RootState> = getStoreBuilder<RootState>().vuexStore()
+export default store // <-- "store" to provide to root Vue
