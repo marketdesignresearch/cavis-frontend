@@ -3,7 +3,9 @@ import { getStoreBuilder, BareActionContext } from 'vuex-typex'
 import { RootState } from '..'
 
 export interface AuctionState {
-  auctions: ApiAuction[]
+  auctions: {
+    [key: string]: ApiAuction
+  }
 }
 
 export enum ApiAuctionType {
@@ -19,9 +21,7 @@ export interface ApiAuction {
 
 export interface ApiBidder {
   id: string
-  value: {
-    bundleValues: []
-  }
+  bids: ApiBid[]
 }
 
 export interface ApiGood {
@@ -30,14 +30,45 @@ export interface ApiGood {
   dummyGood: boolean
 }
 
-const moduleBuilder = getStoreBuilder<RootState>().module<AuctionState>('auction', { auctions: [] })
+export interface ApiBid {
+  amount: number
+  bundle: {
+    [x: string]: number
+  }
+}
+
+const moduleBuilder = getStoreBuilder<RootState>().module<AuctionState>('auction', { auctions: {} })
 
 // getters
-const auctionById = moduleBuilder.read(state => (id: string) => state.auctions.find(obj => obj.id === id), 'getAuctionById')
+const auctionById = moduleBuilder.read(state => (auctionId: string) => state.auctions[auctionId], 'getAuctionById')
+const hasBidBeenPlaced = moduleBuilder.read(
+  state => (auctionId: string, bidderId: string) => {
+    if (!state.auctions[auctionId]) {
+      return false
+    }
+
+    const bidder = state.auctions[auctionId].bidders.find(obj => obj.id === bidderId)
+    if (bidder) {
+      return bidder.bids.length > 0
+    }
+    return false
+  },
+  'hasBidBeenPlaced'
+)
 
 // mutations
 function appendAuctionMutation(state: AuctionState, payload: { auction: ApiAuction }) {
-  state.auctions.push(payload.auction)
+  if (payload.auction.id) {
+    state.auctions[payload.auction.id] = payload.auction
+  }
+}
+
+function updateBid(state: AuctionState, payload: { auctionId: string; bidderId: string; bid: ApiBid }) {
+  const existingBidder: ApiBidder | undefined = state.auctions[payload.auctionId].bidders.find(obj => obj.id === payload.bidderId)
+
+  if (existingBidder) {
+    existingBidder.bids = [payload.bid]
+  }
 }
 
 // actions
@@ -46,6 +77,20 @@ async function createAuction(context: BareActionContext<AuctionState, RootState>
   const { data } = await api().post('/auctions/', auction)
   createdAuction.id = data
   auction.commitAppendAuction({ auction: createdAuction })
+}
+
+async function placeBids(
+  context: BareActionContext<AuctionState, RootState>,
+  payload: { bidderId: string; auctionId: string; bid: number }
+) {
+  const bidders = context.state.auctions[payload.auctionId].bidders
+  const bids: any = {}
+
+  bidders.forEach(bidder => {
+    bids[bidder.id] = bidder.bids
+  })
+
+  const { data } = await api().put(`/auctions/${payload.auctionId}/bids`, bids)
 }
 
 const stateGetter = moduleBuilder.state()
@@ -61,11 +106,17 @@ const auction = {
     return auctionById
   },
 
+  get hasBidBeenPlaced() {
+    return hasBidBeenPlaced
+  },
+
   // mutations
   commitAppendAuction: moduleBuilder.commit(appendAuctionMutation),
+  commitUpdateBidder: moduleBuilder.commit(updateBid),
 
   // actions
-  dispatchCreateAuction: moduleBuilder.dispatch(createAuction)
+  dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
+  dispatchPlaceBid: moduleBuilder.dispatch(placeBids)
 }
 
 export default auction

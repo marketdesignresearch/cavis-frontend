@@ -17,6 +17,16 @@ export default new Router({
       component: Home
     },
     {
+      path: '/auction/result/:id',
+      name: 'auction-result',
+      component: () => import(/* webpackChunkName: "auction-setup" */ './views/AuctionResult.vue')
+    },
+    {
+      path: '/auction/setup',
+      name: 'auction-setup',
+      component: () => import(/* webpackChunkName: "auction-setup" */ './views/AuctionSetup.vue')
+    },
+    {
       path: '/auction/:id',
       name: 'auction',
       component: () => import(/* webpackChunkName: "auction" */ './views/Auction.vue')

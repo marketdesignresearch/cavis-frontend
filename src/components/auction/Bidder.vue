@@ -1,15 +1,20 @@
 <template>
   <div>
-    {{ bidder.name }}
+    {{ bidder.id }}
+    <AuctionBid :bidderId="bidder.id" :auctionId="auctionId" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import AuctionBid from './Bid.vue'
 
 export default Vue.extend({
+  components: {
+    AuctionBid: AuctionBid
+  },
   name: 'AuctionBidder',
-  props: ['bidder']
+  props: ['bidder', 'auctionId']
 });
 </script>
 
