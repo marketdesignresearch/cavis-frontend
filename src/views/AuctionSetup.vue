@@ -2,18 +2,22 @@
   <div class="container">
     <h1>Setup an Auction</h1>
     <AuctionSetup @createAuction="createAuction" />
+
+    <AuctionProgress stage="setup" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
+import AuctionProgress from '@/components/auction/Progress.vue'
 import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiAuctionCreateDTO } from '../store/modules/auction'
 
 export default Vue.extend({
   name: 'AuctionSetupView',
   components: {
-    'AuctionSetup': AuctionSetup
+    'AuctionSetup': AuctionSetup,
+    'AuctionProgress': AuctionProgress
   },
   methods: {
     auctionCreated() {
@@ -35,7 +39,7 @@ export default Vue.extend({
       }
 
       for (let i = 0; i < model.numberOfGoods; i++) {
-        auctionObj.setting.goods.push({ id: `Good#${i+1}`, availability: 1, dummyGood: false })
+        auctionObj.setting.goods.push({ id: `Good#${i+1}`, availability: 1, dummyGood: false, isSelected: false })
       }
 
       const { uuid } = await await auction.dispatchCreateAuction({ auctionCreateDTO: auctionObj })

@@ -1,7 +1,7 @@
 <template>
   <div>
     {{ bidder.id }}
-    <AuctionBid :bidderId="bidder.id" :auctionId="auctionId" />
+    <AuctionBid :bidderId="bidder.id" :auctionId="auctionId" :selectedGoods="selectedGoods" />
   </div>
 </template>
 
@@ -14,7 +14,7 @@ export default Vue.extend({
     AuctionBid: AuctionBid
   },
   name: 'AuctionBidder',
-  props: ['bidder', 'auctionId']
+  props: ['bidder', 'auctionId', 'selectedGoods']
 });
 </script>
 

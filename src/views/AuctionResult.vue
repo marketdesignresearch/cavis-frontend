@@ -1,6 +1,6 @@
 
 <template>
-  <div class="container">
+  <div class="container" v-if="allocation">
     <div class="row">
       <div class="col">
       <h1>Result of Auction</h1>
@@ -34,15 +34,21 @@
       </table>
     </div>
     </div>
+
+    <AuctionProgress stage="result" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction } from '../store/modules/auction'
+import AuctionProgress from '@/components/auction/Progress.vue'
 
 export default Vue.extend({
   name: 'AuctionResultView',
+  components: {
+    'AuctionProgress': AuctionProgress
+  },
   computed: {
     allocation () {
       return auction.auctionById()(this.$route.params.id).allocation

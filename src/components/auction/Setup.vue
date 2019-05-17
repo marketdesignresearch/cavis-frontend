@@ -33,8 +33,8 @@ export default Vue.extend({
               default: 'SINGLE_ITEM_FIRST_PRICE',
               values: [
                 { name: 'Single-Item First Price Auction', id: 'SINGLE_ITEM_FIRST_PRICE' },
-                { name: 'Single-Item Second Price Auction', id: 'SINGLE_ITEM_SECOND_PRICE' }
-                // { name: 'VCG Auction', id: 'VCG_XOR' }
+                { name: 'Single-Item Second Price Auction', id: 'SINGLE_ITEM_SECOND_PRICE' },
+                { name: 'VCG Auction', id: 'VCG_XOR' }
               ],
               validator: VueFormGenerator.validators.required
             },
@@ -54,9 +54,16 @@ export default Vue.extend({
               label: '# of Goods',
               model: 'numberOfGoods',
               default: 1,
-              disabled: true,
+              disabled: (model: any): boolean => {
+                return model.mechanismType !== 'VCG_XOR'
+              },
               min: 0,
-              max: 1,
+              max: (model: any): number => {
+                if (model.mechanismType !== 'VCG_XOR') {
+                  return 50
+                }
+                return 1
+              },
               validator: [VueFormGenerator.validators.required]
             },
             {
@@ -71,11 +78,14 @@ export default Vue.extend({
             },
             {
               type: 'submit',
-              classBtn: 'btn-primary',
+              attributes: {
+                input: {
+                  class: 'btn btn-primary'
+                }
+              },
               buttonText: 'Create Auction',
               validateBeforeSubmit: true,
               onSubmit: () => {
-                console.log(this.$data.model)
                 this.$emit('createAuction', Object.assign({}, this.$data.model))
               }
             }

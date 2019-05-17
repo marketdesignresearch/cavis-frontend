@@ -1,8 +1,16 @@
 <template>
-  <div class="input-group mb-3">
-    <input v-model="bid" type="number" class="form-control" placeholder="Enter your bid" :disabled="bidPlaced">
-    <div class="input-group-append">
-      <button class="btn btn-outline-secondary" @click="placeBid" type="button">Bid</button>
+  <div>
+    <div class="input-group mb-3">
+      <input v-model="bid" type="number" class="form-control" placeholder="Enter your bid">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" @click="placeBid" type="button" :disabled="selectedGoods.length === 0">Bid</button>
+      </div>
+    </div>
+    <div v-for="bid in bids">
+      Bids {{ bid.amount }} for 
+      <ul>
+        <li v-for="(item, key) in bid.bundle">{{ key }}</li>
+      </ul>
     </div>
   </div>
 </template>
@@ -13,12 +21,16 @@ import { Input, Button } from 'element-ui'
 import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../store/modules/auction'
 
 export default Vue.extend({
-    props: ['auctionId', 'bidderId'],
+    props: ['auctionId', 'bidderId', 'selectedGoods'],
     components: {
         'el-input': Input,
         'el-button': Button
     },
     computed: {
+      bids (): any[] {
+        const bids = auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidderId && obj.bids)
+        return bids && bids.length > 0 ? bids[0].bids : []
+      },
       bidPlaced (): boolean {
         return auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidderId && obj.bids && obj.bids.length > 0).length > 0
       }
@@ -30,14 +42,16 @@ export default Vue.extend({
     },
     methods: {
       placeBid() {
-        console.log('place bid')
-
         const bid: ApiBid = { 
           amount: this.$data.bid,
-          bundle: {
-            'Good#1': 1
-          }
+          bundle: { }
         }
+
+        this.$props.selectedGoods.forEach((good: string) => {
+          bid.bundle[good] = 1
+        })
+
+        console.log('Placing Bid:', bid)
 
         auction.commitUpdateBidder({ auctionId: this.$props.auctionId, bidderId: this.$props.bidderId, bid: bid })
       }

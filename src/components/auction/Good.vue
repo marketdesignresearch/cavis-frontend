@@ -1,14 +1,5 @@
 <template>
-  <el-popover
-    placement="top-start"
-    title="Title"
-    width="200"
-    trigger="hover"
-    :content="good">
-    <div class="item" slot="reference">
-      
-    </div>
-  </el-popover>
+    <div class="item shadow-sm" :class="{ 'selected': isSelected }"></div>
 </template>
 
 <script lang="ts">
@@ -25,7 +16,7 @@ const AuctionGoodComponent = Vue.extend({
   components: {
     'el-popover': Popover
   },
-  props: ['good']
+  props: ['good', 'isSelected']
 });
 
 export default AuctionGoodComponent
@@ -34,9 +25,14 @@ export { AuctionGoodComponent }
 
 <style scoped lang="scss">
 .item {
-  background: black;
-  width: 10px;
-  height: 10px;
+  &.selected {
+    background: black;
+  }
+  cursor: pointer;
+  background: white;
+  border: 1px solid #33333350;
+  width: 20px;
+  height: 20px;
   margin: 5px;
   display: inline-flex;
 }

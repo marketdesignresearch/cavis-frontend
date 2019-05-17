@@ -43,6 +43,7 @@ export interface ApiGood {
   id: string
   availability: number
   dummyGood: boolean
+  isSelected: boolean
 }
 
 export interface ApiBid {
@@ -73,13 +74,22 @@ function updateBid(state: AuctionState, payload: { auctionId: string; bidderId: 
     obj => obj.id === payload.bidderId
   )
 
-  if (existingBidder) {
+  if (existingBidder && !existingBidder.bids) {
     Vue.set(existingBidder, 'bids', [payload.bid])
+  } else if (existingBidder) {
+    existingBidder.bids.push(payload.bid)
   }
 }
 
 function addAllocation(state: AuctionState, payload: { auctionId: string; allocation: ApiAuctionAllocation }) {
   Vue.set(state.auctions[payload.auctionId], 'allocation', { ...payload.allocation })
+}
+
+function toggleGoodSelection(state: AuctionState, payload: { auctionId: string; goodId: string }) {
+  const good = state.auctions[payload.auctionId].auction.domain.goods.find(obj => obj.id === payload.goodId)
+  if (good) {
+    good.isSelected = !good.isSelected
+  }
 }
 
 // actions
@@ -132,6 +142,7 @@ const auction = {
   commitAppendAuction: moduleBuilder.commit(appendAuctionMutation),
   commitUpdateBidder: moduleBuilder.commit(updateBid),
   commitAddAllocation: moduleBuilder.commit(addAllocation),
+  commitToggleGoodSelection: moduleBuilder.commit(toggleGoodSelection),
 
   // actions
   dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
