@@ -8,7 +8,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiAuctionCreateDTO } from '../store/modules/auction'
 
 export default Vue.extend({
   name: 'AuctionSetupView',
@@ -19,38 +19,28 @@ export default Vue.extend({
     auctionCreated() {
 
     },
-    createAuction(model: any) {
-      /*
-      auction.dispatchCreateAuction({ bidders: [
-        {"id":"B1","value":{"bundleValues":[]}},
-        {"id":"B2","value":{"bundleValues":[]}},
-        {"id":"B3","value":{"bundleValues":[]}}
-      ], goods: [
-      {"id":"item","availability":1,"dummyGood":false}
-      ]})
-      */
-
+    async createAuction(model: any) {
       // mock creation using store
-      const auctionObj: ApiAuction = {
-        bidders: [], 
-        goods: [],
-        id: '1',
-        type: ApiAuctionType.SINGLE_ITEM_SECOND_PRICE
+      const auctionObj: ApiAuctionCreateDTO = {
+        setting: {
+          type: 'simple',
+          bidders: [], 
+          goods: [],
+        },
+        type: model.mechanismType
       }
 
-      console.log(model)
-
       for (let i = 0; i < model.numberOfBidders; i++) {
-        auctionObj.bidders.push({ id: `Bidder ${i}`, bids: [] })
+        auctionObj.setting.bidders.push({ id: `Bidder#${i+1}`, bids: [] })
       }
 
       for (let i = 0; i < model.numberOfGoods; i++) {
-        auctionObj.goods.push({ id: `Good ${i}`, availability: 1, dummyGood: false })
+        auctionObj.setting.goods.push({ id: `Good#${i+1}`, availability: 1, dummyGood: false })
       }
 
-      auction.commitAppendAuction({ auction: auctionObj })
+      const { uuid } = await await auction.dispatchCreateAuction({ auctionCreateDTO: auctionObj })
 
-      this.$router.push({ name: 'auction', params: { id: '1' } })
+      this.$router.push({ name: 'auction', params: { id: uuid } })
     }
   },
 })

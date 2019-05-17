@@ -39,7 +39,8 @@
     </div>
 
     <div class="auction-control">
-      <button class="btn btn-primary" @click="allocate">Allocate</button>
+      <button class="btn btn-primary" @click="placeBids" :disabled="bidsPlaced">Place Bids</button>
+      <button class="btn btn-primary" @click="allocate">Result</button>
     </div>
 
     <div class="auction-steps">
@@ -70,28 +71,36 @@ export default Vue.extend({
     'el-steps': Steps,
     'el-step': Step
   },
+  data () {
+    return {
+      bidsPlaced: false
+    }
+  },
   methods: {
+    placeBids() {
+      auction.dispatchPlaceBids({ auctionId: this.$route.params.id })
+      this.$data.bidsPlaced = true
+    },
     allocate() {
-
-      this.$router.push({ name: 'auction-result', params: { id: '1' } })
+      this.$router.push({ name: 'auction-result', params: { id: this.$route.params.id } })
     }
   },
   computed: {
     leftSideBidders () {
-      const storedAuction = auction.auctionById()(this.$route.params.id)
-      return (storedAuction ? storedAuction.bidders : []).slice(0, storedAuction.bidders.length / 2 + 1)
+      const bidders = auction.biddersById()(this.$route.params.id)
+      return bidders.slice(0, bidders.length / 2 + 1)
     },
     rightSideBidders () {
-      const storedAuction = auction.auctionById()(this.$route.params.id)
-      return (storedAuction ? storedAuction.bidders : []).slice(storedAuction.bidders.length / 2 + 1, storedAuction.bidders.length)
+      const bidders = auction.biddersById()(this.$route.params.id)
+      return bidders.slice(bidders.length / 2 + 1, bidders.length)
     },
     goods () {
-      const storedAuction = auction.auctionById()(this.$route.params.id)
-      return storedAuction ? storedAuction.goods : []
+      const goods = auction.goodsById()(this.$route.params.id)
+      return goods
     },
     bidders () {
-      const storedAuction = auction.auctionById()(this.$route.params.id)
-      return storedAuction ? storedAuction.bidders : []
+      const bidders = auction.biddersById()(this.$route.params.id)
+      return bidders
     },
     auctionId (): string {
       return this.$route.params.id

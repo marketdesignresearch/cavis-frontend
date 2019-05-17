@@ -4,8 +4,10 @@
     title="Title"
     width="200"
     trigger="hover"
-    content="this is content, this is content, this is content">
-    <div class="item" slot="reference"></div>
+    :content="good">
+    <div class="item" slot="reference">
+      
+    </div>
   </el-popover>
 </template>
 

@@ -34,6 +34,7 @@ export default Vue.extend({
               values: [
                 { name: 'Single-Item First Price Auction', id: 'SINGLE_ITEM_FIRST_PRICE' },
                 { name: 'Single-Item Second Price Auction', id: 'SINGLE_ITEM_SECOND_PRICE' }
+                // { name: 'VCG Auction', id: 'VCG_XOR' }
               ],
               validator: VueFormGenerator.validators.required
             },
@@ -53,6 +54,7 @@ export default Vue.extend({
               label: '# of Goods',
               model: 'numberOfGoods',
               default: 1,
+              disabled: true,
               min: 0,
               max: 1,
               validator: [VueFormGenerator.validators.required]
@@ -69,6 +71,7 @@ export default Vue.extend({
             },
             {
               type: 'submit',
+              classBtn: 'btn-primary',
               buttonText: 'Create Auction',
               validateBeforeSubmit: true,
               onSubmit: () => {

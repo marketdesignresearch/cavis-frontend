@@ -2,7 +2,7 @@
   <div class="input-group mb-3">
     <input v-model="bid" type="number" class="form-control" placeholder="Enter your bid" :disabled="bidPlaced">
     <div class="input-group-append">
-      <button class="btn btn-outline-secondary" @click="placeBid" type="button">Send Bid</button>
+      <button class="btn btn-outline-secondary" @click="placeBid" type="button">Bid</button>
     </div>
   </div>
 </template>
@@ -20,7 +20,7 @@ export default Vue.extend({
     },
     computed: {
       bidPlaced (): boolean {
-        return auction.hasBidBeenPlaced()(this.$props.auctionId, this.$props.bidderId)
+        return auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidderId && obj.bids && obj.bids.length > 0).length > 0
       }
     },
     data () {
@@ -30,10 +30,12 @@ export default Vue.extend({
     },
     methods: {
       placeBid() {
+        console.log('place bid')
+
         const bid: ApiBid = { 
           amount: this.$data.bid,
           bundle: {
-            item: 1
+            'Good#1': 1
           }
         }
 
