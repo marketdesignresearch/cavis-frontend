@@ -1,10 +1,11 @@
 <template>
+<div>
   <div class="container">
     <h1>Setup an Auction</h1>
-    <AuctionSetup @createAuction="createAuction" />
-
-    <AuctionProgress stage="setup" />
+    <AuctionSetup class="content" @createAuction="createAuction" />
   </div>
+  <AuctionProgress stage="setup" />
+</div>
 </template>
 
 <script lang="ts">
@@ -26,20 +27,20 @@ export default Vue.extend({
     async createAuction(model: any) {
       // mock creation using store
       const auctionObj: ApiAuctionCreateDTO = {
-        setting: {
+        domain: {
           type: 'simple',
           bidders: [], 
           goods: [],
         },
-        type: model.mechanismType
+        mechanismType: model.mechanismType
       }
 
       for (let i = 0; i < model.numberOfBidders; i++) {
-        auctionObj.setting.bidders.push({ id: `Bidder#${i+1}`, bids: [] })
+        auctionObj.domain.bidders.push({ id: `Bidder#${i+1}`, bids: [] })
       }
 
       for (let i = 0; i < model.numberOfGoods; i++) {
-        auctionObj.setting.goods.push({ id: `Good#${i+1}`, availability: 1, dummyGood: false, isSelected: false })
+        auctionObj.domain.goods.push({ id: `Good#${i+1}`, availability: 1, dummyGood: false, isSelected: false })
       }
 
       const { uuid } = await await auction.dispatchCreateAuction({ auctionCreateDTO: auctionObj })
@@ -51,4 +52,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
+.content {
+  display: flex;
+  min-height: 80vh;
+  flex-direction: column;
+}
 </style>

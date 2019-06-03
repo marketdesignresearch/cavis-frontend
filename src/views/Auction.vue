@@ -1,49 +1,56 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col">
-        <h1>Auction View</h1>
-      </div>
-    </div>
+  <div>
+    <div class="container">
+      <div class="row d-flex content">
+        <div class="col">
+          <div class="d-flex pt-4">
+            <div class="flex-column">
+              <AuctionBidder 
+                class="align-self-start"
+                v-for="(bidder, index) in leftSideBidders" 
+                :key="'b' + index" 
+                :selectedGoods="selectedGoods"
+                :auctionId="auctionId"
+                :bidder="bidder" />
+            </div>
 
-    <div class="row">
-      <div class="col">
-        <div class="d-flex pt-4">
-          <div class="flex-column">
-            <AuctionBidder 
-              class="align-self-start"
-              v-for="(bidder, index) in leftSideBidders" 
-              :key="'b' + index" 
-              :selectedGoods="selectedGoods"
-              :auctionId="auctionId"
-              :bidder="bidder" />
-          </div>
+            <div class="flex-row text-center flex-grow-1 mx-2">
+              <span v-for="(good, index) in goods" :key="'i' + index" @click="selectGood(good)">
+                <AuctionGood
+                  class="align-self-center d-inline-flex"
+                  :isSelected="selectedGoods.indexOf(good.id) !== -1"
+                  :good="good" />
+              </span>
+            </div>
 
-          <div class="flex-row text-center flex-grow-1">
-            <span v-for="(good, index) in goods" :key="'i' + index" @click="selectGood(good)">
-              <AuctionGood
-                class="align-self-center"
-                :isSelected="selectedGoods.indexOf(good.id) !== -1"
-                :good="good" />
-            </span>
-          </div>
-
-          <div class="flex-column">
-            <AuctionBidder 
-              class="align-self-start"
-              v-for="(bidder, index) in rightSideBidders" 
-              :key="'b' + index" 
-              :selectedGoods="selectedGoods"
-              :auctionId="auctionId"
-              :bidder="bidder" />
+            <div class="flex-column">
+              <AuctionBidder 
+                class="align-self-start"
+                v-for="(bidder, index) in rightSideBidders" 
+                :key="'b' + index" 
+                :selectedGoods="selectedGoods"
+                :auctionId="auctionId"
+                :bidder="bidder" />
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="auction-control">
-      <button class="btn btn-primary" @click="placeBids" :disabled="bidsPlaced">Place Bids</button>
-      <button class="btn btn-primary" @click="allocate">Result</button>
+      <div class="auction-control mb-4">
+        Rounds:
+        <nav v-if="rounds" class="d-inline-flex">
+          <ul class="pagination pagination-sm">
+            <li class="page-item" v-for="round in rounds" :key="round"><a class="page-link" href="#"> {{ round }}</a></li>
+          </ul>
+        </nav>
+
+  
+        <div class="float-right text-right">
+          <button class="btn btn-primary mx-2" @click="placeBids" :disabled="bidsPlaced">Place Bids</button>
+          <button class="btn btn-primary" @click="allocate">Result</button>
+        </div>
+      </div>
+
     </div>
 
     <AuctionProgress stage="auction" />
@@ -54,17 +61,15 @@
 import Vue from 'vue'
 import { AuctionGoodComponent, IAuctionGood } from '@/components/auction/Good.vue'
 import AuctionBidder from '@/components/auction/Bidder.vue'
-import AuctionBid from '@/components/auction/Bid.vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import AuctionProgress from '@/components/auction/Progress.vue'
-import auction, { ApiAuctionType, ApiGood } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiGood, ApiAuction } from '../store/modules/auction'
 
 export default Vue.extend({
   name: 'AuctionTable',
   components: {
     'AuctionGood': AuctionGoodComponent,
     'AuctionBidder': AuctionBidder,
-    'AuctionBid': AuctionBid,
     'AuctionSetup': AuctionSetup,
     'AuctionProgress': AuctionProgress
   },
@@ -73,6 +78,9 @@ export default Vue.extend({
       bidsPlaced: false,
       selectedGoods: []
     }
+  },
+  mounted () {
+    auction.dispatchGetAuction({ auctionId: this.$route.params.id })
   },
   methods: {
     selectGood(good: ApiGood) {
@@ -91,6 +99,9 @@ export default Vue.extend({
     }
   },
   computed: {
+    rounds (): number[] {
+      return Array.from({ length: auction.auctionById()(this.$route.params.id).auction.rounds + 1 }, (v, k) => k)
+    },
     leftSideBidders () {
       const bidders = auction.biddersById()(this.$route.params.id)
       return bidders.slice(0, bidders.length / 2 + 1)
@@ -107,6 +118,9 @@ export default Vue.extend({
       const bidders = auction.biddersById()(this.$route.params.id)
       return bidders
     },
+    auctionStats (): ApiAuction {
+      return auction.auctionById()(this.$route.params.id)
+    },
     auctionId (): string {
       return this.$route.params.id
     }
@@ -115,5 +129,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-
+.content {
+  display: flex;
+  min-height: 70vh;
+  flex-direction: column;
+}
 </style>

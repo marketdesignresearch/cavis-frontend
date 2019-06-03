@@ -10,27 +10,35 @@ export interface AuctionState {
 }
 
 export enum ApiAuctionType {
-  SINGLE_ITEM_SECOND_PRICE
+  SINGLE_ITEM_SECOND_PRICE = 'SINGLE_ITEM_SECOND_PRICE',
+  SINGLE_ITEM_FIRST_PRICE = 'SINGLE_ITEM_FIRST_PRICE',
+  VCG_XOR = 'VCG_XOR'
 }
 
 export interface ApiAuctionCreateDTO {
-  setting: {
+  domain: {
     type: string
     bidders: ApiBidder[]
     goods: ApiGood[]
   }
-  type: ApiAuctionType
+  mechanismType: ApiAuctionType
 }
 
 export interface ApiAuction {
   uuid?: string
   auction: {
+    mechanismType: ApiAuctionType
     domain: {
       bidders: ApiBidder[]
       goods: ApiGood[]
     }
+    latestBids?: {
+      bids: {
+        bundleBids: ApiBid[]
+      }
+    }
+    rounds: number
   }
-  type: ApiAuctionType
   allocation?: ApiAuctionAllocation
 }
 
@@ -58,9 +66,16 @@ export interface ApiAuctionAllocation {}
 const moduleBuilder = getStoreBuilder<RootState>().module<AuctionState>('auction', { auctions: {} })
 
 // getters
-const auctionById = moduleBuilder.read(state => (auctionId: string) => state.auctions[auctionId], 'getAuctionById')
-const biddersById = moduleBuilder.read(state => (auctionId: string) => state.auctions[auctionId].auction.domain.bidders, 'biddersById')
-const goodsById = moduleBuilder.read(state => (auctionId: string) => state.auctions[auctionId].auction.domain.goods, 'goodsById')
+const auctions = moduleBuilder.read(state => Object.values(state.auctions), 'auctions')
+const auctionById = moduleBuilder.read(state => (auctionId: string) => state.auctions[auctionId], 'auctionById')
+const biddersById = moduleBuilder.read(
+  state => (auctionId: string) => (state.auctions[auctionId] ? state.auctions[auctionId].auction.domain.bidders : []),
+  'biddersById'
+)
+const goodsById = moduleBuilder.read(
+  state => (auctionId: string) => (state.auctions[auctionId] ? state.auctions[auctionId].auction.domain.goods : []),
+  'goodsById'
+)
 
 // mutations
 function appendAuctionMutation(state: AuctionState, payload: { auction: ApiAuction }) {
@@ -93,6 +108,16 @@ function toggleGoodSelection(state: AuctionState, payload: { auctionId: string; 
 }
 
 // actions
+async function getAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+  const { data } = await api().get(`/auctions/${payload.auctionId}`)
+  auction.commitAppendAuction({ auction: data })
+}
+
+async function getAuctions(context: BareActionContext<AuctionState, RootState>) {
+  const { data } = await api().get('/auctions/')
+  data.forEach((auctionInstance: any) => auction.commitAppendAuction({ auction: auctionInstance }))
+}
+
 async function createAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionCreateDTO: ApiAuctionCreateDTO }) {
   const { data } = await api().post('/auctions/', payload.auctionCreateDTO)
   auction.commitAppendAuction({ auction: data })
@@ -108,6 +133,10 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
   })
 
   const { data } = await api().post(`/auctions/${payload.auctionId}/bids`, bids)
+
+  // update auctions after placing bids
+  auction.dispatchGetAuction({ auctionId: payload.auctionId })
+
   return data
 }
 
@@ -126,6 +155,10 @@ const auction = {
   },
 
   // getters
+  get auctions() {
+    return auctions
+  },
+
   get auctionById() {
     return auctionById
   },
@@ -145,6 +178,8 @@ const auction = {
   commitToggleGoodSelection: moduleBuilder.commit(toggleGoodSelection),
 
   // actions
+  dispatchGetAuction: moduleBuilder.dispatch(getAuction),
+  dispatchGetAuctions: moduleBuilder.dispatch(getAuctions),
   dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
   dispatchPlaceBids: moduleBuilder.dispatch(placeBids),
   dispatchAllocateAuction: moduleBuilder.dispatch(allocateAuction)

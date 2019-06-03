@@ -1,11 +1,6 @@
 <template>
-  <div class="card shadow-sm mb-3">
-    <div class="card-body">
-      <h6 class="card-subtitle mb-2 text-muted">{{ bidder.id }}</h6>
-      
-      <component :bidderId="bidder.id" :auctionId="auctionId" :selectedGoods="selectedGoods" :is="bidComponent"></component>
-
-    </div>
+  <div>
+    Hi  
   </div>
 </template>
 
@@ -14,8 +9,8 @@ import Vue from 'vue';
 import auction, { ApiAuctionType } from '../../store/modules/auction'
 
 export default Vue.extend({
-  name: 'AuctionBidder',
-  props: ['bidder', 'auctionId', 'selectedGoods'],
+  name: 'AuctionAuctioneer',
+  props: ['auctionId'],
   computed: {
     bidComponent: function () {
       const mechanismType = auction.auctionById()(this.$props.auctionId).auction.mechanismType

@@ -1,10 +1,12 @@
 <template>
   <div class="auction-steps">
-    <el-steps :active="currentStep" align-center simple>
-      <el-step title="Setup" description="Some description"></el-step>
-      <el-step title="Auction" description="Some description"></el-step>
-      <el-step title="Result" description="Some description"></el-step>
-    </el-steps>
+    <div class="container">
+      <div class="progress">
+        <div class="progress-bar" :class="{ 'bg-light text-dark': currentStep < 0, 'bg-primary': currentStep < 0,'bg-success': currentStep > 0 }" role="progressbar" style="width: 33.333333%">Setup</div>
+        <div class="progress-bar" :class="{ 'bg-light text-dark': currentStep < 1, 'bg-primary': currentStep < 1,'bg-success': currentStep > 1 }" role="progressbar" style="width: 33.333333%">Auction</div>
+        <div class="progress-bar" :class="{ 'bg-light text-dark': currentStep < 2, 'bg-primary': currentStep < 2,'bg-success': currentStep > 2 }" role="progressbar" style="width: 33.333333%">Result</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -37,10 +39,4 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.auction-steps {
-  bottom: 0;
-  right: 0;
-  left: 0;
-  position: absolute;
-}
 </style>

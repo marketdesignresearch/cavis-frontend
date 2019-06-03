@@ -1,5 +1,9 @@
 <template>
-    <div class="item shadow-sm" :class="{ 'selected': isSelected }"></div>
+    <div class="card good d-flex justify-content-center shadow-sm" :class="{ 'selected': isSelected }">
+      <div class="align-self-center">
+      {{ good.id.substr(good.id.length - 1) }}
+      </div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -24,16 +28,20 @@ export { AuctionGoodComponent }
 </script>
 
 <style scoped lang="scss">
-.item {
+@import '../../custom.scss';
+
+.good {
   &.selected {
-    background: black;
+    @extend .bg-primary;
+    @extend .text-white;
   }
+  user-select: none;
+  margin: 0 auto;
   cursor: pointer;
-  background: white;
-  border: 1px solid #33333350;
-  width: 20px;
-  height: 20px;
+  width: 50px;
+  height: 50px;
   margin: 5px;
   display: inline-flex;
+
 }
 </style>

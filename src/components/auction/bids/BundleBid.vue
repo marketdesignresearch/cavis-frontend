@@ -1,15 +1,15 @@
 <template>
   <div>
     <div class="input-group mb-3">
-      <input v-model="bid" type="number" class="form-control" placeholder="Enter your bid">
-      <div class="input-group-append">
-        <button class="btn btn-outline-secondary" @click="placeBid" type="button" :disabled="selectedGoods.length === 0">Bid</button>
-      </div>
+      <input :disabled="selectedGoods.length === 0" v-model="bid" type="number" class="form-control" placeholder="Enter your bid">
     </div>
-    <div v-for="bid in bids">
+
+    <a href="#" @click="placeBid" class="card-link float-right">Bid</a>
+
+    <div v-for="bid in bids" :key="bid.id">
       Bids {{ bid.amount }} for 
       <ul>
-        <li v-for="(item, key) in bid.bundle">{{ key }}</li>
+        <li v-for="(item, key) in bid.bundle" :key="key">{{ key }}</li>
       </ul>
     </div>
   </div>
@@ -18,7 +18,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Input, Button } from 'element-ui'
-import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../../store/modules/auction'
 
 export default Vue.extend({
     props: ['auctionId', 'bidderId', 'selectedGoods'],
@@ -42,6 +42,10 @@ export default Vue.extend({
     },
     methods: {
       placeBid() {
+        if (this.$props.selectedGoods.length === 0) {
+          return
+        }
+        
         const bid: ApiBid = { 
           amount: this.$data.bid,
           bundle: { }
@@ -56,7 +60,7 @@ export default Vue.extend({
         auction.commitUpdateBidder({ auctionId: this.$props.auctionId, bidderId: this.$props.bidderId, bid: bid })
       }
     },
-    name: 'AuctionBid'
+    name: 'SingleItemAuctionBid'
 })
 </script>
 
