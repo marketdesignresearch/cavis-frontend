@@ -46,7 +46,8 @@ export default Vue.extend({
           return
         }
         
-        const bid: ApiBid = { 
+        // todo: fixme
+        const bid: any = { 
           amount: this.$data.bid,
           bundle: { }
         }

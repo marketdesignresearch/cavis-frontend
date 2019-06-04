@@ -16,7 +16,7 @@
         <tr v-for="auction in auctions" :key="auction.uuid">
           <td>{{ auction.uuid }}</td>
           <td>{{ auction.auction.domain.bidders.length }}</td>
-          <td>{{ auction.auction.rounds }}</td>
+          <td>{{ auction.auction.rounds.length }}</td>
           <td>{{ auction.auction.mechanismType }}</td>
           <td>
             <router-link tag="button" :to="{ name: 'auction', params: { id: auction.uuid } }" class="btn btn-sm btn-primary">Load</router-link>

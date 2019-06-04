@@ -33,6 +33,29 @@
             </tr>
           </tbody>
         </table>
+
+        <h2>Bids</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Bidder</th>
+              <th scope="col">Value</th>
+              <th scope="col">Payment</th>
+              <th scope="col">Goods</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="round in auction.auction.rounds" :key="round.id">
+              <th scope="row">{{ round.roundNumber }}</th>
+              <td>
+                <div v-for="bid in round.bids" :key="bid.id">
+                  "{{ bid.bidderId }}" bid {{ bid.amount }} for <span v-for="(good, index) in bid.bundle" :key="index">{{ good.amount }}x {{ good.good }}</span>   
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       </div>
 
@@ -54,6 +77,9 @@ export default Vue.extend({
   computed: {
     allocation(): ApiAuctionAllocation | undefined {
       return auction.auctionById()(this.$route.params.id).allocation
+    },
+    auction(): ApiAuction {
+      return auction.auctionById()(this.$route.params.id)
     },
     auctionId(): string {
       return this.$route.params.id

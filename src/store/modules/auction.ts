@@ -37,9 +37,14 @@ export interface ApiAuction {
         bundleBids: ApiBid[]
       }
     }
-    rounds: number
+    rounds: ApiRound[]
   }
   allocation?: ApiAuctionAllocation
+}
+
+export interface ApiRound {
+  roundNumber: number
+  bids: ApiBid[]
 }
 
 export interface ApiBidder {
@@ -56,9 +61,11 @@ export interface ApiGood {
 
 export interface ApiBid {
   amount: number
+  bidderId?: string
   bundle: {
-    [x: string]: number
-  }
+    good: string
+    amount: number
+  }[]
 }
 
 export interface ApiAuctionAllocation {}
@@ -75,6 +82,15 @@ const biddersById = moduleBuilder.read(
 const goodsById = moduleBuilder.read(
   state => (auctionId: string) => (state.auctions[auctionId] ? state.auctions[auctionId].auction.domain.goods : []),
   'goodsById'
+)
+
+const bidsByBidderId = moduleBuilder.read(
+  state => (auctionId: string, bidderId: string, round: number) => {
+    return state.auctions[auctionId] && state.auctions[auctionId].auction.rounds.length > round
+      ? state.auctions[auctionId].auction.rounds[round].bids.filter(bid => bid.bidderId === bidderId)
+      : []
+  },
+  'bidsByBidderId'
 )
 
 // mutations
@@ -146,6 +162,11 @@ async function allocateAuction(context: BareActionContext<AuctionState, RootStat
   return data
 }
 
+async function resetAuctionToRound(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string; round: number }) {
+  const { data } = await api().put(`/auctions/${payload.auctionId}/reset`, { round: payload.round })
+  auction.commitAppendAuction({ auction: data })
+}
+
 const stateGetter = moduleBuilder.state()
 
 const auction = {
@@ -167,6 +188,10 @@ const auction = {
     return biddersById
   },
 
+  get bidsByBidderId() {
+    return bidsByBidderId
+  },
+
   get goodsById() {
     return goodsById
   },
@@ -182,7 +207,8 @@ const auction = {
   dispatchGetAuctions: moduleBuilder.dispatch(getAuctions),
   dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
   dispatchPlaceBids: moduleBuilder.dispatch(placeBids),
-  dispatchAllocateAuction: moduleBuilder.dispatch(allocateAuction)
+  dispatchAllocateAuction: moduleBuilder.dispatch(allocateAuction),
+  dispatchResetAuctionToRound: moduleBuilder.dispatch(resetAuctionToRound)
 }
 
 export default auction

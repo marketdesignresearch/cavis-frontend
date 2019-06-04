@@ -1,5 +1,9 @@
 # caviz-frontend
 
+## Configuration
+Enviroment variable to configure Api: `VUE_APP_API_URL`
+Simply set this during the build process (docker-build for example) and thats it.
+
 ## Project setup
 ```
 npm install

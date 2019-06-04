@@ -4,7 +4,7 @@
       <input :disabled="selectedGoods.length === 0" v-model="bid" type="number" class="form-control" placeholder="Enter your bid">
     </div>
 
-    <a href="#" @click="placeBid" class="card-link float-right">Bid</a>
+    <a href="#" @click="placeBid" class="btn btn-primary btn-sm card-link float-right">Bid</a>
 
     <div v-for="bid in bids" :key="bid.id">
       Bids {{ bid.amount }} for 
@@ -46,9 +46,10 @@ export default Vue.extend({
           return
         }
         
-        const bid: ApiBid = { 
+        // todo: fixme
+        const bid: any = { 
           amount: this.$data.bid,
-          bundle: { }
+          bundle: {}
         }
 
         this.$props.selectedGoods.forEach((good: string) => {

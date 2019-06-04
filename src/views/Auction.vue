@@ -40,11 +40,10 @@
         Rounds:
         <nav v-if="rounds" class="d-inline-flex">
           <ul class="pagination pagination-sm">
-            <li class="page-item" v-for="round in rounds" :key="round"><a class="page-link" href="#"> {{ round }}</a></li>
+            <li class="page-item" v-for="round in rounds" :key="round"><a class="page-link" href="#" @click="resetRound(round)"> {{ round }}</a></li>
           </ul>
         </nav>
 
-  
         <div class="float-right text-right">
           <button class="btn btn-primary mx-2" @click="placeBids" :disabled="bidsPlaced">Place Bids</button>
           <button class="btn btn-primary" @click="allocate">Result</button>
@@ -83,6 +82,9 @@ export default Vue.extend({
     auction.dispatchGetAuction({ auctionId: this.$route.params.id })
   },
   methods: {
+    resetRound(round: number) {
+      auction.dispatchResetAuctionToRound({ auctionId: this.$route.params.id, round: round })
+    },
     selectGood(good: ApiGood) {
       if (this.$data.selectedGoods.indexOf(good.id) === -1) {
         this.$data.selectedGoods.push(good.id)
@@ -100,7 +102,7 @@ export default Vue.extend({
   },
   computed: {
     rounds (): number[] {
-      return Array.from({ length: auction.auctionById()(this.$route.params.id).auction.rounds + 1 }, (v, k) => k)
+      return Array.from({ length: auction.auctionById()(this.$route.params.id).auction.rounds.length + 1 }, (v, k) => k)
     },
     leftSideBidders () {
       const bidders = auction.biddersById()(this.$route.params.id)
