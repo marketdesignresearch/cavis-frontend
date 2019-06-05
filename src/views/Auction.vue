@@ -1,6 +1,11 @@
 <template>
   <div>
     <div class="container">
+      <div class="row">
+        <div class="col">
+          <Auctioneer :auctionId="auctionId" />
+        </div>
+      </div>
       <div class="row d-flex content">
         <div class="col">
           <div class="d-flex pt-4">
@@ -40,7 +45,10 @@
         Rounds:
         <nav v-if="rounds" class="d-inline-flex">
           <ul class="pagination pagination-sm">
-            <li class="page-item" v-for="round in rounds" :key="round"><a class="page-link" href="#" @click="resetRound(round)"> {{ round }}</a></li>
+            <li class="page-item" v-for="round in rounds" :key="round" :class="{ 'active': round == rounds.length - 1 }">
+              <a class="page-link" href="#" @click="resetRound(round)" v-if="round < rounds.length - 1"> {{ round }}</a>
+              <span class="page-link active" v-if="round >= rounds.length - 1"> {{ round }}</span>
+            </li>
           </ul>
         </nav>
 
@@ -62,6 +70,7 @@ import { AuctionGoodComponent, IAuctionGood } from '@/components/auction/Good.vu
 import AuctionBidder from '@/components/auction/Bidder.vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import AuctionProgress from '@/components/auction/Progress.vue'
+import Auctioneer from '@/components/auction/Auctioneer.vue'
 import auction, { ApiAuctionType, ApiGood, ApiAuction } from '../store/modules/auction'
 
 export default Vue.extend({
@@ -70,7 +79,8 @@ export default Vue.extend({
     'AuctionGood': AuctionGoodComponent,
     'AuctionBidder': AuctionBidder,
     'AuctionSetup': AuctionSetup,
-    'AuctionProgress': AuctionProgress
+    'AuctionProgress': AuctionProgress,
+    'Auctioneer': Auctioneer
   },
   data () {
     return {

@@ -5,6 +5,7 @@
       
       <component :bidderId="bidder.id" :auctionId="auctionId" :selectedGoods="selectedGoods" :is="bidComponent"></component>
 
+      <!--
       <div v-if="bids.length > 0">
         <button class="btn btn-sm btn-secondary" :id="'history-popover' + bidder.id">Bid History</button>
         <b-popover :target="'history-popover' + bidder.id" triggers="hover focus">
@@ -17,6 +18,7 @@
           </div>
         </b-popover>
       </div>
+      -->
 
     </div>
   </div>

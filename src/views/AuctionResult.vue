@@ -9,24 +9,22 @@
         <p>Total Payments: {{ allocation.payments.totalPayments }}</p>
 
         <h2>Allocation</h2>
-        <table class="table">
+        <table class="table table-striped">
           <thead>
             <tr>
-              <th scope="col">#</th>
               <th scope="col">Bidder</th>
-              <th scope="col">Value</th>
+              <th scope="col">Bid</th>
               <th scope="col">Payment</th>
               <th scope="col">Goods</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(value, key) in allocation.allocation" :key="key">
-              <th scope="row">1</th>
               <td>{{ key }}</td>
               <td>{{ value.value }}</td>
               <td>{{ allocation.payments[key] }}</td>
               <td>
-                <span v-for="(value, key) in value.goods" :key="key">
+                <span class="badge badge-sm badge-success" v-for="(value, key) in value.goods" :key="key">
                   {{ value }}x {{ key }}
                 </span>
               </td>
@@ -34,30 +32,25 @@
           </tbody>
         </table>
 
+
         <h2>Bids</h2>
-        <table class="table">
+        <table class="table table-striped">
           <thead>
             <tr>
               <th scope="col">Round</th>
               <th scope="col">Bidder</th>
-              <th scope="col">Amount</th>
-              <th scope="col">Goods</th>
+              <th scope="col">Bundle</th>
+              <th scope="col">Bid</th>
             </tr>
           </thead>
           <tbody>
-            <template v-for="round in auction.auction.rounds">
-            <tr v-for="bid in round.bids" :key="bid.id">
-              <td>{{ round.roundNumber }}</td>
-              <td>{{ bid.bidderId }}</td>
-              <td>{{ bid.amount }}</td>
-              <td>
-                <ul class="list-unstyled">
-                  <li v-for="(good, index) in bid.bundle" :key="index">{{ good.amount }}x {{ good.good }}</li>   
-                </ul>
-              </td>
-              <td>
-              </td>
-            </tr>
+            <template v-for="currentRound in auction.auction.rounds">
+              <tr v-for="bid of currentRound.bids" :key="bid.id">
+                <td>{{ currentRound.roundNumber }}</td>
+                <td>{{ bid.bidderId }}</td>
+                <td><span class="badge badge-sm badge-secondary" v-for="(bundle, index) in bid.bundle" :key="'bundle-' + index">{{ bundle.amount }}x {{ bundle.good }}</span></td>
+                <td>{{ bid.amount }}</td>
+              </tr>
             </template>
           </tbody>
         </table>
