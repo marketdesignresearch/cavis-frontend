@@ -45,8 +45,8 @@
         </nav>
 
         <div class="float-right text-right">
-          <button class="btn btn-primary mx-2" @click="placeBids" :disabled="bidsPlaced">Place Bids</button>
-          <button class="btn btn-primary" @click="allocate">Result</button>
+          <button class="btn btn-primary mx-2" @click="placeBids">Place Bids & End Round</button>
+          <button class="btn btn-success" @click="allocate">Result</button>
         </div>
       </div>
 

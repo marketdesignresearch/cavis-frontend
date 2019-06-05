@@ -38,22 +38,27 @@
         <table class="table">
           <thead>
             <tr>
-              <th scope="col">#</th>
+              <th scope="col">Round</th>
               <th scope="col">Bidder</th>
-              <th scope="col">Value</th>
-              <th scope="col">Payment</th>
+              <th scope="col">Amount</th>
               <th scope="col">Goods</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="round in auction.auction.rounds" :key="round.id">
-              <th scope="row">{{ round.roundNumber }}</th>
+            <template v-for="round in auction.auction.rounds">
+            <tr v-for="bid in round.bids" :key="bid.id">
+              <td>{{ round.roundNumber }}</td>
+              <td>{{ bid.bidderId }}</td>
+              <td>{{ bid.amount }}</td>
               <td>
-                <div v-for="bid in round.bids" :key="bid.id">
-                  "{{ bid.bidderId }}" bid {{ bid.amount }} for <span v-for="(good, index) in bid.bundle" :key="index">{{ good.amount }}x {{ good.good }}</span>   
-                </div>
+                <ul class="list-unstyled">
+                  <li v-for="(good, index) in bid.bundle" :key="index">{{ good.amount }}x {{ good.good }}</li>   
+                </ul>
+              </td>
+              <td>
               </td>
             </tr>
+            </template>
           </tbody>
         </table>
       </div>

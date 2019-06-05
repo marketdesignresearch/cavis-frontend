@@ -5,13 +5,18 @@
       
       <component :bidderId="bidder.id" :auctionId="auctionId" :selectedGoods="selectedGoods" :is="bidComponent"></component>
 
-      <button class="btn btn-sm btn-secondary" v-if="bids.length > 0" :id="'history-popover' + bidder.id">Bid History</button>
-      <b-popover :target="'history-popover' + bidder.id" triggers="hover focus">
-        <template slot="title">Past Bids</template>
-        <div v-for="bid of bids" :key="bid.id">
-          Bid: {{ bid.amount }} for <span v-for="(good, index) in bid.bundle" :key="index">{{ good.amount }}x {{ good.good }}</span>   
-        </div>
-      </b-popover>
+      <div v-if="bids.length > 0">
+        <button class="btn btn-sm btn-secondary" :id="'history-popover' + bidder.id">Bid History</button>
+        <b-popover :target="'history-popover' + bidder.id" triggers="hover focus">
+          <template slot="title">Past Bids</template>
+          <div v-for="bid of bids" :key="bid.id">
+            Bid: {{ bid.amount }} for 
+            <ul>
+              <li v-for="(good, index) in bid.bundle" :key="index">{{ good.amount }}x {{ good.good }}</li>   
+            </ul>
+          </div>
+        </b-popover>
+      </div>
 
     </div>
   </div>
