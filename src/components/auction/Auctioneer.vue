@@ -1,6 +1,6 @@
 <template>
   <div class="text-right">
-    <b-button v-b-toggle.collapse-auctioneer size="sm">Show Auctioneer</b-button>
+    <b-button v-b-toggle.collapse-auctioneer size="sm">Toggle Auctioneer</b-button>
     <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
       <div class="card shadow-sm">
         <div class="card-body" v-if="currentRound">
@@ -15,10 +15,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(value, key) in currentRound.auctionResult.allocation" :key="key">
+              <tr v-for="(value, key) in currentRound.mechanismResult.allocation" :key="key">
                 <td>{{ key }}</td>
                 <td>{{ value.value }}</td>
-                <td>{{ currentRound.auctionResult.payments[key] }}</td>
+                <td>{{ currentRound.mechanismResult.payments[key] }}</td>
                 <td>
                   <span class="badge badge-sm badge-success" v-for="(value, key) in value.goods" :key="key">
                     {{ value }}x {{ key }}

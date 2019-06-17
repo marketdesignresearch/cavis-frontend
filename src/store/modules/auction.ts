@@ -10,18 +10,22 @@ export interface AuctionState {
 }
 
 export enum ApiAuctionType {
-  SINGLE_ITEM_SECOND_PRICE = 'SINGLE_ITEM_SECOND_PRICE',
-  SINGLE_ITEM_FIRST_PRICE = 'SINGLE_ITEM_FIRST_PRICE',
+  SINGLE_ITEM_SECOND_PRICE = 'SECOND_PRICE',
+  SINGLE_ITEM_FIRST_PRICE = 'FIRST_PRICE',
   VCG_XOR = 'VCG_XOR'
+}
+
+export enum ApiDomainType {
+  UNIT_DEMAND_VALUE = 'unitDemandValue'
 }
 
 export interface ApiAuctionCreateDTO {
   domain: {
-    type: string
+    type: ApiDomainType
     bidders: ApiBidder[]
     goods: ApiGood[]
   }
-  mechanismType: ApiAuctionType
+  auctionType: ApiAuctionType
 }
 
 export interface ApiAuction {
@@ -48,8 +52,12 @@ export interface ApiRound {
 }
 
 export interface ApiBidder {
-  id: string
+  id?: string
+  name: string
   bids: ApiBid[]
+  value?: {
+    bundleValues: ApiBid[]
+  }
 }
 
 export interface ApiGood {
@@ -60,6 +68,7 @@ export interface ApiGood {
 }
 
 export interface ApiBid {
+  id?: string
   amount: number
   bidderId?: string
   bundle: {

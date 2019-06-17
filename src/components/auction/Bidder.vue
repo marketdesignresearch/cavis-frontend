@@ -1,7 +1,7 @@
 <template>
   <div class="card shadow-sm mb-3">
     <div class="card-body">
-      <h6 class="card-subtitle mb-2 text-muted">{{ bidder.id }}</h6>
+      <h6 class="card-subtitle mb-2 text-muted">{{ bidder.name }}</h6>
       
       <component :bidderId="bidder.id" :auctionId="auctionId" :selectedGoods="selectedGoods" :is="bidComponent"></component>
 

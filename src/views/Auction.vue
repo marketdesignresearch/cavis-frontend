@@ -53,6 +53,7 @@
         </nav>
 
         <div class="float-right text-right">
+          <button class="btn btn-primary mx-2" @click="autoBid">Autobid</button>
           <button class="btn btn-primary mx-2" @click="placeBids">Place Bids & End Round</button>
           <button class="btn btn-success" @click="allocate">Result</button>
         </div>
@@ -105,6 +106,23 @@ export default Vue.extend({
     placeBids() {
       auction.dispatchPlaceBids({ auctionId: this.$route.params.id })
       this.$data.bidsPlaced = true
+    },
+    autoBid() {
+      const bidders = auction.biddersById()(this.$route.params.id)
+
+      bidders.forEach(bidder => {
+        if (bidder.value && bidder.id) {
+          let bundle: any = {}
+          bidder.value.bundleValues[0].bundle.forEach(bid => {
+            bundle[bid.good] = bid.amount
+          })
+          auction.commitUpdateBidder({ auctionId: this.$route.params.id, bidderId: bidder.id!, bid: {
+            amount: bidder.value.bundleValues[0].amount,
+            bidderId: bidder.id,
+            bundle: bundle
+          } })
+        }
+      })
     },
     allocate() {
       this.$router.push({ name: 'auction-result', params: { id: this.$route.params.id } })

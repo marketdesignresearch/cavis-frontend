@@ -12,7 +12,7 @@
 import Vue from 'vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import AuctionProgress from '@/components/auction/Progress.vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiAuctionCreateDTO } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiAuctionCreateDTO, ApiDomainType } from '../store/modules/auction'
 
 export default Vue.extend({
   name: 'AuctionSetupView',
@@ -28,19 +28,19 @@ export default Vue.extend({
       // mock creation using store
       const auctionObj: ApiAuctionCreateDTO = {
         domain: {
-          type: 'simple',
+          type: ApiDomainType.UNIT_DEMAND_VALUE,
           bidders: [], 
           goods: [],
         },
-        mechanismType: model.mechanismType
+        auctionType: model.mechanismType
       }
 
       for (let i = 0; i < model.numberOfBidders; i++) {
-        auctionObj.domain.bidders.push({ id: `Bidder#${i+1}`, bids: [] })
+        auctionObj.domain.bidders.push({ name: `Bidder #${i+1}`, bids: [] })
       }
 
       for (let i = 0; i < model.numberOfGoods; i++) {
-        auctionObj.domain.goods.push({ id: `Good#${i+1}`, availability: 1, dummyGood: false, isSelected: false })
+        auctionObj.domain.goods.push({ id: `Good #${i+1}`, availability: 1, dummyGood: false, isSelected: false })
       }
 
       const { uuid } = await await auction.dispatchCreateAuction({ auctionCreateDTO: auctionObj })
