@@ -39,8 +39,10 @@ export default Vue.extend({
         auctionObj.domain.bidders.push({ name: `B${i+1}`, bids: [] })
       }
 
+      const alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',' Y', 'Z']
+
       for (let i = 0; i < model.numberOfGoods; i++) {
-        auctionObj.domain.goods.push({ id: `Good #${i+1}`, availability: 1, dummyGood: false, isSelected: false })
+        auctionObj.domain.goods.push({ id: alphabet[i], availability: 1, dummyGood: false, isSelected: false })
       }
 
       const { uuid } = await await auction.dispatchCreateAuction({ auctionCreateDTO: auctionObj })

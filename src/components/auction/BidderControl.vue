@@ -10,10 +10,10 @@
                   </tr>
               </thead>
               <tbody>
-                  <tr v-for="good in allGoods" :key="good.id">
-                      <td>{{ good.id }}</td>
-                      <td>{{ valueForGood(good) }}</td>
-                      <td>{{ bidForGood(good) }}</td>
+                  <tr v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
+                      <td><span v-for="good in goodSet" :key="good.id">{{ good.id }}</span></td>
+                      <td>{{ valueForGood(goodSet) }}</td>
+                      <td>{{ bidForGood(goodSet) }}</td>
                     </tr>
                </tbody>
           </table>
@@ -30,26 +30,52 @@ import Vue from 'vue';
 import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 
+const powerSet = function(l: any) {
+    // TODO: ensure l is actually array-like, and return null if not
+    return (function ps(list): any {
+        if (list.length === 0) {
+            return [[]];
+        }
+        const head = list.pop();
+        const tailPS = ps(list);
+        return tailPS.concat(tailPS.map((e: any) => { return [head].concat(e); }));
+    })(l.slice());
+}
+
 export default Vue.extend({
   name: 'BidderControl',
   props: ['bidder', 'goods', 'auctionId'],
   computed: {
-    allGoods () {
-      const goods = auction.goodsById()(this.$props.auctionId)
-      return goods
+    goodCombinations () {
+        if (!this.$props.auctionId) return []
+
+        const goods = auction.goodsById()(this.$props.auctionId)
+        const currentAuction = auction.auctionById()(this.$props.auctionId)
+
+        // check if we have bundle-bids
+        if (currentAuction.auction.mechanismType === ApiAuctionType.VCG_XOR) {
+            const set = powerSet(goods)
+            return set
+        }
+
+        return goods.map(good => [good])
     }
   },
   methods: {
-      valueForGood(good: ApiGood) {
+      valueForGood(goods: ApiGood[]) {
           if (this.$props.bidder.value.bundleValues) {
-              const correctValue = this.$props.bidder.value.bundleValues.find((bid: ApiBid) => (bid.bundle as any).find((obj: any) => obj.good === good.id))
-              return correctValue ? correctValue.amount : null
+            const ids = goods.map(obj => obj.id).sort().join('')
+            const correctValue =  this.$props.bidder.value.bundleValues.find((bid: ApiBid) => bid.bundle.map(val => val.good).sort().join('') === ids)
+            return correctValue ? correctValue.amount : null
           }
           return null
       },
-      bidForGood(good: ApiGood) {
+      bidForGood(goods: ApiGood[]) {
           if (this.$props.bidder.bids) {
-            const correctBid = this.$props.bidder.bids.find((bid: ApiBid) => (bid.bundle as any)[good.id] !== undefined)
+            const ids = goods.map(obj => obj.id).sort().join('')
+            const correctBid = this.$props.bidder.bids.find((bid: ApiBid) => {
+                return Object.keys((bid.bundle as any)).sort().join('') === ids
+            })
             return correctBid ? correctBid.amount : null
           }
           return null

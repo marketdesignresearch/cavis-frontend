@@ -1,7 +1,8 @@
 <template>
-    <div class="card good d-flex justify-content-center shadow-sm" :class="{ 'selected': isSelected }">
-      <div class="align-self-center">
-      {{ good.id.substr(good.id.length - 1) }}
+    <div class="flex-column">
+      <div class="card good shadow-sm" :class="{ 'selected': isSelected }"></div>
+      <div class="pt-2">
+        {{ good.id.substr(good.id.length - 1) }}
       </div>
     </div>
 </template>
@@ -29,7 +30,6 @@ export { AuctionGoodComponent }
 
 <style scoped lang="scss">
 @import '../../custom.scss';
-
 .good {
   &.selected {
     @extend .bg-primary;
