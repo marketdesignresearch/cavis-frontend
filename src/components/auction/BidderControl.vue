@@ -1,22 +1,26 @@
 <template>
   <div class="row" v-if="bidder">
       <div class="col">
-          <table class="table-sm">
-              <thead>
-                  <tr>
-                    <th>Good</th>
-                    <th>Value</th>
-                    <th>Bid</th>
-                  </tr>
-              </thead>
-              <tbody>
-                  <tr v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
-                      <td><span v-for="good in goodSet" :key="good.id">{{ good.id }}</span></td>
-                      <td>{{ valueForGood(goodSet) }}</td>
-                      <td>{{ bidForGood(goodSet) }}</td>
+          <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>Good</th>
+                        <th>Value</th>
+                        <th>Bid</th>
+                        <th></th>
                     </tr>
-               </tbody>
-          </table>
+                </thead>
+                <tbody>
+                    <tr v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
+                        <td><span v-for="good in goodSet" :key="good.id">{{ good.id }}</span></td>
+                        <td>{{ valueForGood(goodSet) }}</td>
+                        <td>{{ bidForGood(goodSet) }}</td>
+                        <td><button class="btn btn-sm btn-warning" @click="removeBid(goodSet)">X</button></td>
+                    </tr>
+                </tbody>
+            </table>
+          </div>
       </div>
       <div class="col">
           <button class="btn btn-primary mx-2" @click="autoBid">Autobid</button>
@@ -54,8 +58,7 @@ export default Vue.extend({
 
         // check if we have bundle-bids
         if (currentAuction.auction.mechanismType === ApiAuctionType.VCG_XOR) {
-            const set = powerSet(goods)
-            return set
+            return powerSet(goods).filter((goods: []) => goods.length > 0)
         }
 
         return goods.map(good => [good])
@@ -82,6 +85,9 @@ export default Vue.extend({
       },
       autoBid() {
           BidderService.autoBid(this.$props.auctionId, this.$props.bidder)
+      },
+      removeBid(goodSet: ApiGood[]) {
+          BidderService.removeBid(this.$props.auctionId, this.$props.bidder, goodSet)
       }
   }
 });

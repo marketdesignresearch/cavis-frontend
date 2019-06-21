@@ -121,6 +121,30 @@ function updateBid(state: AuctionState, payload: { auctionId: string; bidderId: 
   }
 }
 
+function removeBid(state: AuctionState, payload: { auctionId: string; bidderId: string; bundle: ApiGood[] }) {
+  const existingBidder: ApiBidder | undefined = state.auctions[payload.auctionId].auction.domain.bidders.find(
+    obj => obj.id === payload.bidderId
+  )
+
+  if (existingBidder && existingBidder.bids) {
+    const bidIndex = existingBidder.bids.findIndex(bid => {
+      return (
+        Object.keys(bid.bundle)
+          .sort()
+          .join('') ===
+        payload.bundle
+          .map(v => v.id)
+          .sort()
+          .join('')
+      )
+    })
+
+    if (bidIndex !== -1) {
+      existingBidder.bids.splice(bidIndex, 1)
+    }
+  }
+}
+
 function addAllocation(state: AuctionState, payload: { auctionId: string; allocation: ApiAuctionAllocation }) {
   Vue.set(state.auctions[payload.auctionId], 'allocation', { ...payload.allocation })
 }
@@ -208,6 +232,7 @@ const auction = {
   // mutations
   commitAppendAuction: moduleBuilder.commit(appendAuctionMutation),
   commitUpdateBidder: moduleBuilder.commit(updateBid),
+  commitRemoveBid: moduleBuilder.commit(removeBid),
   commitAddAllocation: moduleBuilder.commit(addAllocation),
   commitToggleGoodSelection: moduleBuilder.commit(toggleGoodSelection),
 

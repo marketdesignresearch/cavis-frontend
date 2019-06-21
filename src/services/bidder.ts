@@ -1,6 +1,13 @@
-import auction, { ApiBidder } from '@/store/modules/auction'
+import auction, { ApiBidder, ApiGood } from '@/store/modules/auction'
 
 export default {
+  removeBid(auctionId: string, bidder: ApiBidder, bundle: ApiGood[]) {
+    auction.commitRemoveBid({
+      auctionId: auctionId,
+      bidderId: bidder.id!,
+      bundle: bundle
+    })
+  },
   autoBid(auctionId: string, bidder: ApiBidder) {
     if (bidder.value && bidder.id) {
       bidder.value.bundleValues.forEach(value => {
