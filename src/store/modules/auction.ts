@@ -151,10 +151,10 @@ async function createAuction(context: BareActionContext<AuctionState, RootState>
 
 async function placeBids(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
   const bidders = context.state.auctions[payload.auctionId].auction.domain.bidders
-  const bids: any = {}
+  const bids: { [index: string]: any } = {}
 
   bidders.forEach(bidder => {
-    bids[bidder.id] = bidder.bids
+    bids[bidder.id!] = bidder.bids
   })
 
   const { data } = await api().post(`/auctions/${payload.auctionId}/bids`, bids)

@@ -36,7 +36,7 @@ export default Vue.extend({
       }
 
       for (let i = 0; i < model.numberOfBidders; i++) {
-        auctionObj.domain.bidders.push({ name: `Bidder #${i+1}`, bids: [] })
+        auctionObj.domain.bidders.push({ name: `B${i+1}`, bids: [] })
       }
 
       for (let i = 0; i < model.numberOfGoods; i++) {

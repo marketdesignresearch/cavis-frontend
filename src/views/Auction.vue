@@ -1,22 +1,26 @@
 <template>
   <div>
     <div class="container">
+      <!-- <AuctionProgress stage="auction" /> -->
+
       <div class="row">
         <div class="col">
           <Auctioneer :auctionId="auctionId" />
         </div>
       </div>
+
       <div class="row d-flex content">
         <div class="col">
           <div class="d-flex pt-4">
             <div class="flex-column">
-              <AuctionBidder 
-                class="align-self-start"
-                v-for="(bidder, index) in leftSideBidders" 
-                :key="'b' + index" 
-                :selectedGoods="selectedGoods"
-                :auctionId="auctionId"
-                :bidder="bidder" />
+              <span v-for="(bidder, index) in leftSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
+                <AuctionBidder 
+                  class="align-self-start"
+                  :isSelected="selectedBidder === bidder"
+                  :selectedGoods="selectedGoods"
+                  :auctionId="auctionId"
+                  :bidder="bidder" />
+              </span>
             </div>
 
             <div class="flex-row text-center flex-grow-1 mx-2">
@@ -29,18 +33,24 @@
             </div>
 
             <div class="flex-column">
-              <AuctionBidder 
-                class="align-self-start"
-                v-for="(bidder, index) in rightSideBidders" 
-                :key="'b' + index" 
-                :selectedGoods="selectedGoods"
-                :auctionId="auctionId"
-                :bidder="bidder" />
+              <span v-for="(bidder, index) in rightSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
+                <AuctionBidder 
+                  class="align-self-start"
+                  :isSelected="selectedBidder === bidder"
+                  :selectedGoods="selectedGoods"
+                  :auctionId="auctionId"
+                  :bidder="bidder" />
+              </span>
             </div>
           </div>
         </div>
       </div>
 
+      <div class="auction-control">
+        <BidderControl :goods="selectedGoods" :bidder="selectedBidder" :auctionId="auctionId" />
+      </div>
+
+      <!--
       <div class="auction-control mb-4">
         Rounds:
         <nav v-if="rounds" class="d-inline-flex">
@@ -58,10 +68,9 @@
           <button class="btn btn-success" @click="allocate">Result</button>
         </div>
       </div>
-
+      -->
     </div>
 
-    <AuctionProgress stage="auction" />
   </div>
 </template>
 
@@ -72,7 +81,8 @@ import AuctionBidder from '@/components/auction/Bidder.vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import AuctionProgress from '@/components/auction/Progress.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
-import auction, { ApiAuctionType, ApiGood, ApiAuction } from '../store/modules/auction'
+import BidderControl from '@/components/auction/BidderControl.vue'
+import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder } from '../store/modules/auction'
 
 export default Vue.extend({
   name: 'AuctionTable',
@@ -81,12 +91,14 @@ export default Vue.extend({
     'AuctionBidder': AuctionBidder,
     'AuctionSetup': AuctionSetup,
     'AuctionProgress': AuctionProgress,
-    'Auctioneer': Auctioneer
+    'Auctioneer': Auctioneer,
+    'BidderControl': BidderControl
   },
   data () {
     return {
       bidsPlaced: false,
-      selectedGoods: []
+      selectedGoods: [],
+      selectedBidder: null
     }
   },
   mounted () {
@@ -101,6 +113,13 @@ export default Vue.extend({
         this.$data.selectedGoods.push(good.id)
       } else {
         this.$data.selectedGoods.splice(this.$data.selectedGoods.indexOf(good.id))
+      }
+    },
+    selectBidder(bidder: ApiBidder) {
+      if (this.$data.selectedBidder === bidder) {
+        this.$data.selectBidder = null
+      } else {
+        this.$data.selectedBidder = bidder
       }
     },
     placeBids() {
@@ -134,11 +153,11 @@ export default Vue.extend({
     },
     leftSideBidders () {
       const bidders = auction.biddersById()(this.$route.params.id)
-      return bidders.slice(0, bidders.length / 2 + 1)
+      return bidders.slice(0, bidders.length / 2)
     },
     rightSideBidders () {
       const bidders = auction.biddersById()(this.$route.params.id)
-      return bidders.slice(bidders.length / 2 + 1, bidders.length)
+      return bidders.slice(bidders.length / 2, bidders.length)
     },
     goods () {
       const goods = auction.goodsById()(this.$route.params.id)
