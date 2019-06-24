@@ -1,6 +1,9 @@
 <template>
   <div class="text-right">
     <b-button v-b-toggle.collapse-auctioneer size="sm">Toggle Auctioneer</b-button>
+    <button class="btn btn-primary btn-sm ml-2" @click="autoBid()">Auto-Bid All</button>
+    <button class="btn btn-primary btn-sm ml-2" @click="allocate()">Allocate</button>
+    <button class="btn btn-primary btn-sm ml-2" @click="results()">Results</button>
     <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
       <div class="card shadow-sm">
         <div class="card-body" v-if="currentRound">
@@ -58,6 +61,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import auction, { ApiAuctionType } from '../../store/modules/auction'
+import BidderService from '../../services/bidder'
 
 export default Vue.extend({
   name: 'AuctionAuctioneer',
@@ -66,6 +70,17 @@ export default Vue.extend({
     currentRound: function () {
       const rounds = auction.auctionById()(this.$props.auctionId).auction.rounds
       return rounds[rounds.length - 1]
+    }
+  },
+  methods: {
+    autoBid () {
+      BidderService.autoBidAll(this.$props.auctionId)
+    },
+    allocate () {
+      auction.dispatchPlaceBids({ auctionId: this.$route.params.id })
+    },
+    results () {
+      this.$router.push({ name: 'auction-result', params: { id: this.$props.auctionId } })
     }
   }
 });

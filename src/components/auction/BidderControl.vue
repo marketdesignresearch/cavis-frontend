@@ -1,5 +1,5 @@
 <template>
-  <div class="row" v-if="bidder">
+  <div class="row" v-if="selectedBidder">
       <div class="col">
           <div class="table-responsive">
             <table class="table table-hover table-striped">
@@ -24,7 +24,15 @@
       </div>
       <div class="col">
           <button class="btn btn-primary mx-2" @click="autoBid">Autobid</button>
-          {{ bidder.value.bundleValues }}
+          <component 
+            v-if="mechanismType"  
+            :is="'component-bid-' + mechanismType"
+            :auctionId="auctionId" 
+            :bidderId="selectedBidder.id" 
+            :selectedGoods="selectedGoods"
+            >
+            
+        </component>
       </div>
   </div>
 </template>
@@ -38,17 +46,17 @@ const powerSet = function(l: any) {
     // TODO: ensure l is actually array-like, and return null if not
     return (function ps(list): any {
         if (list.length === 0) {
-            return [[]];
+            return [[]]
         }
-        const head = list.pop();
-        const tailPS = ps(list);
-        return tailPS.concat(tailPS.map((e: any) => { return [head].concat(e); }));
-    })(l.slice());
+        const head = list.pop()
+        const tailPS = ps(list)
+        return tailPS.concat(tailPS.map((e: any) => { return [head].concat(e) }))
+    })(l.slice())
 }
 
 export default Vue.extend({
   name: 'BidderControl',
-  props: ['bidder', 'goods', 'auctionId'],
+  props: ['selectedBidder', 'selectedGoods', 'auctionId'],
   computed: {
     goodCombinations () {
         if (!this.$props.auctionId) return []
@@ -62,21 +70,26 @@ export default Vue.extend({
         }
 
         return goods.map(good => [good])
+    },
+    mechanismType () {
+        if (!this.$props.auctionId) return null
+        const auctionInstance = auction.auctionById()(this.$props.auctionId)
+        return auctionInstance.auction.mechanismType
     }
   },
   methods: {
       valueForGood(goods: ApiGood[]) {
-          if (this.$props.bidder.value.bundleValues) {
+          if (this.$props.selectedBidder.value.bundleValues) {
             const ids = goods.map(obj => obj.id).sort().join('')
-            const correctValue =  this.$props.bidder.value.bundleValues.find((bid: ApiBid) => bid.bundle.map(val => val.good).sort().join('') === ids)
+            const correctValue =  this.$props.selectedBidder.value.bundleValues.find((bid: ApiBid) => bid.bundle.map(val => val.good).sort().join('') === ids)
             return correctValue ? correctValue.amount : null
           }
           return null
       },
       bidForGood(goods: ApiGood[]) {
-          if (this.$props.bidder.bids) {
+          if (this.$props.selectedBidder.bids) {
             const ids = goods.map(obj => obj.id).sort().join('')
-            const correctBid = this.$props.bidder.bids.find((bid: ApiBid) => {
+            const correctBid = this.$props.selectedBidder.bids.find((bid: ApiBid) => {
                 return Object.keys((bid.bundle as any)).sort().join('') === ids
             })
             return correctBid ? correctBid.amount : null
@@ -84,10 +97,10 @@ export default Vue.extend({
           return null
       },
       autoBid() {
-          BidderService.autoBid(this.$props.auctionId, this.$props.bidder)
+          BidderService.autoBid(this.$props.auctionId, this.$props.selectedBidder)
       },
       removeBid(goodSet: ApiGood[]) {
-          BidderService.removeBid(this.$props.auctionId, this.$props.bidder, goodSet)
+          BidderService.removeBid(this.$props.auctionId, this.$props.selectedBidder, goodSet)
       }
   }
 });

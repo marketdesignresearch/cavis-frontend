@@ -8,6 +8,13 @@ export default {
       bundle: bundle
     })
   },
+  autoBidAll(auctionId: string) {
+    const auctionInstance = auction.auctionById()(auctionId)
+    console.log(auctionInstance)
+    auctionInstance.auction.domain.bidders.forEach(bidder => {
+      this.autoBid(auctionId, bidder)
+    })
+  },
   autoBid(auctionId: string, bidder: ApiBidder) {
     if (bidder.value && bidder.id) {
       bidder.value.bundleValues.forEach(value => {

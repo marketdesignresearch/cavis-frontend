@@ -1,16 +1,26 @@
 <template>
   <div>
-    <div class="input-group mb-3">
-      <input :disabled="selectedGoods.length === 0" v-model="bid" type="number" class="form-control" placeholder="Enter your bid">
+    <div class="row" v-if="selectedGoods.length > 0">
+      <div class="col-4">
+        Selected Bundle:
+      </div>
+      <div class="col-4">
+        Bid
+      </div>
+      <div class="col-4">
+      </div>
+      <div class="col-4">
+        <span class="badge badge-secondary" v-for="good in selectedGoods" :key="good.id">{{ good }}</span>
+      </div>
+      <div class="col-4">
+        <input v-model="bid" type="number" class="form-control" placeholder="Enter your bid">
+      </div>
+      <div class="col-4">
+        <button @click="placeBid" class="btn btn-primary btn-sm float-right">Bid</button>
+      </div>
     </div>
-
-    <a href="#" @click="placeBid" class="btn btn-primary btn-sm card-link float-right">Bid</a>
-
-    <div v-for="bid in bids" :key="bid.id">
-      Bids {{ bid.amount }} for 
-      <ul>
-        <li v-for="(item, key) in bid.bundle" :key="key">{{ key }}</li>
-      </ul>
+    <div class="alert alert-info" v-if="selectedGoods.length === 0">
+      Select a good to bid on it
     </div>
   </div>
 </template>
@@ -26,15 +36,6 @@ export default Vue.extend({
         'el-input': Input,
         'el-button': Button
     },
-    computed: {
-      bids (): any[] {
-        const bids = auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidderId && obj.bids)
-        return bids && bids.length > 0 ? bids[0].bids : []
-      },
-      bidPlaced (): boolean {
-        return auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidderId && obj.bids && obj.bids.length > 0).length > 0
-      }
-    },
     data () {
       return {
         bid: null
@@ -42,13 +43,9 @@ export default Vue.extend({
     },
     methods: {
       placeBid() {
-        if (this.$props.selectedGoods.length === 0) {
-          return
-        }
-        
-        // todo: fixme
         const bid: any = { 
           amount: this.$data.bid,
+          bidderId: this.$props.bidderId,
           bundle: {}
         }
 
@@ -56,9 +53,11 @@ export default Vue.extend({
           bid.bundle[good] = 1
         })
 
-        console.log('Placing Bid:', bid)
-
-        auction.commitUpdateBidder({ auctionId: this.$props.auctionId, bidderId: this.$props.bidderId, bid: bid })
+        auction.commitUpdateBidder({
+          auctionId: this.$props.auctionId,
+          bidderId: this.$props.bidderId,
+          bid: bid
+        })
       }
     },
     name: 'SingleItemAuctionBid'

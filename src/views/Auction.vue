@@ -47,7 +47,7 @@
       </div>
 
       <div class="auction-control">
-        <BidderControl :goods="selectedGoods" :bidder="selectedBidder" :auctionId="auctionId" />
+        <BidderControl :selectedGoods="selectedGoods" :selectedBidder="selectedBidder" :auctionId="auctionId" />
       </div>
 
       <!--
@@ -180,7 +180,7 @@ export default Vue.extend({
 <style scoped lang="scss">
 .content {
   display: flex;
-  min-height: 70vh;
+  min-height: 30vh;
   flex-direction: column;
 }
 </style>
