@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="d-flex flex-column">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container">
       <a class="navbar-brand" href="#">CA-Vis</a>
@@ -23,10 +23,7 @@
       </div>
     </nav>
 
-    <div class="mt-4 content">
-      <router-view />
-    </div>
-
+    <router-view />
   </div>
 </template>
 
@@ -36,6 +33,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+  min-height: 100vh;
+}
+
+.content {
+  flex: 1 0 auto
 }
 
 #nav {

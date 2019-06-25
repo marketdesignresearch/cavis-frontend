@@ -1,53 +1,57 @@
 <template>
-  <div>
-    <div class="container">
-      <!-- <AuctionProgress stage="auction" /> -->
-
-      <div class="row">
-        <div class="col">
-          <Auctioneer :auctionId="auctionId" />
-        </div>
-      </div>
-
-      <div class="row d-flex content">
-        <div class="col">
-          <div class="d-flex pt-4">
-            <div class="flex-column">
-              <span v-for="(bidder, index) in leftSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
-                <AuctionBidder 
-                  class="align-self-start"
-                  :isSelected="selectedBidder === bidder"
-                  :selectedGoods="selectedGoods"
-                  :auctionId="auctionId"
-                  :bidder="bidder" />
-              </span>
-            </div>
-
-            <div class="flex-row text-center flex-grow-1 mx-2">
-              <span v-for="(good, index) in goods" :key="'i' + index" @click="selectGood(good)">
-                <AuctionGood
-                  class="align-self-center d-inline-flex"
-                  :isSelected="selectedGoods.indexOf(good.id) !== -1"
-                  :good="good" />
-              </span>
-            </div>
-
-            <div class="flex-column">
-              <span v-for="(bidder, index) in rightSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
-                <AuctionBidder 
-                  class="align-self-start"
-                  :isSelected="selectedBidder === bidder"
-                  :selectedGoods="selectedGoods"
-                  :auctionId="auctionId"
-                  :bidder="bidder" />
-              </span>
-            </div>
+  <div class="grow">
+        
+        <div class="bg-white">
+          <div class="container">
+            <Auctioneer :auctionId="auctionId" />
           </div>
         </div>
+
+        <div class="grow">
+          <div class="container">
+            <div class="row">
+              <div class="col">
+                <div class="d-flex pt-4">
+                  <div class="flex-column">
+                    <span v-for="(bidder, index) in leftSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
+                      <AuctionBidder 
+                        class="align-self-start"
+                        :isSelected="selectedBidder === bidder"
+                        :selectedGoods="selectedGoods"
+                        :auctionId="auctionId"
+                        :bidder="bidder" />
+                    </span>
+                  </div>
+
+                  <div class="flex-row text-center flex-grow-1 mx-2">
+                    <span v-for="(good, index) in goods" :key="'i' + index" @click="selectGood(good)">
+                      <AuctionGood
+                        class="align-self-center d-inline-flex"
+                        :isSelected="selectedGoods.indexOf(good.id) !== -1"
+                        :good="good" />
+                    </span>
+                  </div>
+
+                  <div class="flex-column">
+                    <span v-for="(bidder, index) in rightSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
+                      <AuctionBidder 
+                        class="align-self-start"
+                        :isSelected="selectedBidder === bidder"
+                        :selectedGoods="selectedGoods"
+                        :auctionId="auctionId"
+                        :bidder="bidder" />
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+        </div>
       </div>
 
-      <div class="auction-control">
-        <BidderControl :selectedGoods="selectedGoods" :selectedBidder="selectedBidder" :auctionId="auctionId" />
+      <div class="bg-white">
+        <div class="container">
+          <BidderControl :selectedGoods="selectedGoods" :selectedBidder="selectedBidder" :auctionId="auctionId" />
+        </div>
       </div>
 
       <!--
@@ -178,9 +182,9 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
-.content {
+.grow {
   display: flex;
-  min-height: 30vh;
+  flex: 1 0 auto;
   flex-direction: column;
 }
 </style>
