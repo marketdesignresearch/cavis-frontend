@@ -80,16 +80,20 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import auction, { ApiAuctionType } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiRound } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 
 export default Vue.extend({
   name: 'AuctionAuctioneer',
   props: ['auctionId'],
   computed: {
-    currentRound: function () {
-      const rounds = auction.auctionById()(this.$props.auctionId).auction.rounds
-      return rounds[rounds.length - 1]
+    currentRound (): ApiRound | null {
+      if (this.$props.auctionId) {
+        const rounds = auction.auctionById()(this.$props.auctionId).auction.rounds
+        return rounds[rounds.length - 1]
+      }
+
+      return null
     }
   },
   methods: {

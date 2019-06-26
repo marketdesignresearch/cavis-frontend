@@ -1,5 +1,6 @@
 <template>
   <div class="row" v-if="selectedBidder">
+      <bidder-circle :name="selectedBidder.name" class="selected bidder-circle" />
       <div class="col">
           <div class="table-responsive">
             <table class="table table-hover table-striped">
@@ -12,7 +13,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
+                    <tr v-for="(goodSet, index) in goodCombinations" :key="'set' + index" @click="selectGoods(goodSet)">
                         <td><span v-for="good in goodSet" :key="good.id">{{ good.id }}</span></td>
                         <td>{{ valueForGood(goodSet) }}</td>
                         <td>{{ bidForGood(goodSet) }}</td>
@@ -31,7 +32,6 @@
             :bidderId="selectedBidder.id" 
             :selectedGoods="selectedGoods"
             >
-            
         </component>
       </div>
   </div>
@@ -41,6 +41,7 @@
 import Vue from 'vue';
 import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
+import BidderCircleVue from './BidderCircle.vue';
 
 const powerSet = function(l: any) {
     // TODO: ensure l is actually array-like, and return null if not
@@ -56,6 +57,7 @@ const powerSet = function(l: any) {
 
 export default Vue.extend({
   name: 'BidderControl',
+  components: { 'bidder-circle': BidderCircleVue }, 
   props: ['selectedBidder', 'selectedGoods', 'auctionId'],
   computed: {
     goodCombinations () {
@@ -78,6 +80,9 @@ export default Vue.extend({
     }
   },
   methods: {
+      selectGoods(goods: ApiGood[]) {
+          this.$props.selectedGoods = goods.map(goods => goods.id)
+      },
       valueForGood(goods: ApiGood[]) {
           if (this.$props.selectedBidder.value.bundleValues) {
             const ids = goods.map(obj => obj.id).sort().join('')
@@ -109,5 +114,11 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import '../../custom';
 
+.bidder-circle {
+    position: relative;
+    top: -90px;
+    left: 50%;
+    padding-left: -50px;
+}
 
 </style>

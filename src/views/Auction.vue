@@ -12,7 +12,7 @@
             <div class="row">
               <div class="col">
                 <div class="d-flex pt-4">
-                  <div class="flex-column">
+                  <div>
                     <span v-for="(bidder, index) in leftSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
                       <AuctionBidder 
                         class="align-self-start"
@@ -32,7 +32,7 @@
                     </span>
                   </div>
 
-                  <div class="flex-column">
+                  <div>
                     <span v-for="(bidder, index) in rightSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
                       <AuctionBidder 
                         class="align-self-start"
@@ -49,7 +49,10 @@
       </div>
 
       <div class="bg-white">
-        <div class="container">
+        <div class="container bottom-container">
+          <div class="text-center" v-if="!selectedBidder">
+            <h4 class="text-muted">select bidder to view details</h4>
+          </div>
           <BidderControl :selectedGoods="selectedGoods" :selectedBidder="selectedBidder" :auctionId="auctionId" />
         </div>
       </div>
@@ -121,7 +124,7 @@ export default Vue.extend({
     },
     selectBidder(bidder: ApiBidder) {
       if (this.$data.selectedBidder === bidder) {
-        this.$data.selectBidder = null
+        this.$data.selectedBidder = null
       } else {
         this.$data.selectedBidder = bidder
       }
@@ -182,6 +185,12 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
+.bottom-container {
+  padding-top: 50px;
+  padding-bottom: 15px;
+  min-height: 10vh;
+}
+
 .grow {
   display: flex;
   flex: 1 0 auto;
