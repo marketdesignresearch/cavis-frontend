@@ -34,7 +34,8 @@ export default Vue.extend({
               values: [
                 { name: 'Single-Item First Price Auction', id: 'SINGLE_ITEM_FIRST_PRICE' },
                 { name: 'Single-Item Second Price Auction', id: 'SINGLE_ITEM_SECOND_PRICE' },
-                { name: 'VCG Auction', id: 'VCG_XOR' }
+                { name: 'VCG Auction', id: 'VCG_XOR' },
+                { name: 'CCA Auction', id: 'CCA_VCG' }
               ],
               validator: VueFormGenerator.validators.required
             },
@@ -55,15 +56,10 @@ export default Vue.extend({
               model: 'numberOfGoods',
               default: 1,
               disabled: (model: any): boolean => {
-                return model.mechanismType !== 'VCG_XOR'
+                return model.mechanismType.indexOf('SINGLE_ITEM') !== -1
               },
               min: 0,
-              max: (model: any): number => {
-                if (model.mechanismType !== 'VCG_XOR') {
-                  return 50
-                }
-                return 1
-              },
+              max: 5,
               validator: [VueFormGenerator.validators.required]
             },
             {

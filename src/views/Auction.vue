@@ -3,11 +3,11 @@
         
         <div class="bg-white">
           <div class="container">
-            <Auctioneer :auctionId="auctionId" />
+            <Auctioneer v-if="activeAuction" :auction="activeAuction" />
           </div>
         </div>
 
-        <div class="grow">
+        <div class="grow auction-view">
           <div class="container">
             <div class="row">
               <div class="col">
@@ -24,12 +24,21 @@
                   </div>
 
                   <div class="flex-row text-center flex-grow-1 mx-2">
-                    <span v-for="(good, index) in goods" :key="'i' + index" @click="selectGood(good)">
-                      <AuctionGood
-                        class="align-self-center d-inline-flex"
-                        :isSelected="selectedGoods.indexOf(good.id) !== -1"
-                        :good="good" />
-                    </span>
+                    <div class="goods-container" :class="{ 'selected': selectedBidder }">
+                      <span v-for="(good, index) in goods" :key="'i' + index" @click="selectGood(good)">
+                        <AuctionGood
+                          class="align-self-center d-inline-flex"
+                          :isSelected="selectedGoods.indexOf(good.id) !== -1"
+                          :good="good" />
+                      </span>
+
+                      <div class="mt-4" v-if="selectedGoods.length > 0">
+                        Value of <span class="badge badge-secondary" v-for="good in selectedGoods" :key="good">{{ good }}</span> for {{ selectedBidder.name }}:
+                        <h2 class="mt-4">
+                          {{ valueForGoods }}
+                        </h2>
+                      </div>
+                    </div>
                   </div>
 
                   <div>
@@ -53,7 +62,7 @@
           <div class="text-center" v-if="!selectedBidder">
             <h4 class="text-muted">select bidder to view details</h4>
           </div>
-          <BidderControl :selectedGoods="selectedGoods" :selectedBidder="selectedBidder" :auctionId="auctionId" />
+          <BidderControl @selectGoods="selectGoods" :selectedGoods="selectedGoods" :selectedBidder="selectedBidder" :auctionId="auctionId" />
         </div>
       </div>
 
@@ -89,7 +98,7 @@ import AuctionSetup from '@/components/auction/Setup.vue'
 import AuctionProgress from '@/components/auction/Progress.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
-import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid } from '../store/modules/auction'
 
 export default Vue.extend({
   name: 'AuctionTable',
@@ -112,8 +121,8 @@ export default Vue.extend({
     auction.dispatchGetAuction({ auctionId: this.$route.params.id })
   },
   methods: {
-    resetRound(round: number) {
-      auction.dispatchResetAuctionToRound({ auctionId: this.$route.params.id, round: round })
+    selectGoods(goods: ApiGood[]) {
+      this.$data.selectedGoods = goods
     },
     selectGood(good: ApiGood) {
       if (this.$data.selectedGoods.indexOf(good.id) === -1) {
@@ -155,6 +164,13 @@ export default Vue.extend({
     }
   },
   computed: {
+    valueForGoods (): number {
+      if (this.$data.selectedBidder && this.$data.selectedBidder.value.bundleValues) {
+        const correctValue =  this.$data.selectedBidder.value.bundleValues.find((bid: ApiBid) => bid.bundle.map(val => val.good).sort().join('') === this.$data.selectedGoods.sort().join(''))
+        return correctValue ? correctValue.amount : null
+      }
+      return 0
+    },
     rounds (): number[] {
       return Array.from({ length: auction.auctionById()(this.$route.params.id).auction.rounds.length + 1 }, (v, k) => k)
     },
@@ -174,7 +190,7 @@ export default Vue.extend({
       const bidders = auction.biddersById()(this.$route.params.id)
       return bidders
     },
-    auctionStats (): ApiAuction {
+    activeAuction (): ApiAuction {
       return auction.auctionById()(this.$route.params.id)
     },
     auctionId (): string {
@@ -189,6 +205,20 @@ export default Vue.extend({
   padding-top: 50px;
   padding-bottom: 15px;
   min-height: 10vh;
+}
+
+.goods-container {
+  display: inline-block;
+  padding: 15px;
+  border-radius: 10px;
+
+  &.selected {
+    background-color: white;
+  }
+}
+
+.auction-view {
+  min-height: 60vh;
 }
 
 .grow {

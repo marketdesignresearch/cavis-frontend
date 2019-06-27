@@ -1,5 +1,5 @@
 <template>
-  <div v-if="auctionId">
+  <div v-if="auction">
 
     <div class="row">
       <div class="col">
@@ -13,7 +13,7 @@
       </div>
       <div class="col text-right">
         <p class="my-4">
-          <button class="btn btn-success btn-sm ml-2" @click="results()">Get Auction Results</button>
+          <component :is="roundType" :auction="auction" />
         </p>
       </div>
     </div>
@@ -80,32 +80,31 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import auction, { ApiAuctionType, ApiRound } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiRound, ApiAuction } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 
 export default Vue.extend({
   name: 'AuctionAuctioneer',
-  props: ['auctionId'],
+  props: ['auction'],
   computed: {
+    roundType (): string {
+      return 'component-round-' + this.$props.auction.auctionType
+    },
     currentRound (): ApiRound | null {
-      if (this.$props.auctionId) {
-        const rounds = auction.auctionById()(this.$props.auctionId).auction.rounds
-        return rounds[rounds.length - 1]
-      }
-
-      return null
+      const rounds = this.$props.auction.auction.rounds
+      return rounds[rounds.length - 1]
     }
   },
   methods: {
     autoBid () {
-      BidderService.autoBidAll(this.$props.auctionId)
+      BidderService.autoBidAll(this.$props.auction.id)
     },
     allocate () {
-      auction.dispatchPlaceBids({ auctionId: this.$route.params.id })
+      auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
     },
     results () {
       this.allocate()
-      this.$router.push({ name: 'auction-result', params: { id: this.$props.auctionId } })
+      this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
     }
   }
 });

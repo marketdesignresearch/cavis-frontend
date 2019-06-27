@@ -81,7 +81,7 @@ export default Vue.extend({
   },
   methods: {
       selectGoods(goods: ApiGood[]) {
-          this.$props.selectedGoods = goods.map(goods => goods.id)
+          this.$emit('selectGoods', goods.map(goods => goods.id))
       },
       valueForGood(goods: ApiGood[]) {
           if (this.$props.selectedBidder.value.bundleValues) {

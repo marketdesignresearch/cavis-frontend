@@ -12,7 +12,8 @@ export interface AuctionState {
 export enum ApiAuctionType {
   SINGLE_ITEM_SECOND_PRICE = 'SECOND_PRICE',
   SINGLE_ITEM_FIRST_PRICE = 'FIRST_PRICE',
-  VCG_XOR = 'VCG_XOR'
+  VCG_XOR = 'VCG_XOR',
+  CCA_VCG = 'CCA_VCG'
 }
 
 export enum ApiDomainType {
@@ -43,7 +44,7 @@ export interface ApiAuction {
     }
     rounds: ApiRound[]
   }
-  allocation?: ApiAuctionAllocation
+  result?: ApiAuctionAllocation
 }
 
 export interface ApiRound {
@@ -77,7 +78,20 @@ export interface ApiBid {
   }[]
 }
 
-export interface ApiAuctionAllocation {}
+export interface ApiAuctionAllocation {
+  allocation: {
+    [x: string]: {
+      value: number
+      goods: {
+        [x: string]: string
+      }
+    }
+  }
+  payment: {
+    totalPayments: number
+    [x: string]: number
+  }
+}
 
 const moduleBuilder = getStoreBuilder<RootState>().module<AuctionState>('auction', { auctions: {} })
 
@@ -100,6 +114,12 @@ const bidsByBidderId = moduleBuilder.read(
       : []
   },
   'bidsByBidderId'
+)
+
+const auctionResultById = moduleBuilder.read(
+  state => (auctionId: string) =>
+    state.auctions[auctionId] ? (state.auctions[auctionId].result ? state.auctions[auctionId].result : null) : null,
+  'auctionResultById'
 )
 
 // mutations
@@ -145,8 +165,8 @@ function removeBid(state: AuctionState, payload: { auctionId: string; bidderId: 
   }
 }
 
-function addAllocation(state: AuctionState, payload: { auctionId: string; allocation: ApiAuctionAllocation }) {
-  Vue.set(state.auctions[payload.auctionId], 'allocation', { ...payload.allocation })
+function addResult(state: AuctionState, payload: { auctionId: string; result: ApiAuctionAllocation }) {
+  Vue.set(state.auctions[payload.auctionId], 'result', { ...payload.result })
 }
 
 function toggleGoodSelection(state: AuctionState, payload: { auctionId: string; goodId: string }) {
@@ -160,11 +180,13 @@ function toggleGoodSelection(state: AuctionState, payload: { auctionId: string; 
 async function getAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
   const { data } = await api().get(`/auctions/${payload.auctionId}`)
   auction.commitAppendAuction({ auction: data })
+  return data
 }
 
 async function getAuctions(context: BareActionContext<AuctionState, RootState>) {
   const { data } = await api().get('/auctions/')
   data.forEach((auctionInstance: any) => auction.commitAppendAuction({ auction: auctionInstance }))
+  return data
 }
 
 async function createAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionCreateDTO: ApiAuctionCreateDTO }) {
@@ -189,9 +211,9 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
   return data
 }
 
-async function allocateAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+async function getResult(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
   const { data } = await api().get(`/auctions/${payload.auctionId}/result`)
-  auction.commitAddAllocation({ auctionId: payload.auctionId, allocation: data })
+  auction.commitResult({ auctionId: payload.auctionId, result: data })
   return data
 }
 
@@ -221,6 +243,10 @@ const auction = {
     return biddersById
   },
 
+  get auctionResultById() {
+    return auctionResultById
+  },
+
   get bidsByBidderId() {
     return bidsByBidderId
   },
@@ -233,7 +259,7 @@ const auction = {
   commitAppendAuction: moduleBuilder.commit(appendAuctionMutation),
   commitUpdateBidder: moduleBuilder.commit(updateBid),
   commitRemoveBid: moduleBuilder.commit(removeBid),
-  commitAddAllocation: moduleBuilder.commit(addAllocation),
+  commitResult: moduleBuilder.commit(addResult),
   commitToggleGoodSelection: moduleBuilder.commit(toggleGoodSelection),
 
   // actions
@@ -241,7 +267,7 @@ const auction = {
   dispatchGetAuctions: moduleBuilder.dispatch(getAuctions),
   dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
   dispatchPlaceBids: moduleBuilder.dispatch(placeBids),
-  dispatchAllocateAuction: moduleBuilder.dispatch(allocateAuction),
+  dispatchGetAuctionResult: moduleBuilder.dispatch(getResult),
   dispatchResetAuctionToRound: moduleBuilder.dispatch(resetAuctionToRound)
 }
 

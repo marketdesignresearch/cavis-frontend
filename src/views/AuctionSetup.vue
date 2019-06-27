@@ -45,8 +45,7 @@ export default Vue.extend({
         auctionObj.domain.goods.push({ id: alphabet[i], availability: 1, dummyGood: false, isSelected: false })
       }
 
-      const { uuid } = await await auction.dispatchCreateAuction({ auctionCreateDTO: auctionObj })
-
+      const { uuid } = await auction.dispatchCreateAuction({ auctionCreateDTO: auctionObj })
       this.$router.push({ name: 'auction', params: { id: uuid } })
     }
   },

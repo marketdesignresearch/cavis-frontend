@@ -1,12 +1,12 @@
 
 <template>
   <div>
-    <div class="container content" v-if="allocation">
+    <div class="container content" v-if="result">
       <div class="row">
         <div class="col">
         <h1>Result of Auction</h1>
         
-        <p>Total Payments: {{ allocation.payments.totalPayments }}</p>
+        <p>Total Payments: {{ result.payments.totalPayments }}</p>
 
         <h2>Allocation</h2>
         <table class="table table-striped">
@@ -19,10 +19,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(value, key) in allocation.allocation" :key="key">
+            <tr v-for="(value, key) in result.allocation" :key="key">
               <td>{{ key }}</td>
               <td>{{ value.value }}</td>
-              <td>{{ allocation.payments[key] }}</td>
+              <td>{{ result.payments[key] }}</td>
               <td>
                 <span class="badge badge-sm badge-success" v-for="(value, key) in value.goods" :key="key">
                   {{ value }}x {{ key }}
@@ -31,7 +31,6 @@
             </tr>
           </tbody>
         </table>
-
 
         <h2>Bids</h2>
         <table class="table table-striped">
@@ -56,9 +55,7 @@
         </table>
       </div>
       </div>
-
     </div>
-    <AuctionProgress stage="result" />
   </div>
 </template>
 
@@ -73,8 +70,8 @@ export default Vue.extend({
     'AuctionProgress': AuctionProgress
   },
   computed: {
-    allocation(): ApiAuctionAllocation | undefined {
-      return auction.auctionById()(this.$route.params.id).allocation
+    result(): ApiAuctionAllocation | undefined | null {
+      return auction.auctionResultById()(this.$route.params.id)
     },
     auction(): ApiAuction {
       return auction.auctionById()(this.$route.params.id)
@@ -83,9 +80,9 @@ export default Vue.extend({
       return this.$route.params.id
     }
   },
-  mounted () {
-    // fetch allocation
-    auction.dispatchAllocateAuction({ auctionId: this.$route.params.id })
+  async mounted () {
+    await auction.dispatchGetAuction({ auctionId: this.$route.params.id })
+    await auction.dispatchGetAuctionResult({ auctionId: this.$route.params.id })
   }
 })
 </script>

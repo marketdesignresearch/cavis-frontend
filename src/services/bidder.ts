@@ -20,6 +20,9 @@ export default {
       bidder.value.bundleValues.forEach(value => {
         let bundle: any = {}
 
+        // skip empty bundles
+        if (value.bundle.length === 0) return
+
         value.bundle.forEach(bid => {
           bundle[bid.good] = bid.amount
         })
