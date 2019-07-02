@@ -1,26 +1,33 @@
 <template>
   <div>
-    <div class="row" v-if="selectedGoods.length > 0">
-      <div class="col-4">
-        Selected Bundle:
-      </div>
-      <div class="col-4">
-        Bid
-      </div>
-      <div class="col-4">
-      </div>
-      <div class="col-4">
-        <span class="badge badge-secondary" v-for="good in selectedGoods" :key="good.id">{{ good }}</span>
-      </div>
-      <div class="col-4">
-        <input v-model="bid" type="number" class="form-control" placeholder="Enter your bid">
-      </div>
-      <div class="col-4">
-        <button @click="placeBid" class="btn btn-primary btn-sm float-right">Bid</button>
-      </div>
-    </div>
-    <div class="alert alert-info" v-if="selectedGoods.length === 0">
-      Select a good to bid on it
+    <div class="table-responsive">
+      <table class="table table-bidder table-hover">
+          <thead>
+              <tr>
+                  <th class="col-4">Selected Bundle</th>
+                  <th class="col-6">Bid</th>
+                  <th></th>
+              </tr>
+          </thead>
+          <tbody>
+              <tr v-if="selectedGoods.length > 0">
+                  <td>
+                    <good-badge :goods="selectedGoods" />
+                  </td>
+                  <td>
+                    <input v-model="bid" type="number" class="form-control" placeholder="Your Bid">
+                  </td>
+                  <td class="text-right">
+                    <button @click="placeBid" class="btn btn-primary btn-sm float-right">Bid</button>
+                  </td>
+              </tr>
+              <tr v-if="selectedGoods.length === 0">
+                <td class="text-center" colspan="3">
+                  Select a good to bid on it
+                </td>
+              </tr>
+          </tbody>
+      </table>
     </div>
   </div>
 </template>
@@ -29,12 +36,23 @@
 import Vue from 'vue'
 import { Input, Button } from 'element-ui'
 import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../../store/modules/auction'
+import GoodBadgeComponent from '../GoodBadge.vue'
+import BidderService from '@/services/bidder'
 
 export default Vue.extend({
-    props: ['auctionId', 'bidderId', 'selectedGoods'],
+    props: ['auctionId', 'bidder', 'selectedGoods'],
     components: {
         'el-input': Input,
-        'el-button': Button
+        'el-button': Button,
+        'good-badge': GoodBadgeComponent
+    },
+    watch: {
+      'selectedGoods': function () {
+        this.determineBid()
+      },
+      'bidder': function () {
+        this.determineBid()
+      }
     },
     data () {
       return {
@@ -42,10 +60,15 @@ export default Vue.extend({
       }
     },
     methods: {
+      determineBid() {
+        if (this.$props.bidder && this.$props.selectedGoods) {
+          this.$data.bid = BidderService.bidForBundle(this.$props.bidder, this.$props.selectedGoods)
+        }
+      },
       placeBid() {
         const bid: any = { 
           amount: this.$data.bid,
-          bidderId: this.$props.bidderId,
+          bidderId: this.$props.bidder.id,
           bundle: {}
         }
 
@@ -55,7 +78,7 @@ export default Vue.extend({
 
         auction.commitUpdateBidder({
           auctionId: this.$props.auctionId,
-          bidderId: this.$props.bidderId,
+          bidderId: this.$props.bidder.id,
           bid: bid
         })
       }

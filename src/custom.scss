@@ -33,3 +33,18 @@ $body-bg: darken(white, 5%);
   background: white;
   border: 1px solid #33333325;
 }
+
+/** Custom Table **/
+.table-bidder {
+  font-size: 0.8rem;
+
+  &.table thead th {
+      color: lighten(black, 40%);
+      border: none;
+      font-weight: bolder;
+  }
+
+  &.table tbody td {
+      border: none;
+  }
+}

@@ -1,17 +1,15 @@
 <template>
   <div>
-    <div>Auction: CCA</div>
-    <div>Rounds: 
+    <div>Auction: {{ auctionType }}</div>
+    <div>Clock Round: 
       <nav v-if="rounds" class="d-inline-flex">
-        <ul class="pagination pagination-sm">
-          <li class="page-item" :class="{ 'active': rounds.length === 0 }">
-            <a class="page-link" href="#" @click="resetRound(0)" >Start</a>
-          </li>
-          <li class="page-item" v-for="round in rounds" :key="round.roundNumber" :class="{ 'active': round.roundNumber === rounds.length }">
-            <a class="page-link" href="#" @click="resetRound(round.roundNumber)" v-if="round.roundNumber < rounds.length"> {{ round.roundNumber }}</a>
-            <span class="page-link active" v-if="round.roundNumber === rounds.length"> {{ round.roundNumber }}</span>
-          </li>
-        </ul>
+        <span class="round" :class="{ 'active': rounds.length === 0 }">
+          <a href="#" @click="resetRound(0)" >1</a>
+        </span>
+        <span class="round" v-for="(round, index) in rounds" :key="round.roundNumber" :class="{ 'active': index === rounds.length - 1 }">
+          <span v-if="index < rounds.length">&nbsp;/&nbsp;</span>
+          <a href="#" @click="resetRound(round.roundNumber)">{{ round.roundNumber + 1 }}</a>
+        </span>
       </nav>
     </div>
 
@@ -26,12 +24,16 @@ import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound } from '../../../
 export default Vue.extend({
     props: ['auction'],
     computed: {
+      auctionType(): string {
+        switch (this.$props.auction.auction.mechanismType) {
+          case (ApiAuctionType.VCG_XOR):
+            return 'CCA VCG'
+          default:
+            return ''
+        }
+      },
       rounds(): ApiRound[] {
         return this.$props.auction.auction.rounds
-      }
-    },
-    data () {
-      return {
       }
     },
     methods: {
@@ -46,4 +48,16 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
+@import '../../../custom';
+
+span {
+  a {
+    color: theme-color('secondary')
+  }
+
+
+  &.active {
+    font-weight: bold;
+  }
+}
 </style>

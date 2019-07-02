@@ -1,8 +1,10 @@
 <template>
     <div class="flex-column">
-      <div class="card good shadow-sm" :class="{ 'selected': isSelected }"></div>
+      <div class="card good shadow-sm" :class="{ 'selected': isSelected }">
+        <div class="price" v-if="priceForGood !== null">{{ priceForGood }} $</div>
+      </div>
       <div class="pt-2">
-        {{ good.id.substr(good.id.length - 1) }}
+        {{ good.id }}
       </div>
     </div>
 </template>
@@ -10,6 +12,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { Popover } from 'element-ui'
+import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood } from '../../store/modules/auction'
 
 export interface IAuctionGood {
   name: string
@@ -21,7 +24,12 @@ const AuctionGoodComponent = Vue.extend({
   components: {
     'el-popover': Popover
   },
-  props: ['good', 'isSelected']
+  props: ['auctionId', 'good', 'isSelected'],
+  computed: {
+    priceForGood: function () {
+      return auction.priceForGood()(this.$props.auctionId, this.$props.good.id)
+    }
+  }
 });
 
 export default AuctionGoodComponent
@@ -35,6 +43,12 @@ export { AuctionGoodComponent }
     @extend .bg-primary;
     @extend .text-white;
   }
+
+  .price {
+    height: 100%;
+    line-height: 50px;
+  }
+
   user-select: none;
   margin: 0 auto;
   cursor: pointer;

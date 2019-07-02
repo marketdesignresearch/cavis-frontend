@@ -1,13 +1,15 @@
 <template>
   <div class="bidder-container" :class="{ 'selected': isSelected }">
   <div class="row">
-    <div class="col">
+    <div class="col-3">
       <bidder-circle :name="bidder.name" :class="{ 'selected': isSelected }" />
     </div>
-    <div class="col bidder-info">
-      <span class="small" v-if="bidsPlaces">Bids placed</span>
+    <div class="col py-2 text-left bidder-info">
+      <div class="small pb-2">
+        {{ bidsPlaced ? 'Bids placed' : '-' }}
+      </div>
       <el-select disabled v-model="strategy">
-        <el-option value="truthful" label="Truthful"></el-option>
+        <el-option value="TRUTHFUL" label="Truthful"></el-option>
       </el-select>
     </div>
   </div>
@@ -16,7 +18,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import auction, { ApiAuctionType, ApiBidder } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiBidder, ApiBidderStrategy } from '../../store/modules/auction'
 import { Select, Option } from 'element-ui'
 import BidderCircleVue from './BidderCircle.vue';
 
@@ -26,11 +28,11 @@ export default Vue.extend({
   props: ['bidder', 'auctionId', 'selectedGoods', 'isSelected'],
   data () {
     return {
-      strategy: 'truthful'
+      strategy: ApiBidderStrategy.TRUTHFUL
     }
   },
   computed: {
-    bidsPlaces: function () {
+    bidsPlaced: function () {
       if (this.$props.bidder) {
         return (this.$props.bidder as ApiBidder).bids && (this.$props.bidder as ApiBidder).bids.length > 0
       }

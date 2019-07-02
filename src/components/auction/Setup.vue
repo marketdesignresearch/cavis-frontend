@@ -8,6 +8,7 @@
 import Vue from 'vue'
 import { Input } from 'element-ui'
 import VueFormGenerator from 'vue-form-generator'
+import { ApiBidderStrategy } from '../../store/modules/auction';
 
 export default Vue.extend({
     components: {
@@ -44,6 +45,7 @@ export default Vue.extend({
               label: 'Bidder Type',
               model: 'bidderType',
               default: 'XOR_BIDDER',
+              required: true,
               values: [
                 { name: 'XOR Bidder', id: 'XOR_BIDDER' }
               ],
@@ -56,7 +58,11 @@ export default Vue.extend({
               model: 'numberOfGoods',
               default: 1,
               disabled: (model: any): boolean => {
-                return model.mechanismType.indexOf('SINGLE_ITEM') !== -1
+                if (model.mechanismType && model.mechanismType.indexOf('SINGLE_ITEM') !== -1) {
+                  model.numberOfGoods = 1
+                  return true
+                }
+                return false
               },
               min: 0,
               max: 5,
@@ -71,6 +77,17 @@ export default Vue.extend({
               min: 0,
               max: 50,
               validator: [VueFormGenerator.validators.required]
+            },
+                      {
+              type: 'select',
+              label: 'Default Bidder Strategy',
+              model: 'defaultStrategy',
+              default: ApiBidderStrategy.TRUTHFUL,
+              values: [
+                { name: 'Truthful', id: ApiBidderStrategy.TRUTHFUL }
+              ],
+              required: true,
+              validator: VueFormGenerator.validators.required
             },
             {
               type: 'submit',

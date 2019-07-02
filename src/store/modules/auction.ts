@@ -20,6 +20,10 @@ export enum ApiDomainType {
   UNIT_DEMAND_VALUE = 'unitDemandValue'
 }
 
+export enum ApiBidderStrategy {
+  TRUTHFUL = 'TRUTHFUL'
+}
+
 export interface ApiAuctionCreateDTO {
   domain: {
     type: ApiDomainType
@@ -42,8 +46,14 @@ export interface ApiAuction {
         bundleBids: ApiBid[]
       }
     }
+    restrictedBids: any
+    currentPrices: {
+      [x: string]: number
+    }
+    allowedNumberOfBids: number
     rounds: ApiRound[]
   }
+  auctionType: ApiAuctionType
   result?: ApiAuctionAllocation
 }
 
@@ -56,6 +66,7 @@ export interface ApiBidder {
   id?: string
   name: string
   bids: ApiBid[]
+  defaultStrategy: ApiBidderStrategy
   value?: {
     bundleValues: ApiBid[]
   }
@@ -120,6 +131,16 @@ const auctionResultById = moduleBuilder.read(
   state => (auctionId: string) =>
     state.auctions[auctionId] ? (state.auctions[auctionId].result ? state.auctions[auctionId].result : null) : null,
   'auctionResultById'
+)
+
+const priceForGood = moduleBuilder.read(
+  state => (auctionId: string, goodId: string) =>
+    state.auctions[auctionId]
+      ? state.auctions[auctionId].auction.currentPrices
+        ? state.auctions[auctionId].auction.currentPrices[goodId]
+        : null
+      : null,
+  'priceForGood'
 )
 
 // mutations
@@ -203,12 +224,14 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
     bids[bidder.id!] = bidder.bids
   })
 
-  const { data } = await api().post(`/auctions/${payload.auctionId}/bids`, bids)
+  // place bids and close round
+  await api().post(`/auctions/${payload.auctionId}/bids`, bids)
+  const { data: auctionData } = await api().post(`/auctions/${payload.auctionId}/close-round`, bids)
 
   // update auctions after placing bids
-  auction.dispatchGetAuction({ auctionId: payload.auctionId })
+  auction.commitAppendAuction({ auction: auctionData })
 
-  return data
+  return auctionData
 }
 
 async function getResult(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
@@ -253,6 +276,10 @@ const auction = {
 
   get goodsById() {
     return goodsById
+  },
+
+  get priceForGood() {
+    return priceForGood
   },
 
   // mutations

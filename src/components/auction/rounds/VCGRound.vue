@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="small pb-2">Auction: Single-Item First-Price</div>
+    <div class="small pb-2">Auction: VCG</div>
 
     <button class="btn btn-success btn-sm" @click="nextRound()">Get Auction Results</button>
   </div>

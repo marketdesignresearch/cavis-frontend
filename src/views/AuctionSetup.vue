@@ -4,7 +4,6 @@
     <h1>Setup an Auction</h1>
     <AuctionSetup class="content" @createAuction="createAuction" />
   </div>
-  <AuctionProgress stage="setup" />
 </div>
 </template>
 
@@ -12,7 +11,7 @@
 import Vue from 'vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import AuctionProgress from '@/components/auction/Progress.vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiAuctionCreateDTO, ApiDomainType } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiAuctionCreateDTO, ApiDomainType, ApiBidderStrategy } from '../store/modules/auction'
 
 export default Vue.extend({
   name: 'AuctionSetupView',
@@ -36,7 +35,7 @@ export default Vue.extend({
       }
 
       for (let i = 0; i < model.numberOfBidders; i++) {
-        auctionObj.domain.bidders.push({ name: `B${i+1}`, bids: [] })
+        auctionObj.domain.bidders.push({ name: `B${i+1}`, bids: [], defaultStrategy: model.defaultStrategy })
       }
 
       const alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',' Y', 'Z']

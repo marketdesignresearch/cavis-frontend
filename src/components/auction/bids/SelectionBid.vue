@@ -21,18 +21,18 @@ import { Input, Button } from 'element-ui'
 import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../../store/modules/auction'
 
 export default Vue.extend({
-    props: ['auctionId', 'bidderId', 'selectedGoods'],
+    props: ['auctionId', 'bidder', 'selectedGoods'],
     components: {
         'el-input': Input,
         'el-button': Button
     },
     computed: {
       bids (): any[] {
-        const bids = auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidderId && obj.bids)
+        const bids = auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidder.id && obj.bids)
         return bids && bids.length > 0 ? bids[0].bids : []
       },
       bidPlaced (): boolean {
-        return auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidderId && obj.bids && obj.bids.length > 0).length > 0
+        return auction.biddersById()(this.$props.auctionId).filter(obj => obj.id === this.$props.bidder.id && obj.bids && obj.bids.length > 0).length > 0
       }
     },
     data () {

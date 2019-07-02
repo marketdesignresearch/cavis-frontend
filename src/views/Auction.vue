@@ -29,11 +29,12 @@
                         <AuctionGood
                           class="align-self-center d-inline-flex"
                           :isSelected="selectedGoods.indexOf(good.id) !== -1"
+                          :auctionId="auctionId"
                           :good="good" />
                       </span>
 
                       <div class="mt-4" v-if="selectedGoods.length > 0">
-                        Value of <span class="badge badge-secondary" v-for="good in selectedGoods" :key="good">{{ good }}</span> for {{ selectedBidder.name }}:
+                        Value of <good-badge :goods="selectedGoods" /> for {{ selectedBidder.name }}:
                         <h2 class="mt-4">
                           {{ valueForGoods }}
                         </h2>
@@ -99,6 +100,7 @@ import AuctionProgress from '@/components/auction/Progress.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
 import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid } from '../store/modules/auction'
+import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 
 export default Vue.extend({
   name: 'AuctionTable',
@@ -108,7 +110,8 @@ export default Vue.extend({
     'AuctionSetup': AuctionSetup,
     'AuctionProgress': AuctionProgress,
     'Auctioneer': Auctioneer,
-    'BidderControl': BidderControl
+    'BidderControl': BidderControl,
+    'good-badge': GoodBadgeComponent
   },
   data () {
     return {
@@ -125,6 +128,10 @@ export default Vue.extend({
       this.$data.selectedGoods = goods
     },
     selectGood(good: ApiGood) {
+      if (!this.$data.selectedBidder) {
+        return
+      }
+
       if (this.$data.selectedGoods.indexOf(good.id) === -1) {
         this.$data.selectedGoods.push(good.id)
       } else {
@@ -202,7 +209,7 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 .bottom-container {
-  padding-top: 50px;
+  padding-top: 20px;
   padding-bottom: 15px;
   min-height: 10vh;
 }
