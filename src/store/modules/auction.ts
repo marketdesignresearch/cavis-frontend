@@ -10,10 +10,26 @@ export interface AuctionState {
 }
 
 export enum ApiAuctionType {
-  SINGLE_ITEM_SECOND_PRICE = 'SECOND_PRICE',
-  SINGLE_ITEM_FIRST_PRICE = 'FIRST_PRICE',
+  SINGLE_ITEM_FIRST_PRICE = 'SINGLE_ITEM_FIRST_PRICE',
+  SINGLE_ITEM_SECOND_PRICE = 'SINGLE_ITEM_SECOND_PRICE',
+  SEQUENTIAL_FIRST_PRICE = 'SEQUENTIAL_FIRST_PRICE',
+  SEQUENTIAL_SECOND_PRICE = 'SEQUENTIAL_SECOND_PRICE',
+  SIMULTANEOUS_FIRST_PRICE = 'SIMULTANEOUS_FIRST_PRICE',
+  SIMULTANEOUS_SECOND_PRICE = 'SIMULTANEOUS_SECOND_PRICE',
   VCG_XOR = 'VCG_XOR',
-  CCA_VCG = 'CCA_VCG'
+  VCG_OR = 'VCG_OR',
+  CCA_VCG = 'CCA_VCG',
+  CCA_CCG = 'CCA_CCG',
+  PVM_VCG = 'PVM_VCG',
+  PVM_CCG = 'PVM_CCG'
+}
+
+export enum ApiMechanismType {
+  FIRST_PRICE = 'FIRST_PRICE',
+  SECOND_PRICE = 'SECOND_PRICE',
+  VCG_XOR = 'VCG_XOR',
+  VCG_OR = 'VCG_OR',
+  CCG = 'CCG'
 }
 
 export enum ApiDomainType {
@@ -36,7 +52,7 @@ export interface ApiAuctionCreateDTO {
 export interface ApiAuction {
   uuid?: string
   auction: {
-    mechanismType: ApiAuctionType
+    mechanismType: ApiMechanismType
     domain: {
       bidders: ApiBidder[]
       goods: ApiGood[]
@@ -230,6 +246,11 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
 
   // update auctions after placing bids
   auction.commitAppendAuction({ auction: auctionData })
+
+  // remove bids from bidders
+  bidders.forEach(bidder => {
+    bids[bidder.id!] = []
+  })
 
   return auctionData
 }

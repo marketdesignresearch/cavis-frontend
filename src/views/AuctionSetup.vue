@@ -27,11 +27,11 @@ export default Vue.extend({
       // mock creation using store
       const auctionObj: ApiAuctionCreateDTO = {
         domain: {
-          type: ApiDomainType.UNIT_DEMAND_VALUE,
+          type: model.domainType,
           bidders: [], 
           goods: [],
         },
-        auctionType: model.mechanismType
+        auctionType: model.auctionType
       }
 
       for (let i = 0; i < model.numberOfBidders; i++) {

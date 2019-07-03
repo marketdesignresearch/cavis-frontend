@@ -10,7 +10,7 @@
               </tr>
           </thead>
           <tbody>
-              <tr v-if="selectedGoods.length > 0">
+              <tr v-if="selectedGoods.length > 0 && allowedToBid">
                   <td>
                     <good-badge :goods="selectedGoods" />
                   </td>
@@ -18,12 +18,17 @@
                     <input v-model="bid" type="number" class="form-control" placeholder="Your Bid">
                   </td>
                   <td class="text-right">
-                    <button @click="placeBid" class="btn btn-primary btn-sm float-right">Bid</button>
+                    <button @click="placeBid" :disabled="!allowedGoods" class="btn btn-primary btn-sm float-right">Bid</button>
                   </td>
               </tr>
-              <tr v-if="selectedGoods.length === 0">
+              <tr v-if="selectedGoods.length === 0 && allowedToBid">
                 <td class="text-center" colspan="3">
                   Select a good to bid on it
+                </td>
+              </tr>
+              <tr v-if="!allowedToBid">
+                <td class="text-center" colspan="3">
+                  You have reached the maximum amount of bids.
                 </td>
               </tr>
           </tbody>
@@ -35,9 +40,10 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Input, Button } from 'element-ui'
-import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder } from '../../../store/modules/auction'
 import GoodBadgeComponent from '../GoodBadge.vue'
 import BidderService from '@/services/bidder'
+import GoodsService from '@/services/goods'
 
 export default Vue.extend({
     props: ['auctionId', 'bidder', 'selectedGoods'],
@@ -47,16 +53,34 @@ export default Vue.extend({
         'good-badge': GoodBadgeComponent
     },
     watch: {
-      'selectedGoods': function () {
+      'selectedGoods': function() {
         this.determineBid()
       },
-      'bidder': function () {
+      'bidder': function() {
         this.determineBid()
       }
     },
     data () {
       return {
         bid: null
+      }
+    },
+    computed: {
+      allowedGoods: function () {
+        console.log(GoodsService.isAllowed(this.$props.bidder, this.$props.auctionId, this.$props.selectedGoods))
+        return GoodsService.isAllowed(this.$props.bidder, this.$props.auctionId, this.$props.selectedGoods)
+      },
+      allowedToBid: function () {
+        if (!this.$props.bidder || !(this.$props.bidder as ApiBidder).bids) {
+          return true
+        }
+        const allowedNumberOfBids = auction.auctionById()(this.$props.auctionId).auction.allowedNumberOfBids
+
+        if (allowedNumberOfBids === 0) {
+          return false
+        }
+
+        return allowedNumberOfBids > (this.$props.bidder as ApiBidder).bids.length
       }
     },
     methods: {

@@ -26,8 +26,14 @@ export default Vue.extend({
     computed: {
       auctionType(): string {
         switch (this.$props.auction.auction.mechanismType) {
-          case (ApiAuctionType.VCG_XOR):
-            return 'CCA VCG'
+          case (ApiAuctionType.SEQUENTIAL_FIRST_PRICE):
+            return 'Sequential First-Price'
+          case (ApiAuctionType.SEQUENTIAL_SECOND_PRICE):
+            return 'Sequential Second-Price'
+          case (ApiAuctionType.SIMULTANEOUS_FIRST_PRICE):
+            return 'Simultaneous First-Price'
+          case (ApiAuctionType.SIMULTANEOUS_SECOND_PRICE):
+            return 'Simultaneous Second-Price'
           default:
             return ''
         }

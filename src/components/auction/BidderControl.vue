@@ -15,7 +15,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="(goodSet, index) in goodCombinations" :key="'set' + index" :class="{ 'active' : isActive(goodSet) }" @click="selectGoods(goodSet)">
+                    <tr v-for="(goodSet, index) in goodCombinations" :key="'set' + index" :class="{ 'active' : isActive(goodSet), 'disabled': !isAllowed(goodSet) }" @click="selectGoods(goodSet)">
                         <td><good-badge :goods="goodSet" /></td>
                         <td>{{ valueForGood(goodSet) }}</td>
                         <td v-if="pricedAuction">{{ priceForGood(goodSet) }}</td>
@@ -32,8 +32,8 @@
       <div class="col">
           <!-- <button class="btn btn-primary mx-2" @click="autoBid">Autobid</button> -->
           <component 
-            v-if="mechanismType"  
-            :is="'component-bid-' + mechanismType"
+            v-if="auctionType"  
+            :is="'component-bid-' + auctionType"
             :auctionId="auctionId" 
             :bidder="selectedBidder" 
             :selectedGoods="selectedGoods"
@@ -68,13 +68,16 @@ export default Vue.extend({
     goodCombinations (): ApiGood[][] {
         return GoodsService.goodCombinations(this.$props.auctionId)
     },
-    mechanismType () {
+    auctionType () {
         if (!this.$props.auctionId) return null
         const auctionInstance = auction.auctionById()(this.$props.auctionId)
-        return auctionInstance.auction.mechanismType
+        return auctionInstance.auctionType
     }
   },
   methods: {
+      isAllowed(goods: ApiGood[]): boolean {
+        return GoodsService.isAllowed(this.$props.selectedBidder, this.$props.auctionId, goods)
+      },
       isActive(goods: ApiGood[]): boolean {
           if (!this.$props.selectedGoods) {
               return false
@@ -115,6 +118,11 @@ export default Vue.extend({
 
 tr.active {
     background-color: rgba(0, 0, 0, 0.075);
+}
+
+tr.disabled {
+    opacity: 0.5;
+    pointer-events: none;
 }
 
 </style>

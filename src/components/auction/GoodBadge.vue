@@ -14,13 +14,22 @@ const GoodBadgeComponent = Vue.extend({
   props: ['goods'],
   computed: {
       unifiedGoods(): ApiGood[] {
+          let goods = []
+
           if (Array.isArray(this.$props.goods) && this.$props.goods.length > 0 && typeof this.$props.goods[0] === 'object') {
-              return this.$props.goods
-          }
-          return this.$props.goods.map((good: string) => {
+            goods = this.$props.goods
+          } else {
+           goods = this.$props.goods.map((good: string) => {
               return {
                   id: good
               }
+            })
+          }
+
+          return goods.sort((goodA: ApiGood, goodB: ApiGood) => {
+              if (goodA.id < goodB.id) { return - 1 }
+              if (goodA.id > goodB.id) { return 1 }
+              return 0
           })
       }
   }

@@ -19,95 +19,92 @@
     </div>
 
     <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
-      <div class="row">
-        <div class="col">
-          <div class="card-body" v-if="currentRound">
-            <h4 class="card-subtitle mb-2 text-muted">Current Allocation</h4>
-            <table class="table table-bidder table-sm table-striped">
-              <thead>
-                <tr>
-                  <th scope="col">Bidder</th>
-                  <th scope="col">Bid</th>
-                  <th scope="col">Payment</th>
-                  <th scope="col">Goods</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(value, key) in currentRound.mechanismResult.allocation" :key="key">
-                  <td>{{ key }}</td>
-                  <td>{{ value.value }}</td>
-                  <td>{{ currentRound.mechanismResult.payments[key] }}</td>
-                  <td>
-                    <span class="badge badge-sm badge-success" v-for="(value, key) in value.goods" :key="key">
-                      {{ value }}x {{ key }}
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-
-            <h4 class="card-subtitle mb-2 text-muted">Current Bids</h4>
-            <table class="table table-bidder table-sm table-striped">
-              <thead>
-                <tr>
-                  <th scope="col">Bidder</th>
-                  <th scope="col">Bundle</th>
-                  <th scope="col">Bid</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="bid of currentRound.bids" :key="bid.id">
-                  <td>{{ bid.bidderId }}</td>
-                  <td><span class="badge badge-sm badge-secondary" v-for="(bundle, index) in bid.bundle" :key="'bundle-' + index">{{ bundle.amount }}x {{ bundle.good }}</span></td>
-                  <td>{{ bid.amount }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="card-body">
-            <b-tabs content-class="mt-3">
-              <b-tab v-for="round in rounds" :title="'Round' + round.roundNumber" :key="round.roundNumber">
-                <table class="table table-bidder">
-                  <thead>
-                    <tr>
-                      <th scope="col">Bidder</th>
-                      <th scope="col">
-                        <div>Values</div>
-                        <span class="mr-2" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
-                          <good-badge :goods="goodSet" />
-                        </span>
-                      </th>
-                      <th scope="col">Bids</th>
-                      <th scope="col">Allocation</th>
-                      <th scope="col">Payment</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="bidder of bidders" :key="bidder.id">
-                      <td>{{ bidder.name }}</td>
-                      <td>
-                        <span class="mr-2" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
-                          {{ valueForGood(bidder, goodSet) }}
-                        </span>
-                      </td>
-                      <td>
-                        tbd
-                      </td>
-                      <td>
-                        tbd
-                      </td>
-                      <td>
-                        tbd
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </b-tab>
-            </b-tabs>
-          </div>
-        </div>
+      <div v-if="currentRound">
+        <h4 class="card-subtitle mb-2 text-muted">Current Allocation</h4>
+        
+        <table class="table table-bidder">
+          <thead>
+            <tr>
+              <th scope="col">Bidder</th>
+              <th scope="col">Bid</th>
+              <th scope="col">Payment</th>
+              <th scope="col">Goods</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(value, key) in currentRound.mechanismResult.allocation" :key="key">
+              <td>{{ key }}</td>
+              <td>{{ value.value }}</td>
+              <td>{{ currentRound.mechanismResult.payments[key] }}</td>
+              <td>
+                <span class="badge badge-sm badge-success" v-for="(value, key) in value.goods" :key="key">
+                  {{ value }}x {{ key }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <h4 class="card-subtitle mb-2 text-muted">Current Bids</h4>
+        <table class="table table-bidder">
+          <thead>
+            <tr>
+              <th scope="col">Bidder</th>
+              <th scope="col">Bundle</th>
+              <th scope="col">Bid</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="bid of currentRound.bids" :key="bid.id">
+              <td>{{ bid.bidderId }}</td>
+              <td><span class="badge badge-sm badge-secondary" v-for="(bundle, index) in bid.bundle" :key="'bundle-' + index">{{ bundle.amount }}x {{ bundle.good }}</span></td>
+              <td>{{ bid.amount }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
+      <b-tabs content-class="mt-3">
+        <b-tab v-for="round in rounds" :title="'Round ' + round.roundNumber" :key="round.roundNumber">
+          <table class="table table-bidder">
+            <thead>
+              <tr>
+                <th scope="col">Bidder</th>
+                <th scope="col">
+                  <div>Values</div>
+                  <div class="d-flex d-flex-column">
+                    <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
+                      <good-badge :goods="goodSet" />
+                    </div>
+                  </div>
+                </th>
+                <th scope="col">Bids</th>
+                <th scope="col">Allocation</th>
+                <th scope="col">Payment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="bidder of bidders" :key="bidder.id">
+                <td>{{ bidder.name }}</td>
+                <td>
+                  <div class="d-flex d-flex-column">
+                    <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
+                      {{ valueForGood(bidder, goodSet) }}
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  -
+                </td>
+                <td>
+                  -
+                </td>
+                <td>
+                  -
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </b-tab>
+      </b-tabs>
     </b-collapse>
   </div>
 </template>
@@ -134,7 +131,7 @@ export default Vue.extend({
       return rounds[rounds.length - 1]
     },
     rounds (): ApiRound[] {
-      return this.$props.auction.auction.rounds
+      return [{ roundNumber: 0 }, ...this.$props.auction.auction.rounds]
     },
     goods (): ApiGood[] {
       const goods = this.$props.auction.auction.domain.goods
@@ -179,5 +176,9 @@ export default Vue.extend({
 
 .logo {
   width: 50px;
+}
+
+.flex-basis-0 {
+  flex-basis: 0;
 }
 </style>

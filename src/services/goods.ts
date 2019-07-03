@@ -73,5 +73,29 @@ export default {
       return correctBid ? correctBid.amount : null
     }
     return null
+  },
+  isAllowed(bidder: ApiBidder, auctionId: string, goods: ApiGood[] | string[]): boolean {
+    if (!bidder) {
+      return false
+    }
+
+    let convertedGoods: string[]
+
+    if (goods.length > 0 && typeof goods[0] === 'object') {
+      convertedGoods = (goods as ApiGood[]).map(obj => obj.id)
+    } else {
+      convertedGoods = goods as string[]
+    }
+
+    const currentAuction = auction.auctionById()(auctionId)
+    if (currentAuction.auction.restrictedBids && currentAuction.auction.restrictedBids[bidder.id!]) {
+      const goodIds: string[] = currentAuction.auction.restrictedBids[bidder.id!].map((obj: any) => {
+        return obj.map((obj: any) => obj.good).join()
+      })
+
+      return goodIds.find(id => id === convertedGoods.join()) !== undefined
+    }
+
+    return false
   }
 }

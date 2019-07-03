@@ -30,6 +30,7 @@
                           class="align-self-center d-inline-flex"
                           :isSelected="selectedGoods.indexOf(good.id) !== -1"
                           :auctionId="auctionId"
+                          :bidder="selectedBidder"
                           :good="good" />
                       </span>
 
