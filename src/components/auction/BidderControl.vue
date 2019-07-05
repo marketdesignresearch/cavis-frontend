@@ -75,7 +75,7 @@ export default Vue.extend({
     }
   },
   methods: {
-      isAllowed(goods: ApiGood[]): boolean {
+      isAllowed(goods: string[]): boolean {
         return GoodsService.isAllowed(this.$props.selectedBidder, this.$props.auctionId, goods)
       },
       isActive(goods: ApiGood[]): boolean {
