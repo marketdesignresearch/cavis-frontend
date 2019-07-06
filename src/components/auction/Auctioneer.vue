@@ -1,10 +1,7 @@
 <template>
   <div v-if="auction">
-
     <div class="row">
-      <div class="col">
-      
-      </div>
+      <div class="col"></div>
       <div class="col text-center">
         <img src="../../assets/auctioneer.png" class="logo mt-3" v-b-toggle.collapse-auctioneer />
         <p>
@@ -19,6 +16,7 @@
     </div>
 
     <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
+      <!--
       <div v-if="currentRound">
         <h4 class="card-subtitle mb-2 text-muted">Current Allocation</h4>
         
@@ -62,6 +60,7 @@
           </tbody>
         </table>
       </div>
+      -->
       <b-tabs content-class="mt-3">
         <b-tab v-for="round in rounds" :title="'Round ' + round.roundNumber" :key="round.roundNumber">
           <table class="table table-bidder">
@@ -92,13 +91,15 @@
                   </div>
                 </td>
                 <td>
-                  -
+                  <span v-for="bid in bidsByBidder(bidder, round)" :key="bid.id">
+                    <good-badge :goods="bid.bundle.map(obj => obj.good)" />
+                  </span>
                 </td>
                 <td>
-                  -
+                  <good-badge :goods="allocationForBidder(bidder, round)" />
                 </td>
                 <td>
-                  -
+                  {{ paymentForGoods(bidder, round) }}
                 </td>
               </tr>
             </tbody>
@@ -110,11 +111,11 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from 'vue'
 import auction, { ApiAuctionType, ApiRound, ApiAuction, ApiBidder, ApiGood } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
-import GoodBadgeComponent from './GoodBadge.vue';
+import GoodBadgeComponent from './GoodBadge.vue'
 
 export default Vue.extend({
   name: 'AuctionAuctioneer',
@@ -123,36 +124,36 @@ export default Vue.extend({
     'good-badge': GoodBadgeComponent
   },
   computed: {
-    roundType (): string {
+    roundType(): string {
       return 'component-round-' + this.$props.auction.auctionType
     },
-    currentRound (): ApiRound | null {
+    currentRound(): ApiRound | null {
       const rounds = this.$props.auction.auction.rounds
       return rounds[rounds.length - 1]
     },
-    rounds (): ApiRound[] {
-      return [{ roundNumber: 0 }, ...this.$props.auction.auction.rounds]
+    rounds(): ApiRound[] {
+      return [...this.$props.auction.auction.rounds]
     },
-    goods (): ApiGood[] {
+    goods(): ApiGood[] {
       const goods = this.$props.auction.auction.domain.goods
       return goods
     },
-    bidders (): ApiBidder[] {
+    bidders(): ApiBidder[] {
       const bidders = this.$props.auction.auction.domain.bidders
       return bidders
     },
-    goodCombinations (): ApiGood[][] {
-      return GoodsService.goodCombinations(this.$props.auction.uuid)
+    goodCombinations(): ApiGood[][] {
+      return GoodsService.goodCombinations(this.$props.auction.id)
     }
   },
   methods: {
-    autoBid () {
+    autoBid() {
       BidderService.autoBidAll(this.$props.auction.id)
     },
-    allocate () {
+    allocate() {
       auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
     },
-    results () {
+    results() {
       this.allocate()
       this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
     },
@@ -164,9 +165,29 @@ export default Vue.extend({
     },
     bidForGood(bidder: ApiBidder, goods: ApiGood[]) {
       return GoodsService.bidForGood(bidder, goods)
+    },
+    bidsByBidder(bidder: ApiBidder, round: ApiRound) {
+      if (round.bids) {
+        return round.bids.filter(bid => bid.bidderId === bidder.id)
+      }
+      return []
+    },
+    allocationForBidder(bidder: ApiBidder, round: ApiRound): string[] {
+      if (!round.mechanismResult || !round.mechanismResult.allocation[bidder.id!]) {
+        return []
+      }
+
+      return Object.keys(round.mechanismResult.allocation[bidder.id!].goods)
+    },
+    paymentForGoods(bidder: ApiBidder, round: ApiRound): number | null {
+      if (!round.mechanismResult || !round.mechanismResult.allocation[bidder.id!]) {
+        return null
+      }
+
+      return round.mechanismResult.allocation[bidder.id!].value
     }
   }
-});
+})
 </script>
 
 <style scoped lang="scss">

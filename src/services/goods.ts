@@ -1,4 +1,4 @@
-import auction, { ApiBidder, ApiGood, ApiBid, ApiAuctionType } from '@/store/modules/auction'
+import auction, { ApiBidder, ApiGood, ApiBid, ApiAuctionType, ApiMechanismType } from '@/store/modules/auction'
 
 const powerSet = function(l: any) {
   // TODO: ensure l is actually array-like, and return null if not
@@ -20,11 +20,13 @@ export default {
   goodCombinations(auctionId: string): ApiGood[][] {
     if (!auctionId) return []
 
-    const goods = auction.goodsById()(auctionId)
+    const goods = auction
+      .goodsById()(auctionId)
+      .slice(0, 5) // limit the combinations
     const currentAuction = auction.auctionById()(auctionId)
 
     // check if we have bundle-bids
-    if (currentAuction.auction.mechanismType === ApiAuctionType.VCG_XOR) {
+    if (currentAuction.auction.mechanismType === ApiMechanismType.VCG_XOR) {
       return powerSet(goods).filter((goods: []) => goods.length > 0)
     }
 
@@ -94,6 +96,8 @@ export default {
       })
 
       return goodIds.find(id => id === convertedGoods.join()) !== undefined
+    } else if (Object.keys(currentAuction.auction.restrictedBids).length === 0) {
+      return true
     }
 
     return false

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import api from '@/services/api'
 import { getStoreBuilder, BareActionContext } from 'vuex-typex'
 import { RootState } from '..'
+import goods from '@/services/goods'
 
 export interface AuctionState {
   auctions: {
@@ -50,7 +51,7 @@ export interface ApiAuctionCreateDTO {
 }
 
 export interface ApiAuction {
-  uuid?: string
+  id?: string
   auction: {
     mechanismType: ApiMechanismType
     domain: {
@@ -76,6 +77,7 @@ export interface ApiAuction {
 export interface ApiRound {
   roundNumber: number
   bids: ApiBid[]
+  mechanismResult: ApiAuctionAllocation
 }
 
 export interface ApiBidder {
@@ -159,10 +161,47 @@ const priceForGood = moduleBuilder.read(
   'priceForGood'
 )
 
+const valueForBundle = moduleBuilder.read(
+  state => (auctionId: string, bidderId: string, bundle: string[]) => {
+    if (!state.auctions[auctionId]) {
+      return null
+    }
+
+    const currentBidder = state.auctions[auctionId].auction.domain.bidders.find(obj => obj.id === bidderId)
+
+    if (!currentBidder || !currentBidder.value) {
+      return null
+    }
+
+    const value = currentBidder.value.bundleValues.find(
+      bid =>
+        bid.bundle
+          .map(val => val.good)
+          .sort()
+          .join('') === bundle.sort().join('')
+    )
+
+    return value
+  },
+  'valueForBundle'
+)
+
 // mutations
 function appendAuctionMutation(state: AuctionState, payload: { auction: ApiAuction }) {
-  if (payload.auction.uuid) {
-    Vue.set(state.auctions, payload.auction.uuid, { ...payload.auction })
+  if (payload.auction.id) {
+    Vue.set(state.auctions, payload.auction.id, { ...payload.auction })
+  }
+}
+
+function addBundleValue(state: AuctionState, payload: { auctionId: string; bidderId: string; bundleValue: ApiBid }) {
+  const bidder: ApiBidder | undefined = state.auctions[payload.auctionId].auction.domain.bidders.find(obj => obj.id === payload.bidderId)
+
+  if (bidder) {
+    if (!bidder.value) {
+      Vue.set(bidder, 'value', { bundleValues: [payload.bundleValue] })
+    } else {
+      bidder.value.bundleValues.push(payload.bundleValue)
+    }
   }
 }
 
@@ -266,6 +305,38 @@ async function resetAuctionToRound(context: BareActionContext<AuctionState, Root
   auction.commitAppendAuction({ auction: data })
 }
 
+async function valueQuery(
+  context: BareActionContext<AuctionState, RootState>,
+  payload: { auctionId: string; bidders: ApiBidder[]; goodIds: string[] }
+) {
+  const bundle: { [x: string]: number } = {}
+
+  payload.goodIds.forEach(id => {
+    bundle[id] = 1
+  })
+
+  const valueQuery = {
+    bidders: payload.bidders.map(value => value.id),
+    bundle: bundle
+  }
+
+  const { data: valueQueryResult } = await api().post(`/auctions/${payload.auctionId}/valuequery`, valueQuery)
+
+  Object.keys(valueQueryResult).forEach(bidderId => {
+    const apiBid: ApiBid = {
+      amount: valueQueryResult[bidderId],
+      bundle: Object.keys(valueQuery.bundle).map(key => {
+        return {
+          good: key,
+          amount: valueQuery.bundle[key]
+        }
+      }),
+      bidderId: bidderId
+    }
+    auction.commitBundleValue({ auctionId: payload.auctionId, bidderId: bidderId, bundleValue: apiBid })
+  })
+}
+
 const stateGetter = moduleBuilder.state()
 
 const auction = {
@@ -303,12 +374,17 @@ const auction = {
     return priceForGood
   },
 
+  get valueForBundle() {
+    return valueForBundle
+  },
+
   // mutations
   commitAppendAuction: moduleBuilder.commit(appendAuctionMutation),
   commitUpdateBidder: moduleBuilder.commit(updateBid),
   commitRemoveBid: moduleBuilder.commit(removeBid),
   commitResult: moduleBuilder.commit(addResult),
   commitToggleGoodSelection: moduleBuilder.commit(toggleGoodSelection),
+  commitBundleValue: moduleBuilder.commit(addBundleValue),
 
   // actions
   dispatchGetAuction: moduleBuilder.dispatch(getAuction),
@@ -316,7 +392,8 @@ const auction = {
   dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
   dispatchPlaceBids: moduleBuilder.dispatch(placeBids),
   dispatchGetAuctionResult: moduleBuilder.dispatch(getResult),
-  dispatchResetAuctionToRound: moduleBuilder.dispatch(resetAuctionToRound)
+  dispatchResetAuctionToRound: moduleBuilder.dispatch(resetAuctionToRound),
+  dispatchValueQuery: moduleBuilder.dispatch(valueQuery)
 }
 
 export default auction

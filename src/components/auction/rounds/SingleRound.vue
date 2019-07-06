@@ -11,19 +11,17 @@ import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../../store/modules/auction'
 
 export default Vue.extend({
-    props: ['auction'],
-    data () {
-      return {
-      }
-    },
-    methods: {
-      nextRound() {
-        auction.dispatchPlaceBids({ auctionId: this.$props.auction.uuid })
-        this.$router.push({ name: 'auction-result', params: {  id: this.$props.auction.uuid } })
-      }
+  props: ['auction'],
+  data() {
+    return {}
+  },
+  methods: {
+    nextRound() {
+      auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
     }
+  }
 })
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>

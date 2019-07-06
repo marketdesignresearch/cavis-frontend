@@ -13,13 +13,15 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="auction in auctions" :key="auction.uuid">
-          <td>{{ auction.uuid }}</td>
+        <tr v-for="auction in auctions" :key="auction.id">
+          <td>{{ auction.id }}</td>
           <td>{{ auction.auction.domain.bidders.length }}</td>
           <td>{{ auction.auction.rounds.length }}</td>
           <td>{{ auction.auction.mechanismType }}</td>
           <td>
-            <router-link tag="button" :to="{ name: 'auction', params: { id: auction.uuid } }" class="btn btn-sm btn-primary">Load</router-link>
+            <router-link tag="button" :to="{ name: 'auction', params: { id: auction.id } }" class="btn btn-sm btn-primary"
+              >Load</router-link
+            >
           </td>
         </tr>
       </tbody>
@@ -34,15 +36,14 @@ import auction from '../store/modules/auction'
 export default Vue.extend({
   name: 'AuctionListView',
   computed: {
-    auctions () {
+    auctions() {
       return auction.auctions()
     }
   },
-  mounted () {
+  mounted() {
     auction.dispatchGetAuctions()
   }
 })
 </script>
 
-<style scoped lang="scss">
-</style>
+<style scoped lang="scss"></style>
