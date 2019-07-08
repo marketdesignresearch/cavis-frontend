@@ -2,7 +2,6 @@ import Vue from 'vue'
 import api from '@/services/api'
 import { getStoreBuilder, BareActionContext } from 'vuex-typex'
 import { RootState } from '..'
-import goods from '@/services/goods'
 
 export interface AuctionState {
   auctions: {
@@ -54,6 +53,7 @@ export interface ApiAuction {
   id?: string
   auction: {
     mechanismType: ApiMechanismType
+    finished: boolean
     domain: {
       bidders: ApiBidder[]
       goods: ApiGood[]
@@ -271,7 +271,7 @@ async function createAuction(context: BareActionContext<AuctionState, RootState>
   return data
 }
 
-async function placeBids(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+async function placeBids(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }): Promise<ApiAuction> {
   const bidders = context.state.auctions[payload.auctionId].auction.domain.bidders
   const bids: { [index: string]: any } = {}
 
@@ -291,7 +291,7 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
     bids[bidder.id!] = []
   })
 
-  return auctionData
+  return auctionData as ApiAuction
 }
 
 async function getResult(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
@@ -304,6 +304,11 @@ async function resetAuctionToRound(context: BareActionContext<AuctionState, Root
   const { data } = await api().put(`/auctions/${payload.auctionId}/reset`, { round: payload.round })
   auction.commitAppendAuction({ auction: data })
 }
+
+async function demandQuery(
+  context: BareActionContext<AuctionState, RootState>,
+  payload: { auctionId: string; bidders: ApiBidder[]; goodIds: string[] }
+) {}
 
 async function valueQuery(
   context: BareActionContext<AuctionState, RootState>,
@@ -393,7 +398,8 @@ const auction = {
   dispatchPlaceBids: moduleBuilder.dispatch(placeBids),
   dispatchGetAuctionResult: moduleBuilder.dispatch(getResult),
   dispatchResetAuctionToRound: moduleBuilder.dispatch(resetAuctionToRound),
-  dispatchValueQuery: moduleBuilder.dispatch(valueQuery)
+  dispatchValueQuery: moduleBuilder.dispatch(valueQuery),
+  dispatchDemandQuery: moduleBuilder.dispatch(demandQuery)
 }
 
 export default auction

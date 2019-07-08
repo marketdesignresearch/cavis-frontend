@@ -16,9 +16,11 @@ export default Vue.extend({
     return {}
   },
   methods: {
-    nextRound() {
-      auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
-      this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
+    async nextRound() {
+      const result = await auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      if (result.auction.finished) {
+        this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
+      }
     }
   }
 })

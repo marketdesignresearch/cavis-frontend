@@ -178,7 +178,6 @@ export default Vue.extend({
   computed: {
     valueForGoods(): number {
       const value = auction.valueForBundle()(this.$route.params.id, this.$data.selectedBidder.id, this.$data.selectedGoods)
-      console.log(value)
 
       if (value) {
         return value.amount
@@ -189,6 +188,7 @@ export default Vue.extend({
         bidders: [this.$data.selectedBidder],
         goodIds: this.$data.selectedGoods
       })
+
       return 0
     },
     rounds(): number[] {
@@ -196,11 +196,13 @@ export default Vue.extend({
     },
     leftSideBidders() {
       const bidders = auction.biddersById()(this.$route.params.id)
-      return bidders.slice(0, bidders.length / 2)
+      const isEven = bidders.length % 2 === 0
+      return bidders.slice(0, isEven ? bidders.length / 2 : bidders.length / 2 - 1)
     },
     rightSideBidders() {
       const bidders = auction.biddersById()(this.$route.params.id)
-      return bidders.slice(bidders.length / 2, bidders.length)
+      const isEven = bidders.length % 2 === 0
+      return bidders.slice(isEven ? bidders.length / 2 : bidders.length / 2 - 1, bidders.length)
     },
     goods() {
       const goods = auction.goodsById()(this.$route.params.id)

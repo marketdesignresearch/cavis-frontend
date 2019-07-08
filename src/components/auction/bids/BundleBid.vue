@@ -59,7 +59,6 @@ export default Vue.extend({
   },
   computed: {
     allowedGoods: function() {
-      console.log(GoodsService.isAllowed(this.$props.bidder, this.$props.auctionId, this.$props.selectedGoods))
       return GoodsService.isAllowed(this.$props.bidder, this.$props.auctionId, this.$props.selectedGoods)
     },
     allowedToBid: function() {

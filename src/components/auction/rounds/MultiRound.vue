@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="small pb-2">Auction: {{ auctionType }}</div>
+  <div class="small">
+    <div>Auction: {{ auctionType }}</div>
     <div>
       Round:
       <nav v-if="rounds" class="d-inline-flex">
@@ -14,19 +14,19 @@
       </nav>
     </div>
 
-    <button class="btn btn-success btn-sm" @click="nextRound()">Next Round</button>
+    <button class="btn mt-2 btn-success btn-sm" @click="nextRound()">Next Round</button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound } from '../../../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound, ApiMechanismType } from '../../../store/modules/auction'
 
 export default Vue.extend({
   props: ['auction'],
   computed: {
     auctionType(): string {
-      switch (this.$props.auction.auction.mechanismType) {
+      switch (this.$props.auction.auctionType) {
         case ApiAuctionType.SEQUENTIAL_FIRST_PRICE:
           return 'Sequential First-Price'
         case ApiAuctionType.SEQUENTIAL_SECOND_PRICE:
@@ -44,11 +44,14 @@ export default Vue.extend({
     }
   },
   methods: {
-    resetRound(round: number) {
+    async resetRound(round: number) {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: round })
     },
-    nextRound() {
-      auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+    async nextRound() {
+      const result = await auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      if (result.auction.finished) {
+        this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
+      }
     }
   }
 })
