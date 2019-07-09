@@ -12,31 +12,19 @@
           <div class="col">
             <div class="d-flex pt-4">
               <div>
-                <span v-for="(bidder, index) in leftSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
-                  <AuctionBidder
-                    class="align-self-start"
-                    :isSelected="selectedBidder === bidder"
-                    :selectedGoods="selectedGoods"
-                    :auctionId="auctionId"
-                    :bidder="bidder"
-                  />
+                <span v-for="bidderId in leftSideBidders" :key="bidderId" @click="selectBidder(bidderId)">
+                  <AuctionBidder class="align-self-start" :auctionId="auctionId" :bidderId="bidderId" />
                 </span>
               </div>
 
               <div class="flex-row text-center flex-grow-1 mx-2">
                 <div class="goods-container" :class="{ selected: selectedBidder }">
-                  <span v-for="(good, index) in goods" :key="'i' + index" @click="selectGood(good)">
-                    <AuctionGood
-                      class="align-self-center d-inline-flex"
-                      :isSelected="selectedGoods.indexOf(good.id) !== -1"
-                      :auctionId="auctionId"
-                      :bidder="selectedBidder"
-                      :good="good"
-                    />
+                  <span v-for="goodId in goods" :key="goodId" @click="selectGood(goodId)">
+                    <AuctionGood class="align-self-center d-inline-flex" :goodId="goodId" :auctionId="auctionId" />
                   </span>
 
-                  <div class="mt-4" v-if="selectedGoods.length > 0">
-                    Value of <good-badge :goods="selectedGoods" /> for {{ selectedBidder.name }}:
+                  <div class="mt-4" v-if="selectedGoods.length > 0 && selectedBidder">
+                    Value of <good-badge :ids="selectedGoods" /> for {{ selectedBidder.name }}:
                     <h2 class="mt-4">
                       {{ valueForGoods }}
                     </h2>
@@ -45,14 +33,8 @@
               </div>
 
               <div>
-                <span v-for="(bidder, index) in rightSideBidders" :key="'b' + index" @click="selectBidder(bidder)">
-                  <AuctionBidder
-                    class="align-self-start"
-                    :isSelected="selectedBidder === bidder"
-                    :selectedGoods="selectedGoods"
-                    :auctionId="auctionId"
-                    :bidder="bidder"
-                  />
+                <span v-for="bidderId in rightSideBidders" :key="bidderId" @click="selectBidder(bidderId)">
+                  <AuctionBidder class="align-self-start" :auctionId="auctionId" :bidderId="bidderId" />
                 </span>
               </div>
             </div>
@@ -66,7 +48,7 @@
         <div class="text-center" v-if="!selectedBidder">
           <h4 class="text-muted">select bidder to view details</h4>
         </div>
-        <BidderControl @selectGoods="selectGoods" :selectedGoods="selectedGoods" :selectedBidder="selectedBidder" :auctionId="auctionId" />
+        <BidderControl :auctionId="auctionId" />
       </div>
     </div>
 
@@ -102,9 +84,10 @@ import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
 import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid } from '../store/modules/auction'
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
+import selection, { SelectionState } from '../store/modules/selection'
+import { mapGetters, mapState } from 'vuex'
 
 export default Vue.extend({
-  name: 'AuctionTable',
   components: {
     AuctionGood: AuctionGoodComponent,
     AuctionBidder: AuctionBidder,
@@ -116,42 +99,27 @@ export default Vue.extend({
   },
   data() {
     return {
-      bidsPlaced: false,
-      selectedGoods: [],
-      selectedBidder: null
+      bidsPlaced: false
     }
   },
   mounted() {
     auction.dispatchGetAuction({ auctionId: this.$route.params.id })
   },
   methods: {
-    selectGoods(goods: ApiGood[]) {
-      this.$data.selectedGoods = goods
+    selectGood(goodId: string) {
+      selection.commitSelectGood({ goodId: goodId })
     },
-    selectGood(good: ApiGood) {
-      if (!this.$data.selectedBidder) {
-        return
-      }
-
-      if (this.$data.selectedGoods.indexOf(good.id) === -1) {
-        this.$data.selectedGoods.push(good.id)
-      } else {
-        this.$data.selectedGoods.splice(this.$data.selectedGoods.indexOf(good.id))
-      }
-    },
-    selectBidder(bidder: ApiBidder) {
-      if (this.$data.selectedBidder === bidder) {
-        this.$data.selectedBidder = null
-      } else {
-        this.$data.selectedBidder = bidder
-      }
+    selectBidder(bidderId: string) {
+      selection.commitSelectBidder({ bidderId: bidderId })
     },
     placeBids() {
       auction.dispatchPlaceBids({ auctionId: this.$route.params.id })
       this.$data.bidsPlaced = true
     },
     autoBid() {
-      const bidders = auction.biddersById()(this.$route.params.id)
+      const bidders = auction
+        .biddersById()(this.$route.params.id)
+        .map(bidderId => auction.bidderById()(bidderId))
 
       bidders.forEach(bidder => {
         if (bidder.value && bidder.id) {
@@ -160,7 +128,6 @@ export default Vue.extend({
             bundle[bid.good] = bid.amount
           })
           auction.commitUpdateBidder({
-            auctionId: this.$route.params.id,
             bidderId: bidder.id!,
             bid: {
               amount: bidder.value.bundleValues[0].amount,
@@ -176,18 +143,31 @@ export default Vue.extend({
     }
   },
   computed: {
-    valueForGoods(): number {
-      const value = auction.valueForBundle()(this.$route.params.id, this.$data.selectedBidder.id, this.$data.selectedGoods)
-
-      if (value) {
-        return value.amount
+    ...mapGetters('selection', ['selectedGoods']),
+    ...mapState('selection', {
+      selectedBidder(state: SelectionState) {
+        if (state.selectedBidder) {
+          return auction.bidderById()(state.selectedBidder)
+        }
+        return null
       }
+    }),
+    valueForGoods(): number {
+      const selectedBidder = selection.selectedBidder()
 
-      auction.dispatchValueQuery({
-        auctionId: this.$route.params.id,
-        bidders: [this.$data.selectedBidder],
-        goodIds: this.$data.selectedGoods
-      })
+      if (selectedBidder) {
+        const value = auction.valueForBundle()(this.$route.params.id, selectedBidder, selection.selectedGoods())
+
+        if (value) {
+          return value.amount
+        }
+
+        auction.dispatchValueQuery({
+          auctionId: this.$route.params.id,
+          bidderIds: [selectedBidder],
+          goodIds: selection.selectedGoods()
+        })
+      }
 
       return 0
     },
@@ -197,12 +177,12 @@ export default Vue.extend({
     leftSideBidders() {
       const bidders = auction.biddersById()(this.$route.params.id)
       const isEven = bidders.length % 2 === 0
-      return bidders.slice(0, isEven ? bidders.length / 2 : bidders.length / 2 - 1)
+      return bidders.slice(0, isEven ? bidders.length / 2 : bidders.length / 2 + 1)
     },
     rightSideBidders() {
       const bidders = auction.biddersById()(this.$route.params.id)
       const isEven = bidders.length % 2 === 0
-      return bidders.slice(isEven ? bidders.length / 2 : bidders.length / 2 - 1, bidders.length)
+      return bidders.slice(isEven ? bidders.length / 2 : bidders.length / 2 + 1, bidders.length)
     },
     goods() {
       const goods = auction.goodsById()(this.$route.params.id)

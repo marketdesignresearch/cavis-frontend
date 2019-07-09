@@ -5,6 +5,9 @@ import App from './App.vue'
 import router from './router'
 import store from './store/'
 
+// filters
+import './filters/numeral'
+
 import BundleBid from './components/auction/bids/BundleBid.vue'
 import SingleRound from './components/auction/rounds/SingleRound.vue'
 import MultiRound from './components/auction/rounds/MultiRound.vue'
@@ -13,6 +16,7 @@ import VCGRound from './components/auction/rounds/VCGRound.vue'
 
 // bootstrap ui framework
 Vue.use(BootstrapVue)
+
 import './custom.scss'
 import { ApiAuctionType } from './store/modules/auction'
 

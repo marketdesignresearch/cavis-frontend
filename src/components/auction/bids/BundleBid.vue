@@ -12,10 +12,10 @@
         <tbody>
           <tr v-if="selectedGoods.length > 0 && allowedToBid">
             <td>
-              <good-badge :goods="selectedGoods" />
+              <good-badge :ids="selectedGoods" />
             </td>
             <td>
-              <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" />
+              <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" :disabled="bidEditable" />
             </td>
             <td class="text-right">
               <button @click="placeBid" :disabled="!allowedGoods" class="btn btn-primary btn-sm float-right">Bid</button>
@@ -44,9 +44,11 @@ import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder } from '../../..
 import GoodBadgeComponent from '../GoodBadge.vue'
 import BidderService from '@/services/bidder'
 import GoodsService from '@/services/goods'
+import selection from '../../../store/modules/selection'
+import { mapGetters } from 'vuex'
 
 export default Vue.extend({
-  props: ['auctionId', 'bidder', 'selectedGoods'],
+  props: ['auctionId'],
   components: {
     'el-input': Input,
     'el-button': Button,
@@ -58,55 +60,72 @@ export default Vue.extend({
     }
   },
   computed: {
+    ...mapGetters('selection', ['selectedGoods']),
+    bidEditable: function() {
+      const auctionInstance = auction.auctionById()(this.$props.auctionId)
+      return auctionInstance.auction.currentRoundType && auctionInstance.auction.currentRoundType === 'CLOCK'
+    },
     allowedGoods: function() {
-      return GoodsService.isAllowed(this.$props.bidder, this.$props.auctionId, this.$props.selectedGoods)
+      const bidderId = selection.selectedBidder()
+      return GoodsService.isAllowed(bidderId, this.$props.auctionId)
     },
     allowedToBid: function() {
-      if (!this.$props.bidder || !(this.$props.bidder as ApiBidder).bids) {
-        return true
+      const bidderId = selection.selectedBidder()
+
+      if (!bidderId) {
+        return false
       }
+
+      const bidder = auction.bidderById()(bidderId)
+
       const allowedNumberOfBids = auction.auctionById()(this.$props.auctionId).auction.allowedNumberOfBids
+      const numberOfPlacedBids = bidder.bids ? bidder.bids.length : 0
 
       if (allowedNumberOfBids === 0) {
         return false
       }
 
-      return allowedNumberOfBids > (this.$props.bidder as ApiBidder).bids.length
+      return allowedNumberOfBids > numberOfPlacedBids
+    }
+  },
+  watch: {
+    selectedGoods() {
+      ;(this as any).determineBid()
     }
   },
   methods: {
     determineBid() {
-      if (this.$props.bidder && this.$props.selectedGoods) {
-        this.$data.bid = BidderService.bidForBundle(this.$props.bidder, this.$props.selectedGoods)
+      const bidderId = selection.selectedBidder()
+      const bidder = bidderId ? auction.bidderById()(bidderId) : null
+
+      if (bidder) {
+        this.$data.bid = BidderService.bidForBundle(bidder, selection.selectedGoods(), this.$props.auctionId)
       }
     },
     placeBid() {
+      const bidderId = selection.selectedBidder()
+
+      if (!bidderId) {
+        return
+      }
+
       const bid: any = {
         amount: this.$data.bid,
-        bidderId: this.$props.bidder.id,
+        bidderId: bidderId,
         bundle: {}
       }
 
-      this.$props.selectedGoods.forEach((good: string) => {
+      selection.selectedGoods().forEach((good: string) => {
         bid.bundle[good] = 1
       })
 
       auction.commitUpdateBidder({
-        auctionId: this.$props.auctionId,
-        bidderId: this.$props.bidder.id,
+        bidderId: bidderId,
         bid: bid
       })
     }
   },
-  watch: {
-    selectedGoods: function() {
-      ;(this as any).determineBid() // fix for prod-build, typings somehow do not get recognized
-    },
-    bidder: function() {
-      ;(this as any).determineBid() // fix for prod-build, typings somehow do not get recognized
-    }
-  },
-  name: 'SingleItemAuctionBid'
+  name: 'BundleBid'
 })
 </script>
 

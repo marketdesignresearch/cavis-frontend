@@ -3,10 +3,13 @@ import Vue from 'vue'
 import Vuex, { Store } from 'vuex'
 
 import { AuctionState } from './modules/auction'
+import { SelectionState } from './modules/selection'
 import './modules/auction'
+import './modules/selection'
 
 export interface RootState {
   auction: AuctionState
+  selection: SelectionState
 }
 
 Vue.use(Vuex)

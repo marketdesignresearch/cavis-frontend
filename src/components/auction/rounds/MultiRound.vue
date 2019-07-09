@@ -21,6 +21,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound, ApiMechanismType } from '../../../store/modules/auction'
+import selection from '../../../store/modules/selection'
 
 export default Vue.extend({
   props: ['auction'],
@@ -46,9 +47,11 @@ export default Vue.extend({
   methods: {
     async resetRound(round: number) {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: round })
+      selection.commitUnselectAll()
     },
     async nextRound() {
       const result = await auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      selection.commitUnselectAll()
       if (result.auction.finished) {
         this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
       }

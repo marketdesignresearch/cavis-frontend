@@ -17,7 +17,7 @@ const powerSet = function(l: any) {
 }
 
 export default {
-  goodCombinations(auctionId: string): ApiGood[][] {
+  goodCombinations(auctionId: string): string[][] {
     if (!auctionId) return []
 
     const goods = auction
@@ -32,12 +32,11 @@ export default {
 
     return goods.map(good => [good])
   },
-  valueForGood(bidder: ApiBidder, goods: ApiGood[]): number | null {
+  valueForGood(goodIds: string[], bidderId: string): number | null {
+    const bidder = auction.bidderById()(bidderId)
+
     if (bidder.value && bidder.value.bundleValues) {
-      const ids = goods
-        .map(obj => obj.id)
-        .sort()
-        .join('')
+      const ids = goodIds.sort().join('')
       const correctValue = bidder.value.bundleValues.find(
         (bid: ApiBid) =>
           bid.bundle
@@ -49,22 +48,23 @@ export default {
     }
     return null
   },
-  priceForGood(bidder: ApiBidder, auctionId: string, goods: ApiGood[]): number | null {
+  priceForGood(auctionId: string, goodIds: string[], bidderId: string): number | null {
+    const bidder = auction.bidderById()(bidderId)
+
     if (bidder.value && bidder.value.bundleValues) {
-      return goods
-        .map(obj => auction.priceForGood()(auctionId, obj.id))
+      return goodIds
+        .map(id => auction.priceForGood()(auctionId, id))
         .reduce((previous, current) => {
           return previous! + current!
         })
     }
     return null
   },
-  bidForGood(bidder: ApiBidder, goods: ApiGood[]): number | null {
+  bidForGood(goodIds: string[], bidderId: string): number | null {
+    const bidder = auction.bidderById()(bidderId)
+
     if (bidder.bids) {
-      const ids = goods
-        .map(obj => obj.id)
-        .sort()
-        .join('')
+      const ids = goodIds.sort().join('')
       const correctBid = bidder.bids.find((bid: ApiBid) => {
         return (
           Object.keys(bid.bundle as any)
@@ -76,26 +76,18 @@ export default {
     }
     return null
   },
-  isAllowed(bidder: ApiBidder, auctionId: string, goods: ApiGood[] | string[]): boolean {
-    if (!bidder) {
+  isAllowed(bidderId: string | null, auctionId: string): boolean {
+    if (!bidderId) {
       return false
     }
 
-    let convertedGoods: string[]
-
-    if (goods.length > 0 && typeof goods[0] === 'object') {
-      convertedGoods = (goods as ApiGood[]).map(obj => obj.id)
-    } else {
-      convertedGoods = goods as string[]
-    }
-
     const currentAuction = auction.auctionById()(auctionId)
-    if (currentAuction.auction.restrictedBids && currentAuction.auction.restrictedBids[bidder.id!]) {
-      const goodIds: string[] = currentAuction.auction.restrictedBids[bidder.id!].map((obj: any) => {
+    if (currentAuction.auction.restrictedBids && currentAuction.auction.restrictedBids[bidderId]) {
+      const goodIds: string[] = currentAuction.auction.restrictedBids[bidderId].map((obj: any) => {
         return obj.map((obj: any) => obj.good).join()
       })
 
-      return goodIds.find(id => id === convertedGoods.join()) !== undefined
+      return goodIds.find(id => id === goodIds.join()) !== undefined
     } else if (Object.keys(currentAuction.auction.restrictedBids).length === 0) {
       return true
     }

@@ -16,51 +16,10 @@
     </div>
 
     <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
-      <!--
-      <div v-if="currentRound">
-        <h4 class="card-subtitle mb-2 text-muted">Current Allocation</h4>
-        
-        <table class="table table-bidder">
-          <thead>
-            <tr>
-              <th scope="col">Bidder</th>
-              <th scope="col">Bid</th>
-              <th scope="col">Payment</th>
-              <th scope="col">Goods</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(value, key) in currentRound.mechanismResult.allocation" :key="key">
-              <td>{{ key }}</td>
-              <td>{{ value.value }}</td>
-              <td>{{ currentRound.mechanismResult.payments[key] }}</td>
-              <td>
-                <span class="badge badge-sm badge-success" v-for="(value, key) in value.goods" :key="key">
-                  {{ value }}x {{ key }}
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <h4 class="card-subtitle mb-2 text-muted">Current Bids</h4>
-        <table class="table table-bidder">
-          <thead>
-            <tr>
-              <th scope="col">Bidder</th>
-              <th scope="col">Bundle</th>
-              <th scope="col">Bid</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="bid of currentRound.bids" :key="bid.id">
-              <td>{{ bid.bidderId }}</td>
-              <td><span class="badge badge-sm badge-secondary" v-for="(bundle, index) in bid.bundle" :key="'bundle-' + index">{{ bundle.amount }}x {{ bundle.good }}</span></td>
-              <td>{{ bid.amount }}</td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="float-right">
+        <button @click="advanceRound" class="btn btn-warning btn-sm">Advance Round</button>
+        <button @click="advancePhase" class="btn ml-2 btn-warning btn-sm">Advance Phase</button>
       </div>
-      -->
       <b-tabs content-class="mt-3">
         <b-tab v-for="round in rounds" :title="'Round ' + round.roundNumber" :key="round.roundNumber">
           <table class="table table-bidder">
@@ -71,7 +30,7 @@
                   <div>Values</div>
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
-                      <good-badge :goods="goodSet" />
+                      <good-badge :ids="goodSet" />
                     </div>
                   </div>
                 </th>
@@ -86,20 +45,20 @@
                 <td>
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
-                      {{ valueForGood(bidder, goodSet) }}
+                      {{ valueForGood(bidder, goodSet) | formatNumber }}
                     </div>
                   </div>
                 </td>
                 <td>
                   <span v-for="bid in bidsByBidder(bidder, round)" :key="bid.id">
-                    <good-badge :goods="bid.bundle.map(obj => obj.good)" />
+                    <good-badge :ids="bid.bundle.map(obj => obj.good)" />
                   </span>
                 </td>
                 <td>
-                  <good-badge :goods="allocationForBidder(bidder, round)" />
+                  <good-badge :ids="allocationForBidder(bidder, round)" />
                 </td>
                 <td>
-                  {{ paymentForGoods(bidder, round) }}
+                  {{ paymentForGoods(bidder, round) | formatNumber }}
                 </td>
               </tr>
             </tbody>
@@ -135,21 +94,21 @@ export default Vue.extend({
       return [...this.$props.auction.auction.rounds]
     },
     goods(): ApiGood[] {
-      const goods = this.$props.auction.auction.domain.goods
-      return goods
+      return this.$props.auction.auction.domain.goods.map((goodId: string) => {
+        console.log(goodId)
+        return auction.goodById()(goodId)
+      })
     },
     bidders(): ApiBidder[] {
-      const bidders = this.$props.auction.auction.domain.bidders
-      return bidders
+      return this.$props.auction.auction.domain.bidders.map((bidderId: string) => {
+        return auction.bidderById()(bidderId)
+      })
     },
-    goodCombinations(): ApiGood[][] {
+    goodCombinations(): string[][] {
       return GoodsService.goodCombinations(this.$props.auction.id)
     }
   },
   methods: {
-    autoBid() {
-      BidderService.autoBidAll(this.$props.auction.id)
-    },
     allocate() {
       auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
     },
@@ -157,14 +116,14 @@ export default Vue.extend({
       this.allocate()
       this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
     },
-    valueForGood(bidder: ApiBidder, goods: ApiGood[]) {
-      return GoodsService.valueForGood(bidder, goods)
+    valueForGood(bidder: ApiBidder, goods: string[]) {
+      return GoodsService.valueForGood(goods, bidder.id!)
     },
-    priceForGood(bidder: ApiBidder, goods: ApiGood[]) {
-      return GoodsService.priceForGood(bidder, this.$props.auctionId, goods)
+    priceForGood(bidder: ApiBidder, goods: string[]) {
+      return GoodsService.priceForGood(this.$props.auctionId, goods, bidder.id!)
     },
-    bidForGood(bidder: ApiBidder, goods: ApiGood[]) {
-      return GoodsService.bidForGood(bidder, goods)
+    bidForGood(bidder: ApiBidder, goods: string[]) {
+      return GoodsService.bidForGood(goods, bidder.id!)
     },
     bidsByBidder(bidder: ApiBidder, round: ApiRound) {
       if (round.bids) {
@@ -177,14 +136,20 @@ export default Vue.extend({
         return []
       }
 
-      return Object.keys(round.mechanismResult.allocation[bidder.id!].goods)
+      return round.mechanismResult.allocation[bidder.id!].bundle.map(good => good.good)
     },
     paymentForGoods(bidder: ApiBidder, round: ApiRound): number | null {
-      if (!round.mechanismResult || !round.mechanismResult.allocation[bidder.id!]) {
+      if (!round.mechanismResult || !round.mechanismResult.payments[bidder.id!]) {
         return null
       }
 
-      return round.mechanismResult.allocation[bidder.id!].value
+      return round.mechanismResult.payments[bidder.id!]
+    },
+    advanceRound() {
+      auction.dispatchAdvanceRound({ auctionId: this.$props.auctionId })
+    },
+    advancePhase() {
+      auction.dispatchAdvancePhase({ auctionId: this.$props.auctionId })
     }
   }
 })

@@ -1,54 +1,65 @@
 <template>
-  <div class="bidder-container" :class="{ 'selected': isSelected }">
-  <div class="row">
-    <div class="col-3">
-      <bidder-circle :name="bidder.name" :class="{ 'selected': isSelected }" />
-    </div>
-    <div class="col py-2 text-left bidder-info">
-      <div class="small pb-2">
-        {{ bidsPlaced ? 'Bids placed' : '-' }}
+  <div class="bidder-container" :class="{ selected: isSelected }">
+    <div class="row">
+      <div class="col-3">
+        <bidder-circle v-b-tooltip.hover :title="bidder.description" :name="bidder.name" :class="{ selected: isSelected }" />
       </div>
-      <el-select disabled v-model="strategy">
-        <el-option value="TRUTHFUL" label="Truthful"></el-option>
-      </el-select>
+      <div class="col py-2 text-left bidder-info">
+        <div class="small pb-2">
+          {{ bidsPlaced(bidder) ? 'Bids placed' : '-' }}
+        </div>
+        <el-select disabled v-model="strategy">
+          <el-option value="TRUTHFUL" label="Truthful"></el-option>
+        </el-select>
+      </div>
     </div>
-  </div>
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from 'vue'
 import auction, { ApiAuctionType, ApiBidder, ApiBidderStrategy } from '../../store/modules/auction'
 import { Select, Option } from 'element-ui'
-import BidderCircleVue from './BidderCircle.vue';
+import BidderCircleVue from './BidderCircle.vue'
+import selection from '../../store/modules/selection'
 
 export default Vue.extend({
   name: 'AuctionBidder',
-  components: { 'bidder-circle': BidderCircleVue, 'el-select': Select, 'el-option': Option }, 
-  props: ['bidder', 'auctionId', 'selectedGoods', 'isSelected'],
-  data () {
+  components: { 'bidder-circle': BidderCircleVue, 'el-select': Select, 'el-option': Option },
+  props: ['bidderId', 'auctionId'],
+  data() {
     return {
       strategy: ApiBidderStrategy.TRUTHFUL
     }
   },
-  computed: {
-    bidsPlaced: function () {
-      if (this.$props.bidder) {
-        return (this.$props.bidder as ApiBidder).bids && (this.$props.bidder as ApiBidder).bids.length > 0
+  methods: {
+    bidsPlaced(bidder: ApiBidder) {
+      if (bidder) {
+        return bidder.bids && bidder.bids.length > 0
       }
       return false
+    }
+  },
+  computed: {
+    bidder: function(): ApiBidder {
+      return auction.bidderById()(this.$props.bidderId)
     },
-    bids: function () {
-      return Array().concat(...Array.from({ length: auction.auctionById()(this.$route.params.id).auction.rounds.length }, (v, k) => k).map(value => {
-        return auction.bidsByBidderId()(this.$props.auctionId, this.$props.bidder.id, value)
-      }))
+    isSelected: function() {
+      return selection.selectedBidder() === this.$props.bidderId
     },
-    bidComponent: function () {
+    bids: function() {
+      return Array().concat(
+        ...Array.from({ length: auction.auctionById()(this.$props.auctionId).auction.rounds.length }, (v, k) => k).map(value => {
+          return auction.bidsByBidderId()(this.$props.auctionId, this.$props.bidderId, value)
+        })
+      )
+    },
+    bidComponent: function() {
       const mechanismType = auction.auctionById()(this.$props.auctionId).auction.mechanismType
       return 'component-bid-' + mechanismType
     }
   }
-});
+})
 </script>
 
 <style scoped lang="scss">

@@ -73,7 +73,7 @@ export default Vue.extend({
       ]
 
       for (let i = 0; i < model.numberOfGoods; i++) {
-        auctionObj.domain.goods.push({ id: alphabet[i], availability: 1, dummyGood: false, isSelected: false })
+        auctionObj.domain.goods.push({ name: alphabet[i], availability: 1, dummyGood: false, isSelected: false })
       }
 
       const { id } = await auction.dispatchCreateAuction({ auctionCreateDTO: auctionObj })

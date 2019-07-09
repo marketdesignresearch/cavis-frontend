@@ -2,8 +2,16 @@ import Vue from 'vue'
 import api from '@/services/api'
 import { getStoreBuilder, BareActionContext } from 'vuex-typex'
 import { RootState } from '..'
+import { normalize } from 'normalizr'
+import { auctionSchema } from './schemas'
 
 export interface AuctionState {
+  bidders: {
+    [key: string]: ApiBidder
+  }
+  goods: {
+    [key: string]: ApiGood
+  }
   auctions: {
     [key: string]: ApiAuction
   }
@@ -53,10 +61,11 @@ export interface ApiAuction {
   id?: string
   auction: {
     mechanismType: ApiMechanismType
+    currentRoundType?: string
     finished: boolean
     domain: {
-      bidders: ApiBidder[]
-      goods: ApiGood[]
+      bidders: string[]
+      goods: string[]
     }
     latestBids?: {
       bids: {
@@ -91,7 +100,8 @@ export interface ApiBidder {
 }
 
 export interface ApiGood {
-  id: string
+  id?: string
+  name: string
   availability: number
   dummyGood: boolean
   isSelected: boolean
@@ -111,22 +121,28 @@ export interface ApiAuctionAllocation {
   allocation: {
     [x: string]: {
       value: number
-      goods: {
-        [x: string]: string
-      }
+      bundle: [
+        {
+          amount: string
+          good: string
+        }
+      ]
     }
   }
-  payment: {
+  payments: {
     totalPayments: number
     [x: string]: number
   }
 }
 
-const moduleBuilder = getStoreBuilder<RootState>().module<AuctionState>('auction', { auctions: {} })
+const moduleBuilder = getStoreBuilder<RootState>().module<AuctionState>('auction', { auctions: {}, bidders: {}, goods: {} })
 
 // getters
 const auctions = moduleBuilder.read(state => Object.values(state.auctions), 'auctions')
 const auctionById = moduleBuilder.read(state => (auctionId: string) => state.auctions[auctionId], 'auctionById')
+const bidderById = moduleBuilder.read(state => (bidderId: string) => state.bidders[bidderId], 'bidderById')
+const goodById = moduleBuilder.read(state => (goodId: string) => state.goods[goodId], 'goodById')
+
 const biddersById = moduleBuilder.read(
   state => (auctionId: string) => (state.auctions[auctionId] ? state.auctions[auctionId].auction.domain.bidders : []),
   'biddersById'
@@ -167,7 +183,7 @@ const valueForBundle = moduleBuilder.read(
       return null
     }
 
-    const currentBidder = state.auctions[auctionId].auction.domain.bidders.find(obj => obj.id === bidderId)
+    const currentBidder = state.bidders[bidderId]
 
     if (!currentBidder || !currentBidder.value) {
       return null
@@ -188,13 +204,29 @@ const valueForBundle = moduleBuilder.read(
 
 // mutations
 function appendAuctionMutation(state: AuctionState, payload: { auction: ApiAuction }) {
-  if (payload.auction.id) {
-    Vue.set(state.auctions, payload.auction.id, { ...payload.auction })
+  const normalizedData = normalize(payload.auction, auctionSchema)
+
+  if (normalizedData.entities.bidders) {
+    Object.keys(normalizedData.entities.bidders).forEach(bidderId => {
+      Vue.set(state.bidders, bidderId, normalizedData.entities.bidders[bidderId])
+    })
+  }
+
+  if (normalizedData.entities.auctions) {
+    Object.keys(normalizedData.entities.auctions).forEach(auctionId => {
+      Vue.set(state.auctions, auctionId, normalizedData.entities.auctions[auctionId])
+    })
+  }
+
+  if (normalizedData.entities.goods) {
+    Object.keys(normalizedData.entities.goods).forEach(goodId => {
+      Vue.set(state.goods, goodId, normalizedData.entities.goods[goodId])
+    })
   }
 }
 
-function addBundleValue(state: AuctionState, payload: { auctionId: string; bidderId: string; bundleValue: ApiBid }) {
-  const bidder: ApiBidder | undefined = state.auctions[payload.auctionId].auction.domain.bidders.find(obj => obj.id === payload.bidderId)
+function addBundleValue(state: AuctionState, payload: { bidderId: string; bundleValue: ApiBid }) {
+  const bidder = state.bidders[payload.bidderId]
 
   if (bidder) {
     if (!bidder.value) {
@@ -205,10 +237,8 @@ function addBundleValue(state: AuctionState, payload: { auctionId: string; bidde
   }
 }
 
-function updateBid(state: AuctionState, payload: { auctionId: string; bidderId: string; bid: ApiBid }) {
-  const existingBidder: ApiBidder | undefined = state.auctions[payload.auctionId].auction.domain.bidders.find(
-    obj => obj.id === payload.bidderId
-  )
+function updateBid(state: AuctionState, payload: { bidderId: string; bid: ApiBid }) {
+  const existingBidder = state.bidders[payload.bidderId]
 
   if (existingBidder && !existingBidder.bids) {
     Vue.set(existingBidder, 'bids', [payload.bid])
@@ -217,21 +247,15 @@ function updateBid(state: AuctionState, payload: { auctionId: string; bidderId: 
   }
 }
 
-function removeBid(state: AuctionState, payload: { auctionId: string; bidderId: string; bundle: ApiGood[] }) {
-  const existingBidder: ApiBidder | undefined = state.auctions[payload.auctionId].auction.domain.bidders.find(
-    obj => obj.id === payload.bidderId
-  )
+function removeBid(state: AuctionState, payload: { bidderId: string; bundle: string[] }) {
+  const existingBidder = state.bidders[payload.bidderId]
 
   if (existingBidder && existingBidder.bids) {
     const bidIndex = existingBidder.bids.findIndex(bid => {
       return (
         Object.keys(bid.bundle)
           .sort()
-          .join('') ===
-        payload.bundle
-          .map(v => v.id)
-          .sort()
-          .join('')
+          .join('') === payload.bundle.sort().join('')
       )
     })
 
@@ -243,13 +267,6 @@ function removeBid(state: AuctionState, payload: { auctionId: string; bidderId: 
 
 function addResult(state: AuctionState, payload: { auctionId: string; result: ApiAuctionAllocation }) {
   Vue.set(state.auctions[payload.auctionId], 'result', { ...payload.result })
-}
-
-function toggleGoodSelection(state: AuctionState, payload: { auctionId: string; goodId: string }) {
-  const good = state.auctions[payload.auctionId].auction.domain.goods.find(obj => obj.id === payload.goodId)
-  if (good) {
-    good.isSelected = !good.isSelected
-  }
 }
 
 // actions
@@ -272,7 +289,9 @@ async function createAuction(context: BareActionContext<AuctionState, RootState>
 }
 
 async function placeBids(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }): Promise<ApiAuction> {
-  const bidders = context.state.auctions[payload.auctionId].auction.domain.bidders
+  const bidderIds = context.state.auctions[payload.auctionId].auction.domain.bidders
+  const bidders = bidderIds.map((id: string) => context.state.bidders[id])
+
   const bids: { [index: string]: any } = {}
 
   bidders.forEach(bidder => {
@@ -305,6 +324,21 @@ async function resetAuctionToRound(context: BareActionContext<AuctionState, Root
   auction.commitAppendAuction({ auction: data })
 }
 
+async function advanceRound(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+  const { data } = await api().put(`/auctions/${payload.auctionId}/advance-round`)
+  auction.commitAppendAuction({ auction: data })
+}
+
+async function advancePhase(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+  const { data } = await api().put(`/auctions/${payload.auctionId}/advance-phase`)
+  auction.commitAppendAuction({ auction: data })
+}
+
+async function finish(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+  const { data } = await api().put(`/auctions/${payload.auctionId}/finish`)
+  auction.commitAppendAuction({ auction: data })
+}
+
 async function demandQuery(
   context: BareActionContext<AuctionState, RootState>,
   payload: { auctionId: string; bidders: ApiBidder[]; goodIds: string[] }
@@ -312,7 +346,7 @@ async function demandQuery(
 
 async function valueQuery(
   context: BareActionContext<AuctionState, RootState>,
-  payload: { auctionId: string; bidders: ApiBidder[]; goodIds: string[] }
+  payload: { auctionId: string; bidderIds: string[]; goodIds: string[] }
 ) {
   const bundle: { [x: string]: number } = {}
 
@@ -321,7 +355,7 @@ async function valueQuery(
   })
 
   const valueQuery = {
-    bidders: payload.bidders.map(value => value.id),
+    bidders: payload.bidderIds,
     bundle: bundle
   }
 
@@ -338,7 +372,7 @@ async function valueQuery(
       }),
       bidderId: bidderId
     }
-    auction.commitBundleValue({ auctionId: payload.auctionId, bidderId: bidderId, bundleValue: apiBid })
+    auction.commitBundleValue({ bidderId: bidderId, bundleValue: apiBid })
   })
 }
 
@@ -357,6 +391,14 @@ const auction = {
 
   get auctionById() {
     return auctionById
+  },
+
+  get bidderById() {
+    return bidderById
+  },
+
+  get goodById() {
+    return goodById
   },
 
   get biddersById() {
@@ -388,7 +430,6 @@ const auction = {
   commitUpdateBidder: moduleBuilder.commit(updateBid),
   commitRemoveBid: moduleBuilder.commit(removeBid),
   commitResult: moduleBuilder.commit(addResult),
-  commitToggleGoodSelection: moduleBuilder.commit(toggleGoodSelection),
   commitBundleValue: moduleBuilder.commit(addBundleValue),
 
   // actions
@@ -399,7 +440,10 @@ const auction = {
   dispatchGetAuctionResult: moduleBuilder.dispatch(getResult),
   dispatchResetAuctionToRound: moduleBuilder.dispatch(resetAuctionToRound),
   dispatchValueQuery: moduleBuilder.dispatch(valueQuery),
-  dispatchDemandQuery: moduleBuilder.dispatch(demandQuery)
+  dispatchDemandQuery: moduleBuilder.dispatch(demandQuery),
+  dispatchAdvanceRound: moduleBuilder.dispatch(advanceRound),
+  dispatchAdvancePhase: moduleBuilder.dispatch(advancePhase),
+  dispatchFinish: moduleBuilder.dispatch(finish)
 }
 
 export default auction

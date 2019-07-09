@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div class="small pb-2">Auction: {{ auctionType }}</div>
+  <div class="small">
+    <div>Auction: {{ auctionType }}</div>
     <div>
       Round:
       <nav v-if="rounds" class="d-inline-flex">
@@ -14,13 +14,19 @@
       </nav>
     </div>
 
-    <button class="btn btn-success btn-sm" @click="nextRound()">Next Round</button>
+    <div v-if="currentRound">
+      <div v-if="currentRound.type === 'CLOCK'">Clock Round</div>
+      <div v-if="currentRound.type === 'SUPPLEMENTARY'">Supplementary Round</div>
+    </div>
+
+    <button class="btn mt-2 btn-success btn-sm" @click="nextRound()">Next Round</button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound } from '../../../store/modules/auction'
+import selection from '../../../store/modules/selection'
 
 export default Vue.extend({
   props: ['auction'],
@@ -33,6 +39,10 @@ export default Vue.extend({
           return ''
       }
     },
+    currentRound(): ApiRound {
+      const rounds = this.$props.auction.auction.rounds
+      return rounds.length > 0 ? rounds[rounds.length - 1] : null
+    },
     rounds(): ApiRound[] {
       return this.$props.auction.auction.rounds
     }
@@ -40,9 +50,11 @@ export default Vue.extend({
   methods: {
     resetRound(round: number) {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: round })
+      selection.commitUnselectAll()
     },
     nextRound() {
       auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      selection.commitUnselectAll()
     }
   }
 })

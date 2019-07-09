@@ -9,6 +9,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../../store/modules/auction'
+import selection from '../../../store/modules/selection'
 
 export default Vue.extend({
   props: ['auction'],
@@ -18,6 +19,7 @@ export default Vue.extend({
   methods: {
     nextRound() {
       auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      selection.commitUnselectAll()
       this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
     }
   }

@@ -1,19 +1,20 @@
 <template>
-    <div class="flex-column">
-      <div class="card good shadow-sm" :class="{ 'selected': isSelected, 'disabled': !isAllowed }">
-        <div class="price" v-if="priceForGood">{{ priceForGood }} $</div>
-      </div>
-      <div class="pt-2">
-        {{ good.id }}
-      </div>
+  <div class="flex-column">
+    <div class="card good shadow-sm" :class="{ selected: isSelected, disabled: !isAllowed }">
+      <div class="price" v-if="priceForGood">{{ priceForGood | formatNumber }} $</div>
     </div>
+    <div class="pt-2">
+      {{ good.name }}
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
+import Vue from 'vue'
 import { Popover } from 'element-ui'
 import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood } from '../../store/modules/auction'
 import GoodsService from '@/services/goods'
+import selection from '../../store/modules/selection'
 
 export interface IAuctionGood {
   name: string
@@ -25,16 +26,28 @@ const AuctionGoodComponent = Vue.extend({
   components: {
     'el-popover': Popover
   },
-  props: ['auctionId', 'good', 'isSelected', 'bidder'],
+  props: ['auctionId', 'goodId'],
   computed: {
-    priceForGood: function (): number | null {
-      return auction.priceForGood()(this.$props.auctionId, this.$props.good.id)
+    isSelected: function(): boolean {
+      return selection.state().selectedGoods[this.$props.goodId]
     },
-    isAllowed: function (): boolean {
-      return GoodsService.isAllowed(this.$props.bidder, this.$props.auctionId, [this.$props.good])
+    good: function(): ApiGood {
+      return auction.goodById()(this.$props.goodId)
+    },
+    priceForGood: function(): number | null {
+      return auction.priceForGood()(this.$props.auctionId, this.$props.goodId)
+    },
+    isAllowed: function(): boolean {
+      const selectedBidder = selection.selectedBidder()
+
+      if (!selectedBidder) {
+        return false
+      }
+
+      return GoodsService.isAllowed(selectedBidder, this.$props.auctionId)
     }
   }
-});
+})
 
 export default AuctionGoodComponent
 export { AuctionGoodComponent }
@@ -67,6 +80,5 @@ export { AuctionGoodComponent }
   height: 75px;
   margin: 5px;
   display: inline-flex;
-
 }
 </style>
