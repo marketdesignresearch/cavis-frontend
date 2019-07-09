@@ -1,7 +1,7 @@
-FROM node:10
+FROM node:10 as build
 
 RUN mkdir /app
-WORKDIR app
+WORKDIR /app
 
 # install dependencies
 RUN npm install -g node-static
@@ -11,14 +11,22 @@ ADD package-lock.json /app/package-lock.json
 RUN npm ci
 
 ENV NODE_ENV production
-ENV PORT 8000
 
 # copy src
 COPY . /app/
+COPY .env.production .env
 
 # compile to check for errors
 RUN npm run build
 
+######
+
+FROM nginx:1-alpine
+
+COPY --from=build /app/dist /usr/share/nginx/html
+RUN printf "presenter:\$apr1\$rmlaxwj8\$FSmjA1lvIXWqp1brFyn4d1\n" >> /etc/nginx/.htpasswd
+COPY nginx.conf /etc/nginx/nginx.conf
+
 EXPOSE 80
 
-CMD ["static", "-p", "80", "/app/dist"]
+CMD [ "nginx", "-g", "daemon off;" ]
