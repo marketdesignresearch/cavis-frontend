@@ -50,9 +50,9 @@
                   </div>
                 </td>
                 <td>
-                  <span v-for="bid in bidsByBidder(bidder, round)" :key="bid.id">
+                  <div v-for="bid in bidsByBidder(bidder, round)" :key="bid.id">
                     {{ bid.amount | formatNumber }} $ for <good-badge :ids="bid.bundle.map(obj => obj.good)" />
-                  </span>
+                  </div>
                 </td>
                 <td>
                   <good-badge :ids="allocationForBidder(bidder, round)" />

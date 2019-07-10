@@ -274,13 +274,13 @@ function addResult(state: AuctionState, payload: { auctionId: string; result: Ap
 }
 
 // actions
-async function getAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+async function getAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }): Promise<ApiAuction> {
   const { data } = await api().get(`/auctions/${payload.auctionId}`)
   auction.commitAppendAuction({ auction: data })
   return data
 }
 
-async function getAuctions(context: BareActionContext<AuctionState, RootState>) {
+async function getAuctions(context: BareActionContext<AuctionState, RootState>): Promise<ApiAuction[]> {
   const { data } = await api().get('/auctions/')
   data.forEach((auctionInstance: any) => auction.commitAppendAuction({ auction: auctionInstance }))
   return data
@@ -346,6 +346,13 @@ async function advancePhase(context: BareActionContext<AuctionState, RootState>,
 async function finish(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
   const { data } = await api().post(`/auctions/${payload.auctionId}/finish`)
   auction.commitAppendAuction({ auction: data })
+}
+
+async function propose(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string; bidderIds: string[] }) {
+  const { data } = await api().post(`/auctions/${payload.auctionId}/propose`, payload.bidderIds)
+  data.forEach((bid: ApiBid) => {
+    auction.commitBundleValue({ bidderId: bid.bidderId!, bundleValue: bid })
+  })
 }
 
 async function demandQuery(
@@ -449,7 +456,8 @@ const auction = {
   dispatchDemandQuery: moduleBuilder.dispatch(demandQuery),
   dispatchAdvanceRound: moduleBuilder.dispatch(advanceRound),
   dispatchAdvancePhase: moduleBuilder.dispatch(advancePhase),
-  dispatchFinish: moduleBuilder.dispatch(finish)
+  dispatchFinish: moduleBuilder.dispatch(finish),
+  dispatchPropose: moduleBuilder.dispatch(propose)
 }
 
 export default auction

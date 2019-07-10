@@ -102,8 +102,9 @@ export default Vue.extend({
       bidsPlaced: false
     }
   },
-  mounted() {
-    auction.dispatchGetAuction({ auctionId: this.$route.params.id })
+  async mounted() {
+    await auction.dispatchGetAuction({ auctionId: this.$route.params.id })
+    auction.dispatchPropose({ auctionId: this.$route.params.id, bidderIds: auction.biddersById()(this.$route.params.id) })
   },
   methods: {
     selectGood(goodId: string) {
