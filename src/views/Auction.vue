@@ -26,7 +26,7 @@
                   <div class="mt-4" v-if="selectedGoods.length > 0 && selectedBidder">
                     Value of <good-badge :ids="selectedGoods" /> for {{ selectedBidder.name }}:
                     <h2 class="mt-4">
-                      {{ valueForGoods }}
+                      {{ valueForGoods | formatNumber }}
                     </h2>
                   </div>
                 </div>

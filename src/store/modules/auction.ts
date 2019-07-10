@@ -265,6 +265,10 @@ function removeBid(state: AuctionState, payload: { bidderId: string; bundle: str
   }
 }
 
+function removeAuctionMutation(state: AuctionState, payload: { auctionId: string }) {
+  Vue.delete(state.auctions, payload.auctionId)
+}
+
 function addResult(state: AuctionState, payload: { auctionId: string; result: ApiAuctionAllocation }) {
   Vue.set(state.auctions[payload.auctionId], 'result', { ...payload.result })
 }
@@ -286,6 +290,11 @@ async function createAuction(context: BareActionContext<AuctionState, RootState>
   const { data } = await api().post('/auctions/', payload.auctionCreateDTO)
   auction.commitAppendAuction({ auction: data })
   return data
+}
+
+async function removeAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+  const { data } = await api().delete(`/auctions/${payload.auctionId}`)
+  auction.commitRemoveAuction({ auctionId: payload.auctionId })
 }
 
 async function placeBids(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }): Promise<ApiAuction> {
@@ -325,17 +334,17 @@ async function resetAuctionToRound(context: BareActionContext<AuctionState, Root
 }
 
 async function advanceRound(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  const { data } = await api().put(`/auctions/${payload.auctionId}/advance-round`)
+  const { data } = await api().post(`/auctions/${payload.auctionId}/advance-round`)
   auction.commitAppendAuction({ auction: data })
 }
 
 async function advancePhase(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  const { data } = await api().put(`/auctions/${payload.auctionId}/advance-phase`)
+  const { data } = await api().post(`/auctions/${payload.auctionId}/advance-phase`)
   auction.commitAppendAuction({ auction: data })
 }
 
 async function finish(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  const { data } = await api().put(`/auctions/${payload.auctionId}/finish`)
+  const { data } = await api().post(`/auctions/${payload.auctionId}/finish`)
   auction.commitAppendAuction({ auction: data })
 }
 
@@ -356,20 +365,15 @@ async function valueQuery(
 
   const valueQuery = {
     bidders: payload.bidderIds,
-    bundle: bundle
+    bundles: [bundle]
   }
 
   const { data: valueQueryResult } = await api().post(`/auctions/${payload.auctionId}/valuequery`, valueQuery)
 
   Object.keys(valueQueryResult).forEach(bidderId => {
     const apiBid: ApiBid = {
-      amount: valueQueryResult[bidderId],
-      bundle: Object.keys(valueQuery.bundle).map(key => {
-        return {
-          good: key,
-          amount: valueQuery.bundle[key]
-        }
-      }),
+      amount: valueQueryResult[bidderId].value,
+      bundle: valueQueryResult[bidderId].bundle,
       bidderId: bidderId
     }
     auction.commitBundleValue({ bidderId: bidderId, bundleValue: apiBid })
@@ -431,11 +435,13 @@ const auction = {
   commitRemoveBid: moduleBuilder.commit(removeBid),
   commitResult: moduleBuilder.commit(addResult),
   commitBundleValue: moduleBuilder.commit(addBundleValue),
+  commitRemoveAuction: moduleBuilder.commit(removeAuctionMutation),
 
   // actions
   dispatchGetAuction: moduleBuilder.dispatch(getAuction),
   dispatchGetAuctions: moduleBuilder.dispatch(getAuctions),
   dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
+  dispatchRemoveAuction: moduleBuilder.dispatch(removeAuction),
   dispatchPlaceBids: moduleBuilder.dispatch(placeBids),
   dispatchGetAuctionResult: moduleBuilder.dispatch(getResult),
   dispatchResetAuctionToRound: moduleBuilder.dispatch(resetAuctionToRound),

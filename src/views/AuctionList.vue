@@ -19,9 +19,10 @@
           <td>{{ auction.auction.rounds.length }}</td>
           <td>{{ auction.auction.mechanismType }}</td>
           <td>
-            <router-link tag="button" :to="{ name: 'auction', params: { id: auction.id } }" class="btn btn-sm btn-primary"
-              >Load</router-link
-            >
+            <router-link tag="button" :to="{ name: 'auction', params: { id: auction.id } }" class="btn btn-sm btn-primary">
+              Load
+            </router-link>
+            <button class="btn btn-sm btn-warning" @click="remove(auction.id)">Delete</button>
           </td>
         </tr>
       </tbody>
@@ -38,6 +39,11 @@ export default Vue.extend({
   computed: {
     auctions() {
       return auction.auctions()
+    }
+  },
+  methods: {
+    remove(auctionId: string) {
+      auction.dispatchRemoveAuction({ auctionId: auctionId })
     }
   },
   mounted() {

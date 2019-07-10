@@ -19,7 +19,7 @@
       <div v-if="currentRound.type === 'SUPPLEMENTARY'">Supplementary Round</div>
     </div>
 
-    <button class="btn mt-2 btn-success btn-sm" @click="nextRound()">Next Round</button>
+    <button class="btn mt-2 btn-success btn-sm" @click="nextRound()" v-if="!isFinished">Next Round</button>
   </div>
 </template>
 
@@ -31,6 +31,9 @@ import selection from '../../../store/modules/selection'
 export default Vue.extend({
   props: ['auction'],
   computed: {
+    isFinished(): boolean {
+      return this.$props.auction.auction.finished
+    },
     auctionType(): string {
       switch (this.$props.auction.auction.mechanismType) {
         case ApiAuctionType.VCG_XOR:

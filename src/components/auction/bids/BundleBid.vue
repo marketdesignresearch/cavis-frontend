@@ -60,7 +60,7 @@ export default Vue.extend({
     }
   },
   computed: {
-    ...mapGetters('selection', ['selectedGoods']),
+    ...mapGetters('selection', ['selectedGoods', 'selectedBidder']),
     bidEditable: function() {
       const auctionInstance = auction.auctionById()(this.$props.auctionId)
       return auctionInstance.auction.currentRoundType && auctionInstance.auction.currentRoundType === 'CLOCK'
@@ -91,15 +91,17 @@ export default Vue.extend({
   watch: {
     selectedGoods() {
       ;(this as any).determineBid()
+    },
+    selectedBidder() {
+      ;(this as any).determineBid()
     }
   },
   methods: {
-    determineBid() {
+    async determineBid() {
       const bidderId = selection.selectedBidder()
-      const bidder = bidderId ? auction.bidderById()(bidderId) : null
 
-      if (bidder) {
-        this.$data.bid = BidderService.bidForBundle(bidder, selection.selectedGoods(), this.$props.auctionId)
+      if (bidderId) {
+        this.$data.bid = await BidderService.bidForBundle(bidderId, selection.selectedGoods(), this.$props.auctionId)
       }
     },
     placeBid() {

@@ -51,15 +51,13 @@
                 </td>
                 <td>
                   <span v-for="bid in bidsByBidder(bidder, round)" :key="bid.id">
-                    <good-badge :ids="bid.bundle.map(obj => obj.good)" />
+                    {{ bid.amount | formatNumber }} $ for <good-badge :ids="bid.bundle.map(obj => obj.good)" />
                   </span>
                 </td>
                 <td>
                   <good-badge :ids="allocationForBidder(bidder, round)" />
                 </td>
-                <td>
-                  {{ paymentForGoods(bidder, round) | formatNumber }}
-                </td>
+                <td>{{ paymentForGoods(bidder, round) | formatNumber }} $</td>
               </tr>
             </tbody>
           </table>
@@ -146,10 +144,10 @@ export default Vue.extend({
       return round.mechanismResult.payments[bidder.id!]
     },
     advanceRound() {
-      auction.dispatchAdvanceRound({ auctionId: this.$props.auctionId })
+      auction.dispatchAdvanceRound({ auctionId: this.$props.auction.id })
     },
     advancePhase() {
-      auction.dispatchAdvancePhase({ auctionId: this.$props.auctionId })
+      auction.dispatchAdvancePhase({ auctionId: this.$props.auction.id })
     }
   }
 })
