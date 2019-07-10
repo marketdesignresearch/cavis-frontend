@@ -73,7 +73,11 @@ export default Vue.extend({
       return false
     },
     goodCombinations(): string[][] {
-      return GoodsService.goodCombinations(this.$props.auctionId)
+      const bidderId = selection.selectedBidder()
+      if (bidderId) {
+        return GoodsService.bundleForBidder(bidderId)
+      }
+      return []
     },
     auctionType() {
       if (!this.$props.auctionId) return null

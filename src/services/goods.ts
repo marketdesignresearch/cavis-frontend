@@ -17,6 +17,19 @@ const powerSet = function(l: any) {
 }
 
 export default {
+  bundleForBidder(bidderId: string): string[][] {
+    const bidder = auction.bidderById()(bidderId)
+
+    if (bidder.value && bidder.value.bundleValues) {
+      return bidder.value.bundleValues
+        .filter(bid => bid.bundle)
+        .map(bid => {
+          return bid.bundle.map(good => good.good)
+        })
+    }
+
+    return []
+  },
   goodCombinations(auctionId: string): string[][] {
     if (!auctionId) return []
 
@@ -37,13 +50,15 @@ export default {
 
     if (bidder.value && bidder.value.bundleValues) {
       const ids = goodIds.sort().join('')
-      const correctValue = bidder.value.bundleValues.find(
-        (bid: ApiBid) =>
-          bid.bundle
-            .map(val => val.good)
-            .sort()
-            .join('') === ids
-      )
+      const correctValue = bidder.value.bundleValues
+        .filter(bid => bid.bundle)
+        .find(
+          bid =>
+            bid.bundle
+              .map(val => val.good)
+              .sort()
+              .join('') === ids
+        )
       return correctValue ? correctValue.amount : null
     }
     return null

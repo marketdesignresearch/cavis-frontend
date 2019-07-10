@@ -1,16 +1,20 @@
 <template>
   <div class="bidder-container" :class="{ selected: isSelected }">
     <div class="row">
-      <div class="col-3">
-        <bidder-circle v-b-tooltip.hover :title="bidder.description" :name="bidder.name" :class="{ selected: isSelected }" />
+      <div class="col">
+        <bidder-circle
+          v-b-tooltip.hover
+          :title="bidder.description"
+          :name="bidder.name"
+          :class="{ selected: isSelected, bidsPlaced: bidsPlaced(bidder) }"
+        />
       </div>
       <div class="col py-2 text-left bidder-info">
-        <div class="small pb-2">
-          {{ bidsPlaced(bidder) ? 'Bids placed' : '-' }}
-        </div>
+        <!--
         <el-select disabled v-model="strategy">
           <el-option value="TRUTHFUL" label="Truthful"></el-option>
         </el-select>
+        -->
       </div>
     </div>
   </div>

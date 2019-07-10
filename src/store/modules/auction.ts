@@ -189,13 +189,15 @@ const valueForBundle = moduleBuilder.read(
       return null
     }
 
-    const value = currentBidder.value.bundleValues.find(
-      bid =>
-        bid.bundle
-          .map(val => val.good)
-          .sort()
-          .join('') === bundle.sort().join('')
-    )
+    const value = currentBidder.value.bundleValues
+      .filter(bid => bid.bundle)
+      .find(
+        bid =>
+          bid.bundle
+            .map(val => val.good)
+            .sort()
+            .join('') === bundle.sort().join('')
+      )
 
     return value
   },
@@ -378,12 +380,14 @@ async function valueQuery(
   const { data: valueQueryResult } = await api().post(`/auctions/${payload.auctionId}/valuequery`, valueQuery)
 
   Object.keys(valueQueryResult).forEach(bidderId => {
-    const apiBid: ApiBid = {
-      amount: valueQueryResult[bidderId].value,
-      bundle: valueQueryResult[bidderId].bundle,
-      bidderId: bidderId
-    }
-    auction.commitBundleValue({ bidderId: bidderId, bundleValue: apiBid })
+    valueQueryResult[bidderId].forEach((bid: any) => {
+      const apiBid: ApiBid = {
+        amount: bid.value,
+        bundle: bid.bundle,
+        bidderId: bidderId
+      }
+      auction.commitBundleValue({ bidderId: bidderId, bundleValue: apiBid })
+    })
   })
 }
 
