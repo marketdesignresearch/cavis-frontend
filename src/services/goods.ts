@@ -59,7 +59,7 @@ export default {
               .sort()
               .join('') === ids
         )
-      return correctValue ? correctValue.amount : null
+      return correctValue ? correctValue.value : null
     }
     return null
   },
@@ -79,12 +79,12 @@ export default {
     const bidder = auction.bidderById()(bidderId)
 
     if (bidder.bids) {
-      const ids = goodIds.sort().join('')
       const correctBid = bidder.bids.find((bid: ApiBid) => {
         return (
-          Object.keys(bid.bundle as any)
+          bid.bundle
+            .map(good => good.good)
             .sort()
-            .join('') === ids
+            .join('') === goodIds.sort().join('')
         )
       })
       return correctBid ? correctBid.amount : null

@@ -1,4 +1,4 @@
-import auction, { ApiBidder, ApiBid } from '@/store/modules/auction'
+import auction, { ApiBidder, ApiBid, ApiBundleValue } from '@/store/modules/auction'
 
 export default {
   removeBid(bidderId: string, bundle: string[]) {
@@ -22,7 +22,7 @@ export default {
 
     if (bidder.value && bidder.value.bundleValues) {
       const correctValue = bidder.value.bundleValues.find(
-        (bid: ApiBid) =>
+        (bid: ApiBundleValue) =>
           bid.bundle
             .map((obj: any) => obj.good)
             .sort()
@@ -31,43 +31,8 @@ export default {
             .sort()
             .join('')
       )
-      return correctValue ? correctValue.amount : null
+      return correctValue ? correctValue.value : null
     }
     return 0
-  },
-  autoBid(auctionId: string, bidderId: string) {
-    const auctionInstance = auction.auctionById()(auctionId)
-    const bidder = auction.bidderById()(bidderId)
-
-    if (bidder.value && bidder.id) {
-      bidder.value.bundleValues
-        // sort by "value"
-        .sort((bidA, bidB) => {
-          return bidB.amount - bidA.amount
-        })
-        // skip empty bundles
-        .filter(bid => bid.bundle.length > 0)
-        .forEach((value, index) => {
-          // prevent too many bids
-          if (auctionInstance.auction.allowedNumberOfBids && index >= auctionInstance.auction.allowedNumberOfBids) {
-            return
-          }
-
-          let bundle: any = {}
-
-          value.bundle.forEach(bid => {
-            bundle[bid.good] = bid.amount
-          })
-
-          auction.commitUpdateBidder({
-            bidderId: bidder.id!,
-            bid: {
-              amount: value.amount,
-              bidderId: bidder.id,
-              bundle: bundle
-            }
-          })
-        })
-    }
   }
 }

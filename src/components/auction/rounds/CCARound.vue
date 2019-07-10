@@ -27,9 +27,11 @@
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound } from '../../../store/modules/auction'
 import selection from '../../../store/modules/selection'
+import RoundMixinVue from './RoundMixin.vue'
 
 export default Vue.extend({
   props: ['auction'],
+  mixins: [RoundMixinVue],
   computed: {
     isFinished(): boolean {
       return this.$props.auction.auction.finished
@@ -53,10 +55,6 @@ export default Vue.extend({
   methods: {
     resetRound(round: number) {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: round })
-      selection.commitUnselectAll()
-    },
-    nextRound() {
-      auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
       selection.commitUnselectAll()
     }
   }

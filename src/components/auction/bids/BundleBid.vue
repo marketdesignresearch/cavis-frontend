@@ -111,14 +111,14 @@ export default Vue.extend({
         return
       }
 
-      const bid: any = {
+      const bid: ApiBid = {
         amount: this.$data.bid,
         bidderId: bidderId,
-        bundle: {}
+        bundle: []
       }
 
       selection.selectedGoods().forEach((good: string) => {
-        bid.bundle[good] = 1
+        bid.bundle.push({ good: good, amount: 1 })
       })
 
       auction.commitUpdateBidder({

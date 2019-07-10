@@ -51,26 +51,6 @@
         <BidderControl :auctionId="auctionId" />
       </div>
     </div>
-
-    <!--
-      <div class="auction-control mb-4">
-        Rounds:
-        <nav v-if="rounds" class="d-inline-flex">
-          <ul class="pagination pagination-sm">
-            <li class="page-item" v-for="round in rounds" :key="round" :class="{ 'active': round == rounds.length - 1 }">
-              <a class="page-link" href="#" @click="resetRound(round)" v-if="round < rounds.length - 1"> {{ round }}</a>
-              <span class="page-link active" v-if="round >= rounds.length - 1"> {{ round }}</span>
-            </li>
-          </ul>
-        </nav>
-
-        <div class="float-right text-right">
-          <button class="btn btn-primary mx-2" @click="autoBid">Autobid</button>
-          <button class="btn btn-primary mx-2" @click="placeBids">Place Bids & End Round</button>
-          <button class="btn btn-success" @click="allocate">Result</button>
-        </div>
-      </div>
-      -->
   </div>
 </template>
 
@@ -104,7 +84,19 @@ export default Vue.extend({
   },
   async mounted() {
     await auction.dispatchGetAuction({ auctionId: this.$route.params.id })
-    auction.dispatchPropose({ auctionId: this.$route.params.id, bidderIds: auction.biddersById()(this.$route.params.id) })
+    const bundleValues = await auction.dispatchPropose({
+      auctionId: this.$route.params.id,
+      bidderIds: auction.biddersById()(this.$route.params.id)
+    })
+
+    bundleValues.forEach(bundleValue => {
+      const apiBid: ApiBid = {
+        amount: bundleValue.amount!,
+        bidderId: bundleValue.bidderId!,
+        bundle: bundleValue.bundle
+      }
+      auction.commitUpdateBidder({ bidderId: bundleValue.bidderId!, bid: apiBid })
+    })
   },
   methods: {
     selectGood(goodId: string) {
@@ -112,35 +104,6 @@ export default Vue.extend({
     },
     selectBidder(bidderId: string) {
       selection.commitSelectBidder({ bidderId: bidderId })
-    },
-    placeBids() {
-      auction.dispatchPlaceBids({ auctionId: this.$route.params.id })
-      this.$data.bidsPlaced = true
-    },
-    autoBid() {
-      const bidders = auction
-        .biddersById()(this.$route.params.id)
-        .map(bidderId => auction.bidderById()(bidderId))
-
-      bidders.forEach(bidder => {
-        if (bidder.value && bidder.id) {
-          let bundle: any = {}
-          bidder.value.bundleValues[0].bundle.forEach(bid => {
-            bundle[bid.good] = bid.amount
-          })
-          auction.commitUpdateBidder({
-            bidderId: bidder.id!,
-            bid: {
-              amount: bidder.value.bundleValues[0].amount,
-              bidderId: bidder.id,
-              bundle: bundle
-            }
-          })
-        }
-      })
-    },
-    allocate() {
-      this.$router.push({ name: 'auction-result', params: { id: this.$route.params.id } })
     }
   },
   computed: {
@@ -160,7 +123,7 @@ export default Vue.extend({
         const value = auction.valueForBundle()(this.$route.params.id, selectedBidder, selection.selectedGoods())
 
         if (value) {
-          return value.amount
+          return value.value
         }
 
         auction.dispatchValueQuery({

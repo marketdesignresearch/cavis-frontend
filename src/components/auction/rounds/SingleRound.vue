@@ -10,18 +10,11 @@
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../../store/modules/auction'
 import selection from '../../../store/modules/selection'
+import RoundMixinVue from './RoundMixin.vue'
 
 export default Vue.extend({
   props: ['auction'],
-  methods: {
-    async nextRound() {
-      const result = await auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
-      selection.commitUnselectAll()
-      if (result.auction.finished) {
-        this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
-      }
-    }
-  }
+  mixins: [RoundMixinVue]
 })
 </script>
 

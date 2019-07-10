@@ -37,7 +37,6 @@
       </div>
     </div>
     <div class="col">
-      <!-- <button class="btn btn-primary mx-2" @click="autoBid">Autobid</button> -->
       <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId"> </component>
     </div>
   </div>
@@ -115,9 +114,6 @@ export default Vue.extend({
     },
     bidForGood(goodIds: string[]) {
       return GoodsService.bidForGood(goodIds, selection.selectedBidder()!)
-    },
-    autoBid() {
-      BidderService.autoBid(this.$props.auctionId, selection.selectedBidder()!)
     },
     removeBid(goodSet: string[]) {
       BidderService.removeBid(selection.selectedBidder()!, goodSet)

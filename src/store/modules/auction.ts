@@ -95,7 +95,7 @@ export interface ApiBidder {
   bids: ApiBid[]
   defaultStrategy: ApiBidderStrategy
   value?: {
-    bundleValues: ApiBid[]
+    bundleValues: ApiBundleValue[]
   }
 }
 
@@ -105,6 +105,16 @@ export interface ApiGood {
   availability: number
   dummyGood: boolean
   isSelected: boolean
+}
+
+export interface ApiBundleValue {
+  value: number
+  amount?: number
+  bidderId?: string
+  bundle: {
+    good: string
+    amount: number
+  }[]
 }
 
 export interface ApiBid {
@@ -227,7 +237,7 @@ function appendAuctionMutation(state: AuctionState, payload: { auction: ApiAucti
   }
 }
 
-function addBundleValue(state: AuctionState, payload: { bidderId: string; bundleValue: ApiBid }) {
+function addBundleValue(state: AuctionState, payload: { bidderId: string; bundleValue: ApiBundleValue }) {
   const bidder = state.bidders[payload.bidderId]
 
   if (bidder) {
@@ -255,7 +265,8 @@ function removeBid(state: AuctionState, payload: { bidderId: string; bundle: str
   if (existingBidder && existingBidder.bids) {
     const bidIndex = existingBidder.bids.findIndex(bid => {
       return (
-        Object.keys(bid.bundle)
+        bid.bundle
+          .map(good => good.good)
           .sort()
           .join('') === payload.bundle.sort().join('')
       )
@@ -303,10 +314,30 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
   const bidderIds = context.state.auctions[payload.auctionId].auction.domain.bidders
   const bidders = bidderIds.map((id: string) => context.state.bidders[id])
 
-  const bids: { [index: string]: any } = {}
+  let bids: {
+    [index: string]: {
+      amount: number
+      bundle: {
+        [index: string]: number
+      }
+    }[]
+  } = {}
 
   bidders.forEach(bidder => {
-    bids[bidder.id!] = bidder.bids
+    bids[bidder.id!] = bidder.bids.map(bid => {
+      const bundle: {
+        [index: string]: number
+      } = {}
+
+      bid.bundle.forEach(good => {
+        bundle[good.good] = good.amount
+      })
+
+      return {
+        amount: bid.amount,
+        bundle: bundle
+      }
+    })
   })
 
   // place bids and close round
@@ -350,11 +381,15 @@ async function finish(context: BareActionContext<AuctionState, RootState>, paylo
   auction.commitAppendAuction({ auction: data })
 }
 
-async function propose(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string; bidderIds: string[] }) {
+async function propose(
+  context: BareActionContext<AuctionState, RootState>,
+  payload: { auctionId: string; bidderIds: string[] }
+): Promise<ApiBundleValue[]> {
   const { data } = await api().post(`/auctions/${payload.auctionId}/propose`, payload.bidderIds)
-  data.forEach((bid: ApiBid) => {
+  data.forEach((bid: ApiBundleValue) => {
     auction.commitBundleValue({ bidderId: bid.bidderId!, bundleValue: bid })
   })
+  return data
 }
 
 async function demandQuery(
@@ -381,12 +416,12 @@ async function valueQuery(
 
   Object.keys(valueQueryResult).forEach(bidderId => {
     valueQueryResult[bidderId].forEach((bid: any) => {
-      const apiBid: ApiBid = {
-        amount: bid.value,
+      const apiBundleValue: ApiBundleValue = {
+        value: bid.value,
         bundle: bid.bundle,
         bidderId: bidderId
       }
-      auction.commitBundleValue({ bidderId: bidderId, bundleValue: apiBid })
+      auction.commitBundleValue({ bidderId: bidderId, bundleValue: apiBundleValue })
     })
   })
 }
