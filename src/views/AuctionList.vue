@@ -6,7 +6,8 @@
       <thead>
         <tr>
           <th scope="col">Auction ID</th>
-          <th scope="col">Bidders</th>
+          <th scope="col"># Bidders</th>
+          <th scope="col"># Goods</th>
           <th scope="col">Played Rounds</th>
           <th scope="col">Type</th>
           <th scope="col"></th>
@@ -16,8 +17,9 @@
         <tr v-for="auction in auctions" :key="auction.id">
           <td>{{ auction.id }}</td>
           <td>{{ auction.auction.domain.bidders.length }}</td>
+          <td>{{ auction.auction.domain.goods.length }}</td>
           <td>{{ auction.auction.rounds.length }}</td>
-          <td>{{ auction.auction.mechanismType }}</td>
+          <td>{{ auction.auctionType }}</td>
           <td>
             <router-link tag="button" :to="{ name: 'auction', params: { id: auction.id } }" class="btn btn-sm btn-primary">
               Load

@@ -1,30 +1,43 @@
 <template>
   <span class="badge badge-secondary">
-    <span v-for="good in unifiedGoods" :key="good.id">{{ good.name }}</span>
+    <span v-for="(entry, index) in unifiedBundleEntries" :key="index">
+      <span v-if="hasMultiGoods">{{ entry.amount }}x </span>
+      {{ entry.good.name }}
+      <span v-if="hasMultiGoods && index < unifiedBundleEntries.length - 1">, </span>
+    </span>
   </span>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import { Popover } from 'element-ui'
-import auction, { ApiGood } from '../../store/modules/auction'
+import auction, { ApiGood, BundleEntry } from '../../store/modules/auction'
 
 const GoodBadgeComponent = Vue.extend({
   name: 'GoodBadge',
   props: ['ids'],
   computed: {
-    unifiedGoods(): ApiGood[] {
+    unifiedBundleEntries(): BundleEntry[] {
       return (this.$props.ids || [])
-        .map((id: string) => auction.goodById()(id))
-        .sort((goodA: ApiGood, goodB: ApiGood) => {
-          if (goodA.name < goodB.name) {
+        .map((idAmountPair: any) => {
+          if (typeof idAmountPair === 'object') {
+            return { good: auction.goodById()(idAmountPair.good), amount: idAmountPair.amount }
+          } else if (typeof idAmountPair === 'string') {
+            return { good: auction.goodById()(idAmountPair), amount: 1 }
+          }
+        })
+        .sort((entryA: BundleEntry, entryB: BundleEntry) => {
+          if (entryA.good.name < entryB.good.name) {
             return -1
           }
-          if (goodA.name > goodB.name) {
+          if (entryA.good.name > entryB.good.name) {
             return 1
           }
           return 0
         })
+    },
+    hasMultiGoods(): Boolean {
+      return this.unifiedBundleEntries.some(entry => entry.amount > 1)
     }
   }
 })

@@ -41,7 +41,8 @@ export enum ApiMechanismType {
 }
 
 export enum ApiDomainType {
-  UNIT_DEMAND_VALUE = 'unitDemandValue'
+  UNIT_DEMAND_VALUE = 'unitDemandValue',
+  ADDITIVE_VALUE = 'additiveValue'
 }
 
 export enum ApiBidderStrategy {
@@ -97,6 +98,11 @@ export interface ApiBidder {
   value?: {
     bundleValues: ApiBundleValue[]
   }
+}
+
+export interface BundleEntry {
+  good: ApiGood
+  amount: number
 }
 
 export interface ApiGood {

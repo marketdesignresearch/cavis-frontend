@@ -39,8 +39,9 @@ export default Vue.extend({
               { name: 'Simultaneous First Price Auction', id: 'SIMULTANEOUS_FIRST_PRICE' },
               { name: 'Simultaneous Second Price Auction', id: 'SIMULTANEOUS_SECOND_PRICE' },
               { name: 'VCG Auction', id: 'VCG_XOR' },
-              { name: 'CCA-VCG Auction', id: 'CCA_VCG' },
-              { name: 'CCA-CCG Auction', id: 'CCA_CCG' }
+              { name: 'Combinatorial Clock Auction (CCA)', id: 'CCA_VCG' },
+              // { name: 'CCA-CCG Auction', id: 'CCA_CCG' },
+              { name: 'PVM Auction', id: 'PVM_VCG' }
             ],
             validator: VueFormGenerator.validators.required
           },
@@ -49,7 +50,11 @@ export default Vue.extend({
             label: 'Domain',
             model: 'domainType',
             default: 'unitDemandValue',
-            values: [{ name: 'Unit Demand Value', id: 'unitDemandValue' }, { name: 'GSVM', id: 'gsvm' }],
+            values: [
+              { name: 'Unit Demand Value', id: 'unitDemandValue' },
+              { name: 'Additive Value', id: 'additiveValue' },
+              { name: 'GSVM', id: 'gsvm' }
+            ],
             validator: VueFormGenerator.validators.required
           },
           {
