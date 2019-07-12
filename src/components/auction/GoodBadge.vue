@@ -51,6 +51,6 @@ export { GoodBadgeComponent }
 @import '../../custom.scss';
 span {
   font-family: monospace;
-  font-size: 1.3em;
+  font-size: 1.2em;
 }
 </style>
