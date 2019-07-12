@@ -1,8 +1,8 @@
 <template>
   <div>
-    <div class="small pb-2">Auction: Single-Item First-Price</div>
+    <div class="small pb-2">{{ auctionType }}</div>
 
-    <button class="btn btn-success btn-sm" @click="nextRound()">Get Auction Results</button>
+    <button class="btn btn-success btn-sm" @click="getAuctionResults()">Get Auction Results</button>
   </div>
 </template>
 
@@ -14,7 +14,32 @@ import RoundMixinVue from './RoundMixin.vue'
 
 export default Vue.extend({
   props: ['auction'],
-  mixins: [RoundMixinVue]
+  mixins: [RoundMixinVue],
+  computed: {
+    auctionType() {
+      switch (this.$props.auction.auctionType) {
+        case ApiAuctionType.SINGLE_ITEM_FIRST_PRICE:
+          return 'First Price Auction'
+        case ApiAuctionType.SINGLE_ITEM_SECOND_PRICE:
+          return 'Second Price Auction'
+        case ApiAuctionType.SIMULTANEOUS_FIRST_PRICE:
+          return 'Simultaneous Multi-Item First Price Auction'
+        case ApiAuctionType.SIMULTANEOUS_FIRST_PRICE:
+          return 'Simultaneous Multi-Item Second Price Auction'
+        case ApiAuctionType.VCG_XOR:
+          return 'VCG Auction'
+        default:
+          return ''
+      }
+    }
+  },
+  methods: {
+    async getAuctionResults() {
+      const result = await auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      selection.commitUnselectAll()
+      this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
+    }
+  }
 })
 </script>
 

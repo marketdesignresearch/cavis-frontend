@@ -17,7 +17,8 @@ export default Vue.extend({
   },
   mounted() {
     this.$data.model = VueFormGenerator.schema.createDefaultObject(this.schema, {
-      auctionType: 'SINGLE_ITEM_FIRST_PRICE'
+      auctionType: 'VCG_XOR',
+      domainType: 'additiveValue'
     })
   },
   name: 'AuctionSetup',
@@ -39,8 +40,9 @@ export default Vue.extend({
               { name: 'Simultaneous First Price Auction', id: 'SIMULTANEOUS_FIRST_PRICE' },
               { name: 'Simultaneous Second Price Auction', id: 'SIMULTANEOUS_SECOND_PRICE' },
               { name: 'VCG Auction', id: 'VCG_XOR' },
-              { name: 'CCA-VCG Auction', id: 'CCA_VCG' },
-              { name: 'CCA-CCG Auction', id: 'CCA_CCG' }
+              { name: 'Combinatorial Clock Auction (CCA)', id: 'CCA_VCG' },
+              // { name: 'CCA-CCG Auction', id: 'CCA_CCG' },
+              { name: 'PVM Auction', id: 'PVM_VCG' }
             ],
             validator: VueFormGenerator.validators.required
           },
@@ -49,7 +51,11 @@ export default Vue.extend({
             label: 'Domain',
             model: 'domainType',
             default: 'unitDemandValue',
-            values: [{ name: 'Unit Demand Value', id: 'unitDemandValue' }, { name: 'GSVM', id: 'gsvm' }],
+            values: [
+              { name: 'Unit Demand Value', id: 'unitDemandValue' },
+              { name: 'Additive Value', id: 'additiveValue' },
+              { name: 'GSVM', id: 'gsvm' }
+            ],
             validator: VueFormGenerator.validators.required
           },
           {
@@ -57,16 +63,19 @@ export default Vue.extend({
             inputType: 'number',
             label: '# of Goods',
             model: 'numberOfGoods',
-            default: 1,
+            default: 3,
             disabled: (model: any): boolean => {
-              if (model.auctionType && model.auctionType.indexOf('SINGLE_ITEM') !== -1) {
+              if (model.domainType && model.domainType.indexOf('gsvm') !== -1) {
+                model.numberOfGoods = 18
+                return true
+              } else if (model.auctionType && model.auctionType.indexOf('SINGLE_ITEM') !== -1) {
                 model.numberOfGoods = 1
                 return true
               }
               return false
             },
             min: 0,
-            max: 5,
+            max: 20,
             validator: [VueFormGenerator.validators.required]
           },
           {
@@ -75,8 +84,15 @@ export default Vue.extend({
             label: '# of Bidders',
             model: 'numberOfBidders',
             default: 3,
+            disabled: (model: any): boolean => {
+              if (model.domainType && model.domainType.indexOf('gsvm') !== -1) {
+                model.numberOfBidders = 7
+                return true
+              }
+              return false
+            },
             min: 0,
-            max: 50,
+            max: 20,
             validator: [VueFormGenerator.validators.required]
           },
           {

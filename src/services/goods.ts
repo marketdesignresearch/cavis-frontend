@@ -1,4 +1,4 @@
-import auction, { ApiBidder, ApiGood, ApiBid, ApiAuctionType, ApiMechanismType } from '@/store/modules/auction'
+import auction, { ApiBidder, ApiGood, ApiBid, ApiAuctionType, ApiMechanismType, BundleEntry, ApiBundleEntry } from '@/store/modules/auction'
 
 const powerSet = function(l: any) {
   // TODO: ensure l is actually array-like, and return null if not
@@ -17,20 +17,20 @@ const powerSet = function(l: any) {
 }
 
 export default {
-  bundleForBidder(bidderId: string): string[][] {
+  bundleForBidder(bidderId: string): ApiBundleEntry[][] {
     const bidder = auction.bidderById()(bidderId)
 
     if (bidder.value && bidder.value.bundleValues) {
       return bidder.value.bundleValues
         .filter(bid => bid.bundle)
         .map(bid => {
-          return bid.bundle.map(good => good.good)
+          return bid.bundle
         })
     }
 
     return []
   },
-  goodCombinations(auctionId: string): string[][] {
+  goodCombinations(auctionId: string): ApiBundleEntry[][] {
     if (!auctionId) return []
 
     const goods = auction
@@ -43,66 +43,85 @@ export default {
       return powerSet(goods).filter((goods: []) => goods.length > 0)
     }
 
-    return goods.map(good => [good])
+    return goods.map(good => [{ good: good, amount: 1 }]) // TODO: Hard-coded availability of 1
   },
-  valueForGood(goodIds: string[], bidderId: string): number | null {
+  valueForGood(bundle: ApiBundleEntry[], bidderId: string): number | null {
     const bidder = auction.bidderById()(bidderId)
 
     if (bidder.value && bidder.value.bundleValues) {
-      const ids = goodIds.sort().join('')
+      const comparison = bundle
+        .map(bundleEntry => bundleEntry.good + bundleEntry.amount)
+        .sort()
+        .join('')
       const correctValue = bidder.value.bundleValues
-        .filter(bid => bid.bundle)
+        .filter(value => value.bundle)
         .find(
-          bid =>
-            bid.bundle
-              .map(val => val.good)
+          value =>
+            value.bundle
+              .map(bundleEntry => bundleEntry.good + bundleEntry.amount)
               .sort()
-              .join('') === ids
+              .join('') === comparison
         )
       return correctValue ? correctValue.value : null
     }
     return null
   },
-  priceForGood(auctionId: string, goodIds: string[], bidderId: string): number | null {
+  priceForGood(auctionId: string, bundle: ApiBundleEntry[], bidderId: string): number | null {
     const bidder = auction.bidderById()(bidderId)
 
     if (bidder.value && bidder.value.bundleValues) {
-      return goodIds
-        .map(id => auction.priceForGood()(auctionId, id))
+      return bundle
+        .map(id => auction.priceForGood()(auctionId, id.good))
         .reduce((previous, current) => {
           return previous! + current!
-        })
+        }, 0)
     }
     return null
   },
-  bidForGood(goodIds: string[], bidderId: string): number | null {
+  bidForGood(goodIds: ApiBundleEntry[], bidderId: string): number | null {
     const bidder = auction.bidderById()(bidderId)
 
     if (bidder.bids) {
+      const comparison = goodIds
+        .map(bundleEntry => bundleEntry.good + bundleEntry.amount)
+        .sort()
+        .join('')
       const correctBid = bidder.bids.find((bid: ApiBid) => {
         return (
           bid.bundle
-            .map(good => good.good)
+            .map(bundleEntry => bundleEntry.good + bundleEntry.amount)
             .sort()
-            .join('') === goodIds.sort().join('')
+            .join('') === comparison
         )
       })
       return correctBid ? correctBid.amount : null
     }
     return null
   },
-  isAllowed(bidderId: string | null, auctionId: string): boolean {
+  isAllowed(bundle: ApiBundleEntry[], bidderId: string | null, auctionId: string): boolean {
     if (!bidderId) {
       return false
     }
 
     const currentAuction = auction.auctionById()(auctionId)
     if (currentAuction.auction.restrictedBids && currentAuction.auction.restrictedBids[bidderId]) {
-      const goodIds: string[] = currentAuction.auction.restrictedBids[bidderId].map((obj: any) => {
-        return obj.map((obj: any) => obj.good).join()
-      })
+      const restrictedBundles: string[] = currentAuction.auction.restrictedBids[bidderId].map((entry: ApiBundleEntry[]) =>
+        entry
+          .map(e => e.good + e.amount)
+          .sort()
+          .join('')
+      )
 
-      return goodIds.find(id => id === goodIds.join()) !== undefined
+      return (
+        restrictedBundles.find(
+          id =>
+            id ===
+            bundle
+              .map(entry => entry.good + entry.amount)
+              .sort()
+              .join('')
+        ) !== undefined
+      )
     } else if (Object.keys(currentAuction.auction.restrictedBids).length === 0) {
       return true
     }

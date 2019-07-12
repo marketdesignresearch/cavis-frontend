@@ -16,18 +16,18 @@
           </thead>
           <tbody>
             <tr
-              v-for="(goodSet, index) in goodCombinations"
+              v-for="(bundle, index) in goodCombinations"
               :key="'set' + index"
-              :class="{ active: isActive(goodSet), disabled: !isAllowed(goodSet) }"
-              @click="selectGoods(goodSet)"
+              :class="{ active: isActive(bundle), disabled: !isAllowed(bundle) }"
+              @click="selectGoods(bundle)"
             >
-              <td><good-badge :ids="goodSet" /></td>
-              <td>{{ valueForGood(goodSet) | formatNumber }}</td>
-              <td v-if="pricedAuction">{{ priceForGood(goodSet) | formatNumber }}</td>
-              <td v-if="pricedAuction">{{ (valueForGood(goodSet) - priceForGood(goodSet)) | formatNumber }}</td>
-              <td>{{ bidForGood(goodSet) | formatNumber }}</td>
+              <td><good-badge :ids="bundle" /></td>
+              <td>$ {{ valueForGood(bundle) | formatNumber }}</td>
+              <td v-if="pricedAuction">$ {{ priceForGood(bundle) | formatNumber }}</td>
+              <td v-if="pricedAuction">$ {{ (valueForGood(bundle) - priceForGood(bundle)) | formatNumber }}</td>
+              <td>{{ bidForGood(bundle) | formatNumber }}</td>
               <td>
-                <button v-if="bidForGood(goodSet)" class="btn btn-delete btn-outline-secondary btn-sm" @click="removeBid(goodSet)">
+                <button v-if="bidForGood(bundle)" class="btn btn-delete btn-outline-secondary btn-sm" @click="removeBid(bundle)">
                   X
                 </button>
               </td>
@@ -44,7 +44,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood, ApiBundleEntry } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
 import BidderCircleVue from './BidderCircle.vue'
@@ -65,13 +65,13 @@ export default Vue.extend({
     pricedAuction() {
       const currentAuction = auction.auctionById()(this.$props.auctionId)
 
-      if (currentAuction.auctionType.indexOf('CCA') !== -1) {
+      if (Object.keys(currentAuction.auction.currentPrices).length > 0) {
         return true
       }
 
       return false
     },
-    goodCombinations(): string[][] {
+    goodCombinations(): ApiBundleEntry[][] {
       const bidderId = selection.selectedBidder()
       if (bidderId) {
         return GoodsService.bundleForBidder(bidderId)
@@ -85,16 +85,16 @@ export default Vue.extend({
     }
   },
   methods: {
-    isAllowed(goods: string[]): boolean {
-      return GoodsService.isAllowed(selection.selectedBidder(), this.$props.auctionId)
+    isAllowed(goods: ApiBundleEntry[]): boolean {
+      return GoodsService.isAllowed(goods, selection.selectedBidder(), this.$props.auctionId)
     },
-    isActive(goods: ApiGood[]): boolean {
+    isActive(goods: ApiBundleEntry[]): boolean {
       if (!this.$props.selectedGoods) {
         return false
       }
       return (
         goods
-          .map((obj: ApiGood) => obj.id)
+          .map((obj: ApiBundleEntry) => obj.good) // TODO: Also consider multi-availability goods
           .sort()
           .join() ===
         Array.from(this.$props.selectedGoods)
@@ -102,21 +102,21 @@ export default Vue.extend({
           .join()
       )
     },
-    selectGoods(goodIds: string[]) {
+    selectGoods(bundle: ApiBundleEntry[]) {
       selection.commitUnselectGoods()
-      goodIds.forEach(id => selection.commitSelectGood({ goodId: id }))
+      bundle.forEach(entry => selection.commitSelectGood({ goodId: entry.good }))
     },
-    valueForGood(goodIds: string[]) {
-      return GoodsService.valueForGood(goodIds, selection.selectedBidder()!)
+    valueForGood(bundle: ApiBundleEntry[]) {
+      return GoodsService.valueForGood(bundle, selection.selectedBidder()!)
     },
-    priceForGood(goodIds: string[]) {
-      return GoodsService.priceForGood(this.$props.auctionId, goodIds, selection.selectedBidder()!)
+    priceForGood(bundle: ApiBundleEntry[]) {
+      return GoodsService.priceForGood(this.$props.auctionId, bundle, selection.selectedBidder()!)
     },
-    bidForGood(goodIds: string[]) {
-      return GoodsService.bidForGood(goodIds, selection.selectedBidder()!)
+    bidForGood(bundle: ApiBundleEntry[]) {
+      return GoodsService.bidForGood(bundle, selection.selectedBidder()!)
     },
-    removeBid(goodSet: string[]) {
-      BidderService.removeBid(selection.selectedBidder()!, goodSet)
+    removeBid(bundle: ApiBundleEntry[]) {
+      BidderService.removeBid(selection.selectedBidder()!, bundle)
     }
   }
 })

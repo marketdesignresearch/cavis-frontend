@@ -17,7 +17,7 @@
 
     <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
       <div class="float-right">
-        <button @click="advanceRound" class="btn btn-warning btn-sm">Advance Round</button>
+        <!-- <button @click="advanceRound" class="btn btn-warning btn-sm">Advance Round</button> -->
         <button @click="advancePhase" class="btn ml-2 btn-warning btn-sm">Advance Phase</button>
       </div>
       <b-tabs content-class="mt-3">
@@ -69,7 +69,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiRound, ApiAuction, ApiBidder, ApiGood } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiRound, ApiAuction, ApiBidder, ApiGood, ApiBundleEntry, ApiBid } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
 import GoodBadgeComponent from './GoodBadge.vue'
@@ -102,7 +102,7 @@ export default Vue.extend({
         return auction.bidderById()(bidderId)
       })
     },
-    goodCombinations(): string[][] {
+    goodCombinations(): ApiBundleEntry[][] {
       return GoodsService.goodCombinations(this.$props.auction.id)
     }
   },
@@ -114,13 +114,13 @@ export default Vue.extend({
       this.allocate()
       this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
     },
-    valueForGood(bidder: ApiBidder, goods: string[]) {
+    valueForGood(bidder: ApiBidder, goods: ApiBundleEntry[]) {
       return GoodsService.valueForGood(goods, bidder.id!)
     },
-    priceForGood(bidder: ApiBidder, goods: string[]) {
+    priceForGood(bidder: ApiBidder, goods: ApiBundleEntry[]) {
       return GoodsService.priceForGood(this.$props.auctionId, goods, bidder.id!)
     },
-    bidForGood(bidder: ApiBidder, goods: string[]) {
+    bidForGood(bidder: ApiBidder, goods: ApiBundleEntry[]) {
       return GoodsService.bidForGood(goods, bidder.id!)
     },
     bidsByBidder(bidder: ApiBidder, round: ApiRound) {
@@ -129,12 +129,14 @@ export default Vue.extend({
       }
       return []
     },
-    allocationForBidder(bidder: ApiBidder, round: ApiRound): string[] {
+    allocationForBidder(bidder: ApiBidder, round: ApiRound): ApiBundleEntry[] {
       if (!round.mechanismResult || !round.mechanismResult.allocation[bidder.id!]) {
         return []
       }
 
-      return round.mechanismResult.allocation[bidder.id!].bundle.map(good => good.good)
+      return round.mechanismResult.allocation[bidder.id!].bundle.map(entry => {
+        return { good: entry.good, amount: entry.amount }
+      })
     },
     paymentForGoods(bidder: ApiBidder, round: ApiRound): number | null {
       if (!round.mechanismResult || !round.mechanismResult.payments[bidder.id!]) {

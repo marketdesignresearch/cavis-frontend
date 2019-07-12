@@ -1,20 +1,29 @@
 <template>
   <div class="small">
-    <div>Auction: {{ auctionType }}</div>
+    <div>{{ auctionType }}</div>
     <div>
       Round:
       <nav v-if="rounds" class="d-inline-flex">
         <span class="round" :class="{ active: rounds.length === 0 }">
-          <a href="#" @click="resetRound(0)">1</a>
+          <a href="#" v-if="rounds.length > 0" @click="resetRound(0)">1</a>
+          <span v-if="rounds.length === 0">1</span>
         </span>
+        <span v-if="rounds.length >= 15">&nbsp;/&nbsp;...</span>
         <span class="round" v-for="(round, index) in rounds" :key="round.roundNumber" :class="{ active: index === rounds.length - 1 }">
-          <span v-if="index < rounds.length">&nbsp;/&nbsp;</span>
-          <a href="#" @click="resetRound(round.roundNumber)">{{ round.roundNumber + 1 }}</a>
+          <span v-if="index > rounds.length - 4 || rounds.length < 15">
+            <span>&nbsp;/&nbsp;</span>
+            <a href="#" v-if="index < rounds.length - 1" @click="resetRound(round.roundNumber)">{{ round.roundNumber + 1 }}</a>
+            <span v-if="index === rounds.length - 1 && !finished">{{ round.roundNumber + 1 }}</span>
+            <span v-if="index === rounds.length - 1 && finished">END</span>
+          </span>
         </span>
       </nav>
     </div>
 
-    <button class="btn mt-2 btn-success btn-sm" @click="nextRound()">Next Round</button>
+    <div v-if="currentRoundType">{{ currentRoundType }}</div>
+
+    <button class="btn mt-2 btn-success btn-sm" @click="nextRound()" v-if="!finished">Next Round</button>
+    <button class="btn mt-2 btn-success btn-sm" @click="showAuctionResults()" v-if="finished">Show Auction Result</button>
   </div>
 </template>
 
@@ -34,19 +43,28 @@ export default Vue.extend({
           return 'Sequential First-Price'
         case ApiAuctionType.SEQUENTIAL_SECOND_PRICE:
           return 'Sequential Second-Price'
-        case ApiAuctionType.SIMULTANEOUS_FIRST_PRICE:
-          return 'Simultaneous First-Price'
-        case ApiAuctionType.SIMULTANEOUS_SECOND_PRICE:
-          return 'Simultaneous Second-Price'
+        case ApiAuctionType.CCA_VCG:
+          return 'Combinatorial Clock Auction (CCA)'
+        case ApiAuctionType.PVM_VCG:
+          return 'PVM Auction'
         default:
           return ''
       }
     },
     rounds(): ApiRound[] {
       return this.$props.auction.auction.rounds
+    },
+    currentRoundType(): string {
+      return this.$props.auction.auction.currentRoundType
+    },
+    finished(): boolean {
+      return this.$props.auction.auction.finished
     }
   },
   methods: {
+    showAuctionResults() {
+      this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
+    },
     async resetRound(round: number) {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: round })
       selection.commitUnselectAll()

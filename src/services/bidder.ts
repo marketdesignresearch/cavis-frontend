@@ -1,20 +1,20 @@
-import auction, { ApiBidder, ApiBid, ApiBundleValue } from '@/store/modules/auction'
+import auction, { ApiBidder, ApiBid, ApiBundleValue, ApiBundleEntry } from '@/store/modules/auction'
 
 export default {
-  removeBid(bidderId: string, bundle: string[]) {
+  removeBid(bidderId: string, bundle: ApiBundleEntry[]) {
     auction.commitRemoveBid({
       bidderId: bidderId,
       bundle: bundle
     })
   },
-  bidForBundle(bidderId: string, bundle: string[], auctionId: string) {
+  bidForBundle(bidderId: string, bundle: ApiBundleEntry[], auctionId: string) {
     const auctionInstance = auction.auctionById()(auctionId)
     const bidder = auction.bidderById()(bidderId)
 
     // if CCA, go with price for bid
     if (auctionInstance.auctionType.indexOf('CCA') !== -1 && bundle.length > 0) {
       return bundle
-        .map(goodId => auctionInstance.auction.currentPrices[goodId])
+        .map(entry => auctionInstance.auction.currentPrices[entry.good] * entry.amount)
         .reduce((previous, current) => {
           return previous + current
         })
@@ -24,10 +24,11 @@ export default {
       const correctValue = bidder.value.bundleValues.find(
         (bid: ApiBundleValue) =>
           bid.bundle
-            .map((obj: any) => obj.good)
+            .map((obj: ApiBundleEntry) => obj.good + obj.amount)
             .sort()
             .join('') ===
           Array.from(bundle) // copy array before sorting, to not trigger change-detection
+            .map(entry => entry.good + entry.amount)
             .sort()
             .join('')
       )

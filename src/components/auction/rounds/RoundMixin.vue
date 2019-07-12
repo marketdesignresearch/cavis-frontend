@@ -8,21 +8,14 @@ export default Vue.mixin({
     async nextRound() {
       const result = await auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
       selection.commitUnselectAll()
-      if (result.auction.finished) {
-        this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
-      } else {
-        const bundleValues = await auction.dispatchPropose({
+      if (!result.auction.finished) {
+        const bids: ApiBid[] = await auction.dispatchPropose({
           auctionId: this.$props.auction.id,
           bidderIds: auction.biddersById()(this.$props.auction.id)
         })
 
-        bundleValues.forEach(bundleValue => {
-          const apiBid: ApiBid = {
-            amount: bundleValue.amount!,
-            bidderId: bundleValue.bidderId!,
-            bundle: bundleValue.bundle
-          }
-          auction.commitUpdateBidder({ bidderId: bundleValue.bidderId!, bid: apiBid })
+        bids.forEach(bid => {
+          auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
         })
       }
     }
