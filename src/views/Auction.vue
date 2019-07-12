@@ -23,11 +23,9 @@
                     <AuctionGood class="align-self-center d-inline-flex" :goodId="goodId" :auctionId="auctionId" />
                   </span>
 
-                  <div class="mt-4" v-if="selectedGoods.length > 0 && selectedBidder">
-                    Value of <good-badge :ids="selectedGoods" /> for {{ selectedBidder.name }}:
-                    <h2 class="mt-4">
-                      {{ valueForGoods | formatNumber }}
-                    </h2>
+                  <div class="mt-4" v-if="selectedBidder">
+                    Value of <good-badge :ids="selectedGoods" /> for Bidder {{ selectedBidder.name }}:
+                    <h2 class="mt-4">$ {{ valueForGoods | formatNumber }}</h2>
                   </div>
                 </div>
               </div>
@@ -62,7 +60,7 @@ import AuctionSetup from '@/components/auction/Setup.vue'
 import AuctionProgress from '@/components/auction/Progress.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
-import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid, ApiBundleEntry, ApiBundleValue } from '../store/modules/auction'
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 import selection, { SelectionState } from '../store/modules/selection'
 import { mapGetters, mapState } from 'vuex'
@@ -84,18 +82,13 @@ export default Vue.extend({
   },
   async mounted() {
     await auction.dispatchGetAuction({ auctionId: this.$route.params.id })
-    const bundleValues = await auction.dispatchPropose({
+    const bids: ApiBid[] = await auction.dispatchPropose({
       auctionId: this.$route.params.id,
       bidderIds: auction.biddersById()(this.$route.params.id)
     })
 
-    bundleValues.forEach(bundleValue => {
-      const apiBid: ApiBid = {
-        amount: bundleValue.amount!,
-        bidderId: bundleValue.bidderId!,
-        bundle: bundleValue.bundle
-      }
-      auction.commitUpdateBidder({ bidderId: bundleValue.bidderId!, bid: apiBid })
+    bids.forEach(bid => {
+      auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
     })
   },
   methods: {
@@ -120,7 +113,10 @@ export default Vue.extend({
       const selectedBidder = selection.selectedBidder()
 
       if (selectedBidder) {
-        const value = auction.valueForBundle()(this.$route.params.id, selectedBidder, selection.selectedGoods())
+        const selectedBundle: ApiBundleEntry[] = selection.selectedGoods().map(id => {
+          return { good: id, amount: 1 } // FIXME
+        })
+        const value: ApiBundleValue | null | undefined = auction.valueForBundle()(this.$route.params.id, selectedBidder, selectedBundle)
 
         if (value) {
           return value.value
@@ -129,7 +125,7 @@ export default Vue.extend({
         auction.dispatchValueQuery({
           auctionId: this.$route.params.id,
           bidderIds: [selectedBidder],
-          goodIds: selection.selectedGoods()
+          bundle: selectedBundle
         })
       }
 

@@ -1,8 +1,9 @@
 <template>
   <span class="badge badge-secondary">
+    <span v-if="unifiedBundleEntries.length === 0">{}</span>
     <span v-for="(entry, index) in unifiedBundleEntries" :key="index">
       <span v-if="hasMultiGoods">{{ entry.amount }}x </span>
-      {{ entry.good.name }}
+      <span>{{ entry.good.name }}</span>
       <span v-if="hasMultiGoods && index < unifiedBundleEntries.length - 1">, </span>
     </span>
   </span>
@@ -36,7 +37,7 @@ const GoodBadgeComponent = Vue.extend({
           return 0
         })
     },
-    hasMultiGoods(): Boolean {
+    hasMultiGoods(): boolean {
       return this.unifiedBundleEntries.some(entry => entry.amount > 1)
     }
   }
@@ -48,4 +49,8 @@ export { GoodBadgeComponent }
 
 <style scoped lang="scss">
 @import '../../custom.scss';
+span {
+  font-family: monospace;
+  font-size: 1.3em;
+}
 </style>

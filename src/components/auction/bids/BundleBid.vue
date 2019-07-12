@@ -4,8 +4,8 @@
       <table class="table table-bidder table-hover">
         <thead>
           <tr>
-            <th class="col-4">Selected Bundle</th>
-            <th class="col-6">Bid</th>
+            <th>Selected Bundle</th>
+            <th>Bid</th>
             <th></th>
           </tr>
         </thead>
@@ -18,7 +18,7 @@
               <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" :disabled="bidEditable" />
             </td>
             <td class="text-right">
-              <button @click="placeBid" :disabled="!allowedGoods" class="btn btn-primary btn-sm float-right">Bid</button>
+              <button @click="placeBid" :disabled="!isAllowed" class="btn btn-primary btn-sm float-right">Bid</button>
             </td>
           </tr>
           <tr v-if="selectedGoods.length === 0 && allowedToBid">
@@ -40,7 +40,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { Input, Button } from 'element-ui'
-import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder } from '../../../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder, ApiBundleEntry } from '../../../store/modules/auction'
 import GoodBadgeComponent from '../GoodBadge.vue'
 import BidderService from '@/services/bidder'
 import GoodsService from '@/services/goods'
@@ -63,11 +63,14 @@ export default Vue.extend({
     ...mapGetters('selection', ['selectedGoods', 'selectedBidder']),
     bidEditable: function() {
       const auctionInstance = auction.auctionById()(this.$props.auctionId)
-      return auctionInstance.auction.currentRoundType && auctionInstance.auction.currentRoundType === 'CLOCK'
+      return auctionInstance.auction.currentRoundType && auctionInstance.auction.currentRoundType === 'Clock Round'
     },
-    allowedGoods: function() {
+    isAllowed(): boolean {
       const bidderId = selection.selectedBidder()
-      return GoodsService.isAllowed(bidderId, this.$props.auctionId)
+      const bundle = selection.selectedGoods().map(goodId => {
+        return { good: goodId, amount: 1 } // FIXME
+      })
+      return GoodsService.isAllowed(bundle, bidderId, this.$props.auctionId)
     },
     allowedToBid: function() {
       const bidderId = selection.selectedBidder()
@@ -101,7 +104,10 @@ export default Vue.extend({
       const bidderId = selection.selectedBidder()
 
       if (bidderId) {
-        this.$data.bid = await BidderService.bidForBundle(bidderId, selection.selectedGoods(), this.$props.auctionId)
+        const bundle = selection.selectedGoods().map(goodId => {
+          return { good: goodId, amount: 1 } // FIXME
+        })
+        this.$data.bid = await BidderService.bidForBundle(bidderId, bundle, this.$props.auctionId)
       }
     },
     placeBid() {

@@ -68,7 +68,7 @@ export default Vue.extend({
         'V',
         'W',
         'X',
-        ' Y',
+        'Y',
         'Z'
       ]
 

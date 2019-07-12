@@ -1,7 +1,7 @@
 <template>
   <div class="flex-column">
     <div class="card good shadow-sm" :class="{ selected: isSelected, disabled: !isAllowed }">
-      <div class="price" v-if="priceForGood">{{ priceForGood | formatNumber }} $</div>
+      <div class="price" v-if="priceForGood">$ {{ priceForGood | formatNumber }}</div>
     </div>
     <div class="pt-2">
       {{ good.name }}
@@ -43,8 +43,7 @@ const AuctionGoodComponent = Vue.extend({
       if (!selectedBidder) {
         return false
       }
-
-      return GoodsService.isAllowed(selectedBidder, this.$props.auctionId)
+      return GoodsService.isAllowed([{ good: this.good.id!, amount: 1 }], selectedBidder, this.$props.auctionId) // FIXME
     }
   }
 })

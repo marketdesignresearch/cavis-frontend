@@ -5,7 +5,7 @@
         <div class="col">
           <h1>Result of Auction</h1>
 
-          <p>Total Payments: {{ result.payments.totalPayments }}</p>
+          <p>Total Payments: $ {{ result.payments.totalPayments | formatNumber }}</p>
 
           <h2>Allocation</h2>
           <table class="table table-striped">
@@ -19,9 +19,9 @@
             </thead>
             <tbody>
               <tr v-for="(value, key) in result.allocation" :key="key">
-                <td>{{ auctionInstance.bidderById()(key).name }}</td>
-                <td>{{ value.value }}</td>
-                <td>{{ result.payments[key] }}</td>
+                <td>{{ getBidderName(key) }}</td>
+                <td>$ {{ value.value | formatNumber }}</td>
+                <td>$ {{ result.payments[key] | formatNumber }}</td>
                 <td><good-badge :ids="value.bundle"></good-badge></td>
               </tr>
             </tbody>
@@ -40,10 +40,10 @@
             <tbody>
               <template v-for="currentRound in auction.auction.rounds">
                 <tr v-for="bid of currentRound.bids" :key="bid.id">
-                  <td>{{ currentRound.roundNumber }}</td>
-                  <td>{{ auctionInstance.bidderById()(bid.bidderId).name }}</td>
+                  <td>{{ currentRound.description }}</td>
+                  <td>{{ getBidderName(bid.bidderId) }}</td>
                   <td><good-badge :key="'bundle'" :ids="bid.bundle"></good-badge></td>
-                  <td>{{ bid.amount }}</td>
+                  <td>$ {{ bid.amount | formatNumber }}</td>
                 </tr>
               </template>
             </tbody>
@@ -65,6 +65,11 @@ export default Vue.extend({
   components: {
     AuctionProgress: AuctionProgress,
     'good-badge': GoodBadgeComponent
+  },
+  methods: {
+    getBidderName(id: string) {
+      return auction.bidderById()(id).name
+    }
   },
   computed: {
     result(): ApiAuctionAllocation | undefined | null {

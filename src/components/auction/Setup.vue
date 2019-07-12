@@ -17,7 +17,8 @@ export default Vue.extend({
   },
   mounted() {
     this.$data.model = VueFormGenerator.schema.createDefaultObject(this.schema, {
-      auctionType: 'SINGLE_ITEM_FIRST_PRICE'
+      auctionType: 'VCG_XOR',
+      domainType: 'additiveValue'
     })
   },
   name: 'AuctionSetup',
@@ -62,16 +63,19 @@ export default Vue.extend({
             inputType: 'number',
             label: '# of Goods',
             model: 'numberOfGoods',
-            default: 1,
+            default: 3,
             disabled: (model: any): boolean => {
-              if (model.auctionType && model.auctionType.indexOf('SINGLE_ITEM') !== -1) {
+              if (model.domainType && model.domainType.indexOf('gsvm') !== -1) {
+                model.numberOfGoods = 18
+                return true
+              } else if (model.auctionType && model.auctionType.indexOf('SINGLE_ITEM') !== -1) {
                 model.numberOfGoods = 1
                 return true
               }
               return false
             },
             min: 0,
-            max: 5,
+            max: 20,
             validator: [VueFormGenerator.validators.required]
           },
           {
@@ -80,8 +84,15 @@ export default Vue.extend({
             label: '# of Bidders',
             model: 'numberOfBidders',
             default: 3,
+            disabled: (model: any): boolean => {
+              if (model.domainType && model.domainType.indexOf('gsvm') !== -1) {
+                model.numberOfBidders = 7
+                return true
+              }
+              return false
+            },
             min: 0,
-            max: 50,
+            max: 20,
             validator: [VueFormGenerator.validators.required]
           },
           {

@@ -38,12 +38,12 @@ Vue.component('component-round-' + ApiAuctionType.SINGLE_ITEM_FIRST_PRICE, Singl
 Vue.component('component-round-' + ApiAuctionType.SINGLE_ITEM_SECOND_PRICE, SingleRound)
 Vue.component('component-round-' + ApiAuctionType.SEQUENTIAL_FIRST_PRICE, MultiRound)
 Vue.component('component-round-' + ApiAuctionType.SEQUENTIAL_SECOND_PRICE, MultiRound)
-Vue.component('component-round-' + ApiAuctionType.SIMULTANEOUS_FIRST_PRICE, MultiRound)
-Vue.component('component-round-' + ApiAuctionType.SIMULTANEOUS_SECOND_PRICE, MultiRound)
-Vue.component('component-round-' + ApiAuctionType.VCG_XOR, VCGRound)
-Vue.component('component-round-' + ApiAuctionType.CCA_VCG, CCARound)
+Vue.component('component-round-' + ApiAuctionType.SIMULTANEOUS_FIRST_PRICE, SingleRound)
+Vue.component('component-round-' + ApiAuctionType.SIMULTANEOUS_SECOND_PRICE, SingleRound)
+Vue.component('component-round-' + ApiAuctionType.VCG_XOR, SingleRound)
+Vue.component('component-round-' + ApiAuctionType.CCA_VCG, MultiRound)
 //Vue.component('component-round-' + ApiAuctionType.CCA_CCG, CCARound)
-Vue.component('component-round-' + ApiAuctionType.PVM_VCG, CCARound)
+Vue.component('component-round-' + ApiAuctionType.PVM_VCG, MultiRound)
 //Vue.component('component-round-' + ApiAuctionType.PVM_CCG, CCARound)
 
 new Vue({
