@@ -39,7 +39,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Input, Button } from 'element-ui'
 import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder, ApiBundleEntry } from '../../../store/modules/auction'
 import GoodBadgeComponent from '../GoodBadge.vue'
 import BidderService from '@/services/bidder'
@@ -50,8 +49,6 @@ import { mapGetters } from 'vuex'
 export default Vue.extend({
   props: ['auctionId'],
   components: {
-    'el-input': Input,
-    'el-button': Button,
     'good-badge': GoodBadgeComponent
   },
   data() {

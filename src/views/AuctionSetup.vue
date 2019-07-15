@@ -10,7 +10,6 @@
 <script lang="ts">
 import Vue from 'vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
-import AuctionProgress from '@/components/auction/Progress.vue'
 import auction, {
   ApiAuctionType,
   ApiAuction,
@@ -23,8 +22,7 @@ import auction, {
 export default Vue.extend({
   name: 'AuctionSetupView',
   components: {
-    AuctionSetup: AuctionSetup,
-    AuctionProgress: AuctionProgress
+    AuctionSetup: AuctionSetup
   },
   methods: {
     auctionCreated() {},

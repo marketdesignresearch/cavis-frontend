@@ -6,13 +6,11 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Input } from 'element-ui'
 import VueFormGenerator from 'vue-form-generator'
 import { ApiBidderStrategy } from '../../store/modules/auction'
 
 export default Vue.extend({
   components: {
-    'el-input': Input,
     'vue-form-generator': VueFormGenerator.component
   },
   mounted() {

@@ -57,7 +57,6 @@ import Vue from 'vue'
 import { AuctionGoodComponent, IAuctionGood } from '@/components/auction/Good.vue'
 import AuctionBidder from '@/components/auction/Bidder.vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
-import AuctionProgress from '@/components/auction/Progress.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
 import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid, ApiBundleEntry, ApiBundleValue } from '../store/modules/auction'
@@ -70,7 +69,6 @@ export default Vue.extend({
     AuctionGood: AuctionGoodComponent,
     AuctionBidder: AuctionBidder,
     AuctionSetup: AuctionSetup,
-    AuctionProgress: AuctionProgress,
     Auctioneer: Auctioneer,
     BidderControl: BidderControl,
     'good-badge': GoodBadgeComponent
@@ -81,6 +79,9 @@ export default Vue.extend({
     }
   },
   async mounted() {
+    // unselect everything
+    selection.commitUnselectAll()
+
     await auction.dispatchGetAuction({ auctionId: this.$route.params.id })
     const bids: ApiBid[] = await auction.dispatchPropose({
       auctionId: this.$route.params.id,

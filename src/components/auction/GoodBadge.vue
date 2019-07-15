@@ -1,5 +1,5 @@
 <template>
-  <span class="badge badge-secondary">
+  <span class="badge badge-secondary bundle-badge">
     <span v-if="unifiedBundleEntries.length === 0">{}</span>
     <span v-for="(entry, index) in unifiedBundleEntries" :key="index">
       <span v-if="hasMultiGoods">{{ entry.amount }}x </span>
@@ -11,7 +11,6 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { Popover } from 'element-ui'
 import auction, { ApiGood, BundleEntry } from '../../store/modules/auction'
 
 const GoodBadgeComponent = Vue.extend({
@@ -49,8 +48,14 @@ export { GoodBadgeComponent }
 
 <style scoped lang="scss">
 @import '../../custom.scss';
-span {
+
+.bundle-badge {
+  padding: initial 5px;
+}
+
+.bundle-badge span {
   font-family: monospace;
-  font-size: 1.2em;
+  font-weight: 400;
+  font-size: 1.1rem;
 }
 </style>

@@ -9,13 +9,13 @@
           :class="{ selected: isSelected, bidsPlaced: bidsPlaced(bidder) }"
         />
       </div>
-      <div class="col py-2 text-left bidder-info">
-        <!--
-        <el-select disabled v-model="strategy">
-          <el-option value="TRUTHFUL" label="Truthful"></el-option>
-        </el-select>
-        -->
+      <!--
+      <div class="col text-left bidder-info">
+        <select class="custom-select custom-select-sm">
+          <option value="TRUTHFUL" label="Truthful" selected>Truthful</option>
+        </select>
       </div>
+      -->
     </div>
   </div>
 </template>
@@ -23,13 +23,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiBidder, ApiBidderStrategy } from '../../store/modules/auction'
-import { Select, Option } from 'element-ui'
 import BidderCircleVue from './BidderCircle.vue'
 import selection from '../../store/modules/selection'
 
 export default Vue.extend({
   name: 'AuctionBidder',
-  components: { 'bidder-circle': BidderCircleVue, 'el-select': Select, 'el-option': Option },
+  components: { 'bidder-circle': BidderCircleVue },
   props: ['bidderId', 'auctionId'],
   data() {
     return {

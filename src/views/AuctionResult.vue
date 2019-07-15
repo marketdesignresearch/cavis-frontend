@@ -57,13 +57,11 @@
 <script lang="ts">
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiAuctionAllocation, AuctionState } from '../store/modules/auction'
-import AuctionProgress from '@/components/auction/Progress.vue'
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 
 export default Vue.extend({
   name: 'AuctionResultView',
   components: {
-    AuctionProgress: AuctionProgress,
     'good-badge': GoodBadgeComponent
   },
   methods: {

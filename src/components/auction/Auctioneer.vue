@@ -16,17 +16,13 @@
     </div>
 
     <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
-      <div class="float-right">
-        <!-- <button @click="advanceRound" class="btn btn-warning btn-sm">Advance Round</button> -->
-        <button @click="advancePhase" class="btn ml-2 btn-warning btn-sm">Advance Phase</button>
-      </div>
       <b-tabs content-class="mt-3">
         <b-tab v-for="round in rounds" :title="'Round ' + round.roundNumber" :key="round.roundNumber">
           <table class="table table-bidder">
             <thead>
               <tr>
                 <th scope="col">Bidder</th>
-                <th scope="col">
+                <th scope="col" v-if="goodCombinations.length <= 5">
                   <div>Values</div>
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
@@ -42,7 +38,7 @@
             <tbody>
               <tr v-for="bidder of bidders" :key="bidder.id">
                 <td>{{ bidder.name }}</td>
-                <td>
+                <td v-if="goodCombinations.length <= 5">
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
                       {{ valueForGood(bidder, goodSet) | formatNumber }}
@@ -63,6 +59,11 @@
           </table>
         </b-tab>
       </b-tabs>
+
+      <div class="text-right py-3">
+        <button @click="advancePhase" class="btn ml-2 btn-success btn-sm">Advance Phase</button>
+      </div>
+
     </b-collapse>
   </div>
 </template>
@@ -89,7 +90,16 @@ export default Vue.extend({
       return rounds[rounds.length - 1]
     },
     rounds(): ApiRound[] {
-      return [...this.$props.auction.auction.rounds]
+      const bidArrays = auction.biddersById()(this.$props.auction.id).map(bidderId => {
+        return auction.bidderById()(bidderId).bids || []
+      })
+      
+      const currentBids: ApiBid[] = new Array().concat(...bidArrays)
+
+      return [...this.$props.auction.auction.rounds, {
+        roundNumber: this.$props.auction.auction.rounds.length + 1,
+        bids: currentBids
+      }]
     },
     goods(): ApiGood[] {
       return this.$props.auction.auction.domain.goods.map((goodId: string) => {

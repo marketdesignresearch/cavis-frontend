@@ -27,11 +27,15 @@ export default Vue.extend({
 }
 
 .selected {
-  border: 3px solid theme-color('success');
-  padding-top: 21px;
+  // background-color: theme-color('primary');
+  // border: 5px solid theme-color('primary') !important;
+  // border: 3px solid theme-color('success');
+  // padding-top: 21px;
 }
 
 .bidsPlaced {
-  background-color: lighten(theme-color('success'), 25%);
+  border: 3px solid theme-color('success');
+  padding-top: 21px;
+  // background-color: lighten(theme-color('success'), 25%);
 }
 </style>
