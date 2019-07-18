@@ -96,7 +96,7 @@ export default Vue.extend({
       
       const currentBids: ApiBid[] = new Array().concat(...bidArrays)
 
-      return [...this.$props.auction.auction.rounds, {
+      return this.$props.auction.auction.finished ? this.$props.auction.auction.rounds : [...this.$props.auction.auction.rounds, {
         roundNumber: this.$props.auction.auction.rounds.length + 1,
         bids: currentBids
       }]
