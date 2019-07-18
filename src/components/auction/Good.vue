@@ -26,11 +26,29 @@ const AuctionGoodComponent = Vue.extend({
   name: 'AuctionGood',
   props: ['auctionId', 'goodId'],
   watch: {
+    selectedBidder: async function(current, previous) {
+      if (current) {
+        this.updateProposedValue(current)
+      }
+    },
     bundleHash: async function(current, previous) {
       const bidderId = selection.state().selectedBidder
 
       if (bidderId) {
-        const bundle: { [x: string]: number } = {}
+        this.updateProposedValue(bidderId)
+      } else {
+        this.$data.proposedBundleValue = null
+      }
+    }
+  },
+  data: () => {
+    return {
+      proposedBundleValue: null
+    }
+  },
+  methods: {
+    updateProposedValue: async function(bidderId: string) {
+      const bundle: { [x: string]: number } = {}
 
         Object.keys(selection.state().selectedGoods).forEach(key => {
           bundle[key] = 1
@@ -45,19 +63,14 @@ const AuctionGoodComponent = Vue.extend({
 
         const { data: valueQueryResult } = await api().post(`/auctions/${this.$props.auctionId}/valuequery`, valueQuery)
         this.$data.proposedBundleValue = valueQueryResult[bidderId][0].value
-      } else {
-        this.$data.proposedBundleValue = null
-      }
-    }
-  },
-  data: () => {
-    return {
-      proposedBundleValue: null
     }
   },
   computed: {
     showProposedValue: function(): boolean {
       return !this.isSelected && this.$data.proposedBundleValue !== null && this.isAllowed
+    },
+    selectedBidder: function(): string | null {
+      return selection.state().selectedBidder
     },
     bundleHash: function(): string {
       return Object.keys(selection.state().selectedGoods).sort().join()
