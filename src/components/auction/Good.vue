@@ -2,7 +2,7 @@
   <div class="flex-column">
     <div class="card good shadow-sm" :class="{ selected: isSelected, disabled: !isAllowed }">
       <div class="price" v-if="priceForGood">{{ priceForGood | formatNumber }} $</div>
-      <div class="proposedValue" v-if="proposedBundleValue && !isSelected && isAllowed">{{ proposedBundleValue | formatNumber }} $</div>
+      <div class="proposedValue" v-if="showProposedValue">{{ proposedBundleValue | formatNumber }} $</div>
     </div>
     <div class="pt-2">
       {{ good.name }}
@@ -29,7 +29,7 @@ const AuctionGoodComponent = Vue.extend({
     bundleHash: async function(current, previous) {
       const bidderId = selection.state().selectedBidder
 
-      if (current && bidderId) {
+      if (bidderId) {
         const bundle: { [x: string]: number } = {}
 
         Object.keys(selection.state().selectedGoods).forEach(key => {
@@ -56,6 +56,9 @@ const AuctionGoodComponent = Vue.extend({
     }
   },
   computed: {
+    showProposedValue: function(): boolean {
+      return !this.isSelected && this.$data.proposedBundleValue !== null && this.isAllowed
+    },
     bundleHash: function(): string {
       return Object.keys(selection.state().selectedGoods).sort().join()
     },
