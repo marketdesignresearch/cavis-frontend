@@ -38,7 +38,7 @@ export default Vue.extend({
       }
 
       for (let i = 0; i < model.numberOfBidders; i++) {
-        auctionObj.domain.bidders.push({ name: `B${i + 1}`, bids: [], defaultStrategy: model.defaultStrategy })
+        auctionObj.domain.bidders.push({ name: `B${i + 1}`, defaultStrategy: model.defaultStrategy, min: model.bidder.min, max: model.bidder.max })
       }
 
       const alphabet = [

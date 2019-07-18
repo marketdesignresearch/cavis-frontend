@@ -49,10 +49,17 @@ export enum ApiBidderStrategy {
   TRUTHFUL = 'TRUTHFUL'
 }
 
+export interface ApiBidderCreateDTO {
+  name: string
+  min: number
+  max: number
+  defaultStrategy: ApiBidderStrategy
+}
+
 export interface ApiAuctionCreateDTO {
   domain: {
     type: ApiDomainType
-    bidders: ApiBidder[]
+    bidders: ApiBidderCreateDTO[]
     goods: ApiGood[]
   }
   auctionType: ApiAuctionType
