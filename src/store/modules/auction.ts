@@ -94,7 +94,7 @@ export interface ApiAuction {
 export interface ApiRound {
   roundNumber: number
   bids: ApiBid[]
-  mechanismResult: ApiAuctionAllocation
+  mechanismResult?: ApiAuctionAllocation
 }
 
 export interface ApiBidder {
@@ -123,7 +123,12 @@ export interface ApiGood {
 export interface ApiBundleValue {
   value: number
   bidderId?: string
-  bundle: ApiBundleEntry[]
+  bundle: ApiBundleEntryWrapper
+}
+
+export interface ApiBundleEntryWrapper {
+  hash: string
+  entries: ApiBundleEntry[]
 }
 
 export interface ApiBundleEntry {
@@ -136,14 +141,14 @@ export interface ApiBid {
   amount: number
   value?: number
   bidderId?: string
-  bundle: ApiBundleEntry[]
+  bundle: ApiBundleEntryWrapper
 }
 
 export interface ApiAuctionAllocation {
   allocation: {
     [x: string]: {
       value: number
-      bundle: ApiBundleEntry[]
+      bundle: ApiBundleEntryWrapper
     }
   }
   payments: {
@@ -195,7 +200,7 @@ const priceForGood = moduleBuilder.read(
 )
 
 const valueForBundle = moduleBuilder.read(
-  state => (auctionId: string, bidderId: string, bundle: ApiBundleEntry[]) => {
+  state => (auctionId: string, bidderId: string, bundle: ApiBundleEntryWrapper) => {
     if (!state.auctions[auctionId]) {
       return null
     }
@@ -206,19 +211,7 @@ const valueForBundle = moduleBuilder.read(
       return null
     }
 
-    const comparison = bundle
-      .map(bundleEntry => bundleEntry.good + bundleEntry.amount)
-      .sort()
-      .join('')
-    const value = currentBidder.value.bundleValues
-      .filter(value => value.bundle)
-      .find(
-        value =>
-          value.bundle
-            .map(bundleEntry => bundleEntry.good + bundleEntry.amount)
-            .sort()
-            .join('') === comparison
-      )
+    const value = currentBidder.value.bundleValues.filter(value => value.bundle).find(value => value.bundle.hash === bundle.hash)
 
     return value
   },
@@ -263,6 +256,14 @@ function addBundleValue(state: AuctionState, payload: { bidderId: string; bundle
   }
 }
 
+function updateRoundResult(state: AuctionState, payload: { auctionId: string; round: number; result: ApiAuctionAllocation }) {
+  const apiRound = state.auctions[payload.auctionId].auction.rounds[payload.round]
+
+  if (apiRound) {
+    Vue.set(apiRound, 'mechanismResult', payload.result)
+  }
+}
+
 function updateBid(state: AuctionState, payload: { bidderId: string; bid: ApiBid }) {
   const existingBidder = state.bidders[payload.bidderId]
 
@@ -273,21 +274,12 @@ function updateBid(state: AuctionState, payload: { bidderId: string; bid: ApiBid
   }
 }
 
-function removeBid(state: AuctionState, payload: { bidderId: string; bundle: ApiBundleEntry[] }) {
+function removeBid(state: AuctionState, payload: { bidderId: string; bundle: ApiBundleEntryWrapper }) {
   const existingBidder = state.bidders[payload.bidderId]
 
   if (existingBidder && existingBidder.bids) {
     const bidIndex = existingBidder.bids.findIndex(bid => {
-      return (
-        bid.bundle
-          .map(entry => entry.good + entry.amount)
-          .sort()
-          .join('') ===
-        payload.bundle
-          .map(entry => entry.good + entry.amount)
-          .sort()
-          .join('')
-      )
+      return bid.bundle.hash === payload.bundle.hash
     })
 
     if (bidIndex !== -1) {
@@ -328,6 +320,11 @@ async function removeAuction(context: BareActionContext<AuctionState, RootState>
   auction.commitRemoveAuction({ auctionId: payload.auctionId })
 }
 
+async function getRoundResult(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string; round: number }) {
+  const { data } = await api().get(`/auctions/${payload.auctionId}/rounds/${payload.round}/result`)
+  auction.commitRoundResult({ auctionId: payload.auctionId, round: payload.round, result: data })
+}
+
 async function placeBids(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }): Promise<ApiAuction> {
   const bidderIds = context.state.auctions[payload.auctionId].auction.domain.bidders
   const bidders = bidderIds.map((id: string) => context.state.bidders[id])
@@ -348,7 +345,7 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
         [index: string]: number
       } = {}
 
-      bid.bundle.forEach(good => {
+      bid.bundle.entries.forEach(good => {
         bundle[good.good] = good.amount
       })
 
@@ -380,19 +377,24 @@ async function getResult(context: BareActionContext<AuctionState, RootState>, pa
   return data
 }
 
-async function resetAuctionToRound(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string; round: number }) {
-  const { data } = await api().put(`/auctions/${payload.auctionId}/reset`, { round: payload.round })
-  auction.commitAppendAuction({ auction: data })
-  if (!data.finished) {
-    const bids: ApiBid[] = await auction.dispatchPropose({
-      auctionId: data.id,
-      bidderIds: auction.biddersById()(data.id)
-    })
+async function resetAuctionToRound(
+  context: BareActionContext<AuctionState, RootState>,
+  payload: { auctionId: string; round: number; standardBids?: boolean }
+) {
+  let { data: bids } = await api().put(`/auctions/${payload.auctionId}/reset`, { round: payload.round })
 
-    bids.forEach(bid => {
-      auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
-    })
+  // update auction
+  await auction.dispatchGetAuction({ auctionId: payload.auctionId })
+
+  // if we do not want to restore bids
+  if (payload.standardBids) {
+    const bidderIds = auction.biddersById()(payload.auctionId)
+    bids = await auction.dispatchPropose({ auctionId: payload.auctionId, bidderIds: bidderIds })
   }
+
+  bids.forEach((bid: ApiBid) => {
+    auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
+  })
 }
 
 async function advanceRound(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
@@ -455,11 +457,11 @@ async function demandQuery(
 
 async function valueQuery(
   context: BareActionContext<AuctionState, RootState>,
-  payload: { auctionId: string; bidderIds: string[]; bundle: ApiBundleEntry[] }
+  payload: { auctionId: string; bidderIds: string[]; bundle: ApiBundleEntryWrapper }
 ) {
   const bundle: { [x: string]: number } = {}
 
-  payload.bundle.forEach(entry => {
+  payload.bundle.entries.forEach(entry => {
     bundle[entry.good] = entry.amount
   })
 
@@ -533,6 +535,7 @@ const auction = {
   commitResult: moduleBuilder.commit(addResult),
   commitBundleValue: moduleBuilder.commit(addBundleValue),
   commitRemoveAuction: moduleBuilder.commit(removeAuctionMutation),
+  commitRoundResult: moduleBuilder.commit(updateRoundResult),
 
   // actions
   dispatchGetAuction: moduleBuilder.dispatch(getAuction),
@@ -547,7 +550,8 @@ const auction = {
   dispatchAdvanceRound: moduleBuilder.dispatch(advanceRound),
   dispatchAdvancePhase: moduleBuilder.dispatch(advancePhase),
   dispatchFinish: moduleBuilder.dispatch(finish),
-  dispatchPropose: moduleBuilder.dispatch(propose)
+  dispatchPropose: moduleBuilder.dispatch(propose),
+  dispatchGetRoundResult: moduleBuilder.dispatch(getRoundResult)
 }
 
 export default auction

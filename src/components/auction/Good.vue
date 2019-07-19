@@ -1,7 +1,7 @@
 <template>
   <div class="flex-column">
     <div class="card good shadow-sm" :class="{ selected: isSelected, disabled: !isAllowed }">
-      <div class="price" v-if="priceForGood">{{ priceForGood | formatNumber }} $</div>
+      <span class="badge badge-success badge-pill badge-price" v-if="priceForGood">{{ priceForGood | formatNumber }} $</span>
       <div class="proposedValue" v-if="showProposedValue">{{ proposedBundleValue | formatNumber }} $</div>
     </div>
     <div class="pt-2">
@@ -16,6 +16,7 @@ import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood } from '../../store
 import GoodsService from '@/services/goods'
 import selection from '../../store/modules/selection'
 import api from '../../services/api'
+import hashBundle from '../../services/bundleHash';
 
 export interface IAuctionGood {
   name: string
@@ -50,24 +51,24 @@ const AuctionGoodComponent = Vue.extend({
     updateProposedValue: async function(bidderId: string) {
       const bundle: { [x: string]: number } = {}
 
-        Object.keys(selection.state().selectedGoods).forEach(key => {
-          bundle[key] = 1
-        })
+      Object.keys(selection.state().selectedGoods).forEach(key => {
+        bundle[key] = 1
+      })
 
-        bundle[this.$props.goodId] = 1
+      bundle[this.$props.goodId] = 1
 
-        const valueQuery = {
-          bidders: [bidderId],
-          bundles: [bundle]
-        }
+      const valueQuery = {
+        bidders: [bidderId],
+        bundles: [bundle]
+      }
 
-        const { data: valueQueryResult } = await api().post(`/auctions/${this.$props.auctionId}/valuequery`, valueQuery)
-        this.$data.proposedBundleValue = valueQueryResult[bidderId][0].value
+      const { data: valueQueryResult } = await api().post(`/auctions/${this.$props.auctionId}/valuequery`, valueQuery)
+      this.$data.proposedBundleValue = valueQueryResult[bidderId][0].value
     }
   },
   computed: {
     showProposedValue: function(): boolean {
-      return !this.isSelected && this.$data.proposedBundleValue !== null && this.isAllowed
+      return this.$data.proposedBundleValue !== null && this.isAllowed
     },
     selectedBidder: function(): string | null {
       return selection.state().selectedBidder
@@ -93,7 +94,9 @@ const AuctionGoodComponent = Vue.extend({
       if (!selectedBidder) {
         return false
       }
-      return GoodsService.isAllowed([{ good: this.good.id!, amount: 1 }], selectedBidder, this.$props.auctionId) // FIXME
+
+      const entries = [{ good: this.good.id!, amount: 1 }]
+      return GoodsService.isAllowed({ entries: entries, hash: hashBundle(entries) }, selectedBidder, this.$props.auctionId) // FIXME
     }
   }
 })
@@ -116,13 +119,11 @@ export { AuctionGoodComponent }
     cursor: not-allowed;
   }
 
-  .price {
+  .badge-price {
     font-size: 0.8rem;
-    height: 100%;
-    line-height: 75px;
-    text-align: center;
     position: absolute;
-    width: 100%;
+    bottom: -10px;
+    right: -10px;
   }
 
   .proposedValue {
@@ -133,7 +134,6 @@ export { AuctionGoodComponent }
     position: absolute;
     width: 100%;
     opacity: 0.75;
-    margin-top: 18px;
   }
 
   user-select: none;
@@ -141,7 +141,7 @@ export { AuctionGoodComponent }
   cursor: pointer;
   width: 75px;
   height: 75px;
-  margin: 5px;
+  margin: 20px;
   display: inline-flex;
 }
 </style>

@@ -45,6 +45,7 @@ import BidderService from '@/services/bidder'
 import GoodsService from '@/services/goods'
 import selection from '../../../store/modules/selection'
 import { mapGetters } from 'vuex'
+import hashBundle from '../../../services/bundleHash'
 
 export default Vue.extend({
   props: ['auctionId'],
@@ -67,7 +68,8 @@ export default Vue.extend({
       const bundle = selection.selectedGoods().map(goodId => {
         return { good: goodId, amount: 1 } // FIXME
       })
-      return GoodsService.isAllowed(bundle, bidderId, this.$props.auctionId)
+
+      return GoodsService.isAllowed({ hash: hashBundle(bundle), entries: bundle }, bidderId, this.$props.auctionId)
     },
     allowedToBid: function() {
       const bidderId = selection.selectedBidder()
@@ -104,7 +106,7 @@ export default Vue.extend({
         const bundle = selection.selectedGoods().map(goodId => {
           return { good: goodId, amount: 1 } // FIXME
         })
-        this.$data.bid = await BidderService.bidForBundle(bidderId, bundle, this.$props.auctionId)
+        this.$data.bid = await BidderService.bidForBundle(bidderId, { hash: hashBundle(bundle), entries: bundle }, this.$props.auctionId)
       }
     },
     placeBid() {
@@ -117,11 +119,15 @@ export default Vue.extend({
       const bid: ApiBid = {
         amount: this.$data.bid,
         bidderId: bidderId,
-        bundle: []
+        bundle: {
+          hash: hashBundle([]),
+          entries: []
+        }
       }
 
       selection.selectedGoods().forEach((good: string) => {
-        bid.bundle.push({ good: good, amount: 1 })
+        bid.bundle.entries.push({ good: good, amount: 1 })
+        bid.bundle.hash = hashBundle(bid.bundle.entries)
       })
 
       auction.commitUpdateBidder({

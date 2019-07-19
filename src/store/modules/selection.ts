@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import { getStoreBuilder } from 'vuex-typex'
 import { RootState } from '..'
+import hashBundle from '@/services/bundleHash'
+import { ApiBundleEntryWrapper } from './auction'
 
 export interface SelectionState {
   selectedGoods: {
@@ -14,6 +16,15 @@ const stateGetter = moduleBuilder.state()
 
 // getters
 const selectedGoods = moduleBuilder.read(state => Object.keys(state.selectedGoods), 'selectedGoods')
+const selectedBundle = moduleBuilder.read(state => {
+  const entries = Object.keys(state.selectedGoods).map(id => {
+    return { good: id, amount: 1 }
+  })
+  return {
+    hash: hashBundle(entries),
+    entries: entries
+  }
+}, 'selectedBundle')
 const selectedBidder = moduleBuilder.read(state => state.selectedBidder, 'selectedBidder')
 
 // mutations
@@ -53,6 +64,10 @@ const selection = {
 
   get selectedBidder() {
     return selectedBidder
+  },
+
+  get selectedBundle(): () => ApiBundleEntryWrapper {
+    return selectedBundle
   },
 
   // mutations

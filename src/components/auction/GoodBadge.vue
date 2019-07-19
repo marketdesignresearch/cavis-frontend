@@ -18,7 +18,15 @@ const GoodBadgeComponent = Vue.extend({
   props: ['ids'],
   computed: {
     unifiedBundleEntries(): BundleEntry[] {
-      return (this.$props.ids || [])
+      let mapArray = []
+      
+      if (this.$props.ids && this.$props.ids.hasOwnProperty('entries')) {
+        mapArray = this.$props.ids.entries
+      } else if (this.$props.ids) {
+        mapArray = this.$props.ids
+      }
+
+      return mapArray
         .map((idAmountPair: any) => {
           if (typeof idAmountPair === 'object') {
             return { good: auction.goodById()(idAmountPair.good), amount: idAmountPair.amount }

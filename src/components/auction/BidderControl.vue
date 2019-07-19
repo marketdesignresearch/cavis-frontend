@@ -21,7 +21,7 @@
               :class="{ active: isActive(bundle), disabled: !isAllowed(bundle) }"
               @click="selectGoods(bundle)"
             >
-              <td><good-badge :ids="bundle" /></td>
+              <td><good-badge :ids="bundle.entries" /></td>
               <td>$ {{ valueForGood(bundle) | formatNumber }}</td>
               <td v-if="pricedAuction">$ {{ priceForGood(bundle) | formatNumber }}</td>
               <td v-if="pricedAuction">$ {{ (valueForGood(bundle) - priceForGood(bundle)) | formatNumber }}</td>
@@ -44,12 +44,13 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood, ApiBundleEntry } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood, ApiBundleEntry, ApiBundleEntryWrapper } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
 import BidderCircleVue from './BidderCircle.vue'
 import GoodBadgeComponent from './GoodBadge.vue'
 import selection from '../../store/modules/selection'
+import hashBundle from '../../services/bundleHash';
 
 export default Vue.extend({
   name: 'BidderControl',
@@ -71,7 +72,7 @@ export default Vue.extend({
 
       return false
     },
-    goodCombinations(): ApiBundleEntry[][] {
+    goodCombinations(): ApiBundleEntryWrapper[] {
       const bidderId = selection.selectedBidder()
       if (bidderId) {
         return GoodsService.bundleForBidder(bidderId)
@@ -85,37 +86,29 @@ export default Vue.extend({
     }
   },
   methods: {
-    isAllowed(goods: ApiBundleEntry[]): boolean {
+    isAllowed(goods: ApiBundleEntryWrapper): boolean {
       return GoodsService.isAllowed(goods, selection.selectedBidder(), this.$props.auctionId)
     },
-    isActive(goods: ApiBundleEntry[]): boolean {
+    isActive(goods: ApiBundleEntryWrapper): boolean {
       if (!this.$props.selectedGoods) {
         return false
       }
-      return (
-        goods
-          .map((obj: ApiBundleEntry) => obj.good) // TODO: Also consider multi-availability goods
-          .sort()
-          .join() ===
-        Array.from(this.$props.selectedGoods)
-          .sort()
-          .join()
-      )
+      return goods.hash === hashBundle(this.$props.selectedGoods)
     },
-    selectGoods(bundle: ApiBundleEntry[]) {
+    selectGoods(bundle: ApiBundleEntryWrapper) {
       selection.commitUnselectGoods()
-      bundle.forEach(entry => selection.commitSelectGood({ goodId: entry.good }))
+      bundle.entries.forEach(entry => selection.commitSelectGood({ goodId: entry.good }))
     },
-    valueForGood(bundle: ApiBundleEntry[]) {
+    valueForGood(bundle: ApiBundleEntryWrapper) {
       return GoodsService.valueForGood(bundle, selection.selectedBidder()!)
     },
-    priceForGood(bundle: ApiBundleEntry[]) {
+    priceForGood(bundle: ApiBundleEntryWrapper) {
       return GoodsService.priceForGood(this.$props.auctionId, bundle, selection.selectedBidder()!)
     },
-    bidForGood(bundle: ApiBundleEntry[]) {
+    bidForGood(bundle: ApiBundleEntryWrapper) {
       return GoodsService.bidForGood(bundle, selection.selectedBidder()!)
     },
-    removeBid(bundle: ApiBundleEntry[]) {
+    removeBid(bundle: ApiBundleEntryWrapper) {
       BidderService.removeBid(selection.selectedBidder()!, bundle)
     }
   }

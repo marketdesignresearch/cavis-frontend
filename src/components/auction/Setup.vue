@@ -153,7 +153,7 @@ export default Vue.extend({
         validateAfterChanged: true,
         validateAsync: true
       },
-      selectedHistoricDomain: null,
+      selectedHistoricDomain: {},
       historicDomains: [
         {
           value: {},

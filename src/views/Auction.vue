@@ -59,7 +59,7 @@ import AuctionBidder from '@/components/auction/Bidder.vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
-import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid, ApiBundleEntry, ApiBundleValue } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid, ApiBundleEntry, ApiBundleValue, ApiBundleEntryWrapper } from '../store/modules/auction'
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 import selection, { SelectionState } from '../store/modules/selection'
 import { mapGetters, mapState } from 'vuex'
@@ -114,9 +114,7 @@ export default Vue.extend({
       const selectedBidder = selection.selectedBidder()
 
       if (selectedBidder) {
-        const selectedBundle: ApiBundleEntry[] = selection.selectedGoods().map(id => {
-          return { good: id, amount: 1 } // FIXME
-        })
+        const selectedBundle = selection.selectedBundle()
         const value: ApiBundleValue | null | undefined = auction.valueForBundle()(this.$route.params.id, selectedBidder, selectedBundle)
 
         if (value) {

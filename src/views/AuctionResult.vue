@@ -1,54 +1,52 @@
 <template>
-  <div>
-    <div class="container content" v-if="result">
-      <div class="row">
-        <div class="col">
-          <h1>Result of Auction</h1>
+  <div class="container content" v-if="result">
+    <div class="row">
+      <div class="col">
+        <h1>Result of Auction</h1>
 
-          <p>Total Payments: $ {{ result.payments.totalPayments | formatNumber }}</p>
+        <p>Total Payments: $ {{ result.payments.totalPayments | formatNumber }}</p>
 
-          <h2>Allocation</h2>
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">Bidder</th>
-                <th scope="col">Value</th>
-                <th scope="col">Payment</th>
-                <th scope="col">Bundle</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(value, key) in result.allocation" :key="key">
-                <td>{{ getBidderName(key) }}</td>
-                <td>$ {{ value.value | formatNumber }}</td>
-                <td>$ {{ result.payments[key] | formatNumber }}</td>
-                <td><good-badge :ids="value.bundle"></good-badge></td>
-              </tr>
-            </tbody>
-          </table>
+        <h2>Allocation</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Bidder</th>
+              <th scope="col">Value</th>
+              <th scope="col">Payment</th>
+              <th scope="col">Bundle</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(value, key) in result.allocation" :key="key">
+              <td>{{ getBidderName(key) }}</td>
+              <td>$ {{ value.value | formatNumber }}</td>
+              <td>$ {{ result.payments[key] | formatNumber }}</td>
+              <td><good-badge :ids="value.bundle.entries"></good-badge></td>
+            </tr>
+          </tbody>
+        </table>
 
-          <h2>Bids</h2>
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">Round</th>
-                <th scope="col">Bidder</th>
-                <th scope="col">Bundle</th>
-                <th scope="col">Bid</th>
+        <h2>Bids</h2>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th scope="col">Round</th>
+              <th scope="col">Bidder</th>
+              <th scope="col">Bundle</th>
+              <th scope="col">Bid</th>
+            </tr>
+          </thead>
+          <tbody>
+            <template v-for="currentRound in auction.auction.rounds">
+              <tr v-for="bid of currentRound.bids" :key="bid.id">
+                <td>{{ currentRound.description }}</td>
+                <td>{{ getBidderName(bid.bidderId) }}</td>
+                <td><good-badge :key="'bundle'" :ids="bid.bundle.entries"></good-badge></td>
+                <td>$ {{ bid.amount | formatNumber }}</td>
               </tr>
-            </thead>
-            <tbody>
-              <template v-for="currentRound in auction.auction.rounds">
-                <tr v-for="bid of currentRound.bids" :key="bid.id">
-                  <td>{{ currentRound.description }}</td>
-                  <td>{{ getBidderName(bid.bidderId) }}</td>
-                  <td><good-badge :key="'bundle'" :ids="bid.bundle"></good-badge></td>
-                  <td>$ {{ bid.amount | formatNumber }}</td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-        </div>
+            </template>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

@@ -16,13 +16,13 @@
     </div>
 
     <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
-      <b-tabs content-class="mt-3">
+      <b-tabs content-class="mt-3" v-model="selectedRound">
         <b-tab v-for="round in rounds" :title="'Round ' + round.roundNumber" :key="round.roundNumber">
           <table class="table table-bidder">
             <thead>
               <tr>
                 <th scope="col">Bidder</th>
-                <th scope="col" v-if="goodCombinations.length <= 5">
+                <th scope="col" v-if="goodCombinations.length <= 10">
                   <div>Values</div>
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
@@ -38,7 +38,7 @@
             <tbody>
               <tr v-for="bidder of bidders" :key="bidder.id">
                 <td>{{ bidder.name }}</td>
-                <td v-if="goodCombinations.length <= 5">
+                <td v-if="goodCombinations.length <= 10">
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
                       {{ valueForGood(bidder, goodSet) | formatNumber }}
@@ -47,7 +47,7 @@
                 </td>
                 <td>
                   <div v-for="bid in bidsByBidder(bidder, round)" :key="bid.id">
-                    {{ bid.amount | formatNumber }} $ for <good-badge :ids="bid.bundle.map(obj => obj.good)" />
+                    {{ bid.amount | formatNumber }} $ for <good-badge :ids="bid.bundle.entries.map(obj => obj.good)" />
                   </div>
                 </td>
                 <td>
@@ -61,7 +61,8 @@
       </b-tabs>
 
       <div class="text-right py-3">
-        <button @click="advancePhase" class="btn ml-2 btn-success btn-sm">Advance Phase</button>
+        <button @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
+        <button @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
       </div>
 
     </b-collapse>
@@ -70,7 +71,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiRound, ApiAuction, ApiBidder, ApiGood, ApiBundleEntry, ApiBid } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiRound, ApiAuction, ApiBidder, ApiGood, ApiBundleEntry, ApiBid, ApiBundleEntryWrapper } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
 import GoodBadgeComponent from './GoodBadge.vue'
@@ -81,6 +82,16 @@ export default Vue.extend({
   components: {
     'good-badge': GoodBadgeComponent
   },
+  watch: {
+    selectedRound (currentValue) {
+      auction.dispatchGetRoundResult({ auctionId: this.$props.auction.id, round: currentValue })
+    }
+  },
+  data: () => {
+    return {
+      selectedRound: null
+    }
+  },
   computed: {
     roundType(): string {
       return 'component-round-' + this.$props.auction.auctionType
@@ -90,14 +101,15 @@ export default Vue.extend({
       return rounds[rounds.length - 1]
     },
     rounds(): ApiRound[] {
+      const currentAuction = auction.auctionById()(this.$props.auction.id)
       const bidArrays = auction.biddersById()(this.$props.auction.id).map(bidderId => {
         return auction.bidderById()(bidderId).bids || []
       })
       
       const currentBids: ApiBid[] = new Array().concat(...bidArrays)
 
-      return this.$props.auction.auction.finished ? this.$props.auction.auction.rounds : [...this.$props.auction.auction.rounds, {
-        roundNumber: this.$props.auction.auction.rounds.length + 1,
+      return currentAuction.auction.finished ? currentAuction.auction.rounds : [...currentAuction.auction.rounds, {
+        roundNumber: currentAuction.auction.rounds.length + 1,
         bids: currentBids
       }]
     },
@@ -112,7 +124,7 @@ export default Vue.extend({
         return auction.bidderById()(bidderId)
       })
     },
-    goodCombinations(): ApiBundleEntry[][] {
+    goodCombinations(): ApiBundleEntryWrapper[] {
       return GoodsService.goodCombinations(this.$props.auction.id)
     }
   },
@@ -124,14 +136,8 @@ export default Vue.extend({
       this.allocate()
       this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
     },
-    valueForGood(bidder: ApiBidder, goods: ApiBundleEntry[]) {
+    valueForGood(bidder: ApiBidder, goods: ApiBundleEntryWrapper) {
       return GoodsService.valueForGood(goods, bidder.id!)
-    },
-    priceForGood(bidder: ApiBidder, goods: ApiBundleEntry[]) {
-      return GoodsService.priceForGood(this.$props.auctionId, goods, bidder.id!)
-    },
-    bidForGood(bidder: ApiBidder, goods: ApiBundleEntry[]) {
-      return GoodsService.bidForGood(goods, bidder.id!)
     },
     bidsByBidder(bidder: ApiBidder, round: ApiRound) {
       if (round.bids) {
@@ -144,7 +150,7 @@ export default Vue.extend({
         return []
       }
 
-      return round.mechanismResult.allocation[bidder.id!].bundle.map(entry => {
+      return round.mechanismResult.allocation[bidder.id!].bundle.entries.map(entry => {
         return { good: entry.good, amount: entry.amount }
       })
     },
@@ -160,6 +166,9 @@ export default Vue.extend({
     },
     advancePhase() {
       auction.dispatchAdvancePhase({ auctionId: this.$props.auction.id })
+    },
+    resetAuction() {
+      auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: 0, standardBids: true })
     }
   }
 })
