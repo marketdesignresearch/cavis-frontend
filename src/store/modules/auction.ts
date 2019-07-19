@@ -224,9 +224,6 @@ function appendAuctionMutation(state: AuctionState, payload: { auction: ApiAucti
 
   if (normalizedData.entities.bidders) {
     Object.keys(normalizedData.entities.bidders).forEach(bidderId => {
-      if (normalizedData.entities.bidders[bidderId].value) {
-        normalizedData.entities.bidders[bidderId].value.bundleValues = []
-      }
       Vue.set(state.bidders, bidderId, normalizedData.entities.bidders[bidderId])
     })
   }
