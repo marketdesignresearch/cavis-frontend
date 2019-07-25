@@ -1,9 +1,7 @@
 <template>
   <div class="grow">
-    <div class="bg-white">
-      <div class="container">
-        <Auctioneer v-if="activeAuction" :auction="activeAuction" />
-      </div>
+    <div class="container">
+      <Auctioneer v-if="activeAuction" :auction="activeAuction" />
     </div>
 
     <div class="grow auction-view">
@@ -24,9 +22,12 @@
                   </span>
 
                   <div class="mt-4" v-if="selectedBidder">
-                    Value of <good-badge :ids="selectedGoods" /> for Bidder {{ selectedBidder.name }}:
-                    <h2 class="mt-4">$ {{ valueForGoods | formatNumber }}</h2>
+                    Bidder {{ selectedBidder.name }}'s value for bundle <good-badge :ids="selectedGoods" />
+                    <h2 class="mt-4">{{ valueForGoods | formatNumber }} $</h2>
+
+                    <button v-if="selectedGoods.length > 0" class="btn btn-primary mt-4" @click="deselect">Deselect All</button>
                   </div>
+
                 </div>
               </div>
 
@@ -98,6 +99,9 @@ export default Vue.extend({
     },
     selectBidder(bidderId: string) {
       selection.commitSelectBidder({ bidderId: bidderId })
+    },
+    deselect() {
+      selection.commitUnselectGoods()
     }
   },
   computed: {
@@ -170,11 +174,11 @@ export default Vue.extend({
 
 .goods-container {
   display: inline-block;
-  padding: 15px;
+  padding: 30px;
   border-radius: 10px;
 
   &.selected {
-    background-color: white;
+    // background-color: white;
   }
 }
 

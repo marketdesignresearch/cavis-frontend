@@ -1,38 +1,11 @@
 <template>
   <div>
-    <div class="table-responsive">
-      <table class="table table-bidder table-hover">
-        <thead>
-          <tr>
-            <th>Selected Bundle</th>
-            <th>Bid</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="selectedGoods.length > 0 && allowedToBid">
-            <td>
-              <good-badge :ids="selectedGoods" />
-            </td>
-            <td>
-              <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" :disabled="bidEditable" />
-            </td>
-            <td class="text-right">
-              <button @click="placeBid" :disabled="!isAllowed" class="btn btn-primary btn-sm float-right">Bid</button>
-            </td>
-          </tr>
-          <tr v-if="selectedGoods.length === 0 && allowedToBid">
-            <td class="text-center" colspan="3">
-              Select a good to bid on it
-            </td>
-          </tr>
-          <tr v-if="!allowedToBid">
-            <td class="text-center" colspan="3">
-              You have reached the maximum amount of bids.
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="input-group" v-if="selectedGoods.length > 0 && allowedToBid">
+      <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" :disabled="bidEditable" />
+      <button @click="placeBid" :disabled="alreadyBid" class="btn btn-primary btn-sm float-right">Bid</button>
+    </div>
+    <div v-if="!allowedToBid" class="text-center">
+      You have reached the maximum amount of bids.
     </div>
   </div>
 </template>
@@ -65,11 +38,11 @@ export default Vue.extend({
     },
     isAllowed(): boolean {
       const bidderId = selection.selectedBidder()
-      const bundle = selection.selectedGoods().map(goodId => {
-        return { good: goodId, amount: 1 } // FIXME
-      })
-
-      return GoodsService.isAllowed({ hash: hashBundle(bundle), entries: bundle }, bidderId, this.$props.auctionId)
+      return GoodsService.isAllowed(selection.selectedBundle(), bidderId, this.$props.auctionId)
+    },
+    alreadyBid(): boolean {
+      const bidderId = selection.selectedBidder()
+      return GoodsService.bidForGood(selection.selectedBundle(), bidderId!) !== null
     },
     allowedToBid: function() {
       const bidderId = selection.selectedBidder()

@@ -1,11 +1,9 @@
 <template>
   <div class="flex-column">
-    <div class="card good shadow-sm" :class="{ selected: isSelected, disabled: !isAllowed }">
+    <div class="good" :class="{ selected: isSelected, disabled: !isAllowed }">
+      <div class="name">{{ good.name }}</div>
       <span class="badge badge-success badge-pill badge-price" v-if="priceForGood">{{ priceForGood | formatNumber }} $</span>
       <div class="proposedValue" v-if="showProposedValue">{{ proposedBundleValue | formatNumber }} $</div>
-    </div>
-    <div class="pt-2">
-      {{ good.name }}
     </div>
   </div>
 </template>
@@ -107,10 +105,23 @@ export { AuctionGoodComponent }
 
 <style scoped lang="scss">
 @import '../../custom.scss';
+
 .good {
-  &.selected {
-    @extend .bg-primary;
-    @extend .text-white;
+  position: relative;
+  background-image: url('../../assets/card-blank.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  .name {
+    position: absolute;
+    font-size: 36px;
+    width: 70px;
+    text-align: center;
+  }
+
+  &.selected, &:hover {
+    background-image: url('../../assets/card-blank-selected.png');
   }
 
   &.disabled {
@@ -129,9 +140,10 @@ export { AuctionGoodComponent }
   .proposedValue {
     font-size: 0.8rem;
     height: 100%;
-    line-height: 75px;
+    line-height: 70px;
     text-align: center;
     position: absolute;
+    top: 30px;
     width: 100%;
     opacity: 0.75;
   }
@@ -139,8 +151,8 @@ export { AuctionGoodComponent }
   user-select: none;
   margin: 0 auto;
   cursor: pointer;
-  width: 75px;
-  height: 75px;
+  width: 70px;
+  height: 95px;
   margin: 20px;
   display: inline-flex;
 }

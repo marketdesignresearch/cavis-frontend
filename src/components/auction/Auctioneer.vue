@@ -5,7 +5,9 @@
       <div class="col text-center">
         <img src="../../assets/auctioneer.png" class="logo mt-3" v-b-toggle.collapse-auctioneer />
         <p>
-          <b-button v-b-toggle.collapse-auctioneer size="sm" class="mt-3">Toggle Auctioneer</b-button>
+          <b-button v-b-toggle.collapse-auctioneer size="sm" class="mt-3">
+            {{ isAuctioneerVisible ? 'Hide Auctioneer View' : 'Show Auctioneer View' }}
+          </b-button>
         </p>
       </div>
       <div class="col text-right">
@@ -15,7 +17,7 @@
       </div>
     </div>
 
-    <b-collapse id="collapse-auctioneer" class="mt-2 text-left">
+    <b-collapse id="collapse-auctioneer" v-model="isAuctioneerVisible" class="mt-2 text-left">
       <b-tabs content-class="mt-3" v-model="selectedRound">
         <b-tab v-for="round in rounds" :title="'Round ' + round.roundNumber" :key="round.roundNumber">
           <table class="table table-bidder">
@@ -89,7 +91,8 @@ export default Vue.extend({
   },
   data: () => {
     return {
-      selectedRound: null
+      selectedRound: null,
+      isAuctioneerVisible: false
     }
   },
   computed: {

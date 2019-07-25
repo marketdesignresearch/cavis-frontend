@@ -1,7 +1,7 @@
 <template>
-  <span class="badge badge-secondary bundle-badge">
+  <span>
     <span v-if="unifiedBundleEntries.length === 0">{}</span>
-    <span v-for="(entry, index) in unifiedBundleEntries" :key="index">
+    <span class="bundle-card" v-for="(entry, index) in unifiedBundleEntries" :key="index">
       <span v-if="hasMultiGoods">{{ entry.amount }}x </span>
       <span>{{ entry.good.name }}</span>
       <span v-if="hasMultiGoods && index < unifiedBundleEntries.length - 1">, </span>
@@ -57,13 +57,30 @@ export { GoodBadgeComponent }
 <style scoped lang="scss">
 @import '../../custom.scss';
 
-.bundle-badge {
-  padding: initial 5px;
-}
+.bundle-card {
+  position: relative;
+  background-image: url('../../assets/card-blank.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 
-.bundle-badge span {
+  height: 23px;
+  line-height: 23px;
+  width: 16px;
+  margin-left: 1px;
+  margin-right: 1px;
+  display: inline-block;
+  text-align: center;
+
   font-family: monospace;
   font-weight: 400;
   font-size: 1.1rem;
+
+  &:first-child {
+    margin-left: 0;
+  }
 }
+
+
+
 </style>

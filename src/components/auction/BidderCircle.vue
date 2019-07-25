@@ -1,6 +1,6 @@
 <template>
-  <div class="shadow-sm bidder text-center">
-    {{ name }}
+  <div :style="{ 'background-image': backgroundImage }" class="bidder text-center">
+    <span class="badge badge-secondary">Bidder {{ name }}</span>
   </div>
 </template>
 
@@ -8,7 +8,12 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  props: ['name']
+  props: ['name'],
+  computed: {
+    backgroundImage: function () {
+      return `url('/avatars/${this.$props.name}.svg')`
+    }
+  }
 })
 </script>
 
@@ -16,21 +21,28 @@ export default Vue.extend({
 @import '../../custom';
 
 .bidder {
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+
   cursor: pointer;
   user-select: none;
-  background: white;
+  background-color: white;
   padding: 10px;
   padding-top: 25px;
   height: 70px;
   width: 70px;
   border-radius: 35px;
-}
 
-.selected {
-  // background-color: theme-color('primary');
-  // border: 5px solid theme-color('primary') !important;
-  // border: 3px solid theme-color('success');
-  // padding-top: 21px;
+  .badge {
+    position: absolute;
+    bottom: 0;
+    left: auto;
+  }
+
+  .selected, &:hover {
+    background-color: theme-color('success');
+  }
 }
 
 .bidsPlaced {

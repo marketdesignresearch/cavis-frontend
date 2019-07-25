@@ -73,11 +73,11 @@ export default Vue.extend({
 }
 
 .bidder-container {
-  padding: 15px;
+  padding-bottom: 20px;
   border-radius: 10px;
 
-  &.selected {
-    background-color: white;
+  &.selected, &:hover {
+    //background-color: white;
   }
 }
 

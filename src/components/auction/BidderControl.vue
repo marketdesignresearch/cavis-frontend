@@ -1,12 +1,39 @@
 <template>
-  <div class="row" v-if="selectedBidder">
+  <div class="bidder-control" v-if="selectedBidder">
     <bidder-circle :name="selectedBidder.name" class="selected bidder-circle" />
-    <div class="col">
+    <div class="mt-3">
+      <h4>Detailed Bidder Information from Bidder {{ selectedBidder.name }}</h4>
       <div class="table-responsive">
         <table class="table table-bidder table-hover">
           <thead>
             <tr>
-              <th>Good</th>
+              <th>Currently Selected Bundle</th>
+              <th>Value</th>
+              <th v-if="pricedAuction">Price</th>
+              <th v-if="pricedAuction">Utility</th>
+              <th>Bid</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><good-badge :ids="selectedBundle.entries" /></td>
+              <td>$ {{ valueForGood(selectedBundle) | formatNumber }}</td>
+              <td v-if="pricedAuction">$ {{ priceForGood(selectedBundle) | formatNumber }}</td>
+              <td v-if="pricedAuction">$ {{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
+              <td>
+                <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId"> </component>
+              </td>
+              <td class="text-right">
+                <button v-if="bidForGood(selectedBundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(selectedBundle)">
+                  Remove Bid
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <thead>
+            <tr>
+              <th>Bundle</th>
               <th>Value</th>
               <th v-if="pricedAuction">Price</th>
               <th v-if="pricedAuction">Utility</th>
@@ -26,18 +53,15 @@
               <td v-if="pricedAuction">$ {{ priceForGood(bundle) | formatNumber }}</td>
               <td v-if="pricedAuction">$ {{ (valueForGood(bundle) - priceForGood(bundle)) | formatNumber }}</td>
               <td>{{ bidForGood(bundle) | formatNumber }}</td>
-              <td>
-                <button v-if="bidForGood(bundle)" class="btn btn-delete btn-outline-secondary btn-sm" @click="removeBid(bundle)">
-                  X
+              <td class="text-right">
+                <button v-if="bidForGood(bundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">
+                  Remove Bid
                 </button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
-    </div>
-    <div class="col">
-      <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId"> </component>
     </div>
   </div>
 </template>
@@ -62,6 +86,9 @@ export default Vue.extend({
       if (bidderId) {
         return auction.bidderById()(bidderId)
       }
+    },
+    selectedBundle(): ApiBundleEntryWrapper {
+      return selection.selectedBundle()
     },
     pricedAuction() {
       const currentAuction = auction.auctionById()(this.$props.auctionId)
@@ -118,15 +145,23 @@ export default Vue.extend({
 <style scoped lang="scss">
 @import '../../custom';
 
+.bidder-control {
+  position: relative;
+}
+
 .bidder-circle {
   position: relative;
   top: -60px;
   left: 50%;
-  padding-left: -50px;
+  margin-left: -35px;
 }
 
 tr.active {
   background-color: rgba(0, 0, 0, 0.075);
+}
+
+tr.hover {
+  cursor: pointer;
 }
 
 tr.disabled {
