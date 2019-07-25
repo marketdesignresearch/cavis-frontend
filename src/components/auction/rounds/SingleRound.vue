@@ -1,7 +1,5 @@
 <template>
   <div>
-    <div class="small pb-2">{{ auctionType }}</div>
-
     <button class="btn btn-success btn-sm" @click="getAuctionResults()">Get Auction Results</button>
   </div>
 </template>

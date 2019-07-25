@@ -1,9 +1,8 @@
 <template>
   <div class="small">
-    <div>{{ auctionType }}</div>
-    <div>
+    <div v-if="rounds.length > 0">
       Round:
-      <nav v-if="rounds" class="d-inline-flex">
+      <nav class="d-inline-flex">
         <span class="round" :class="{ active: rounds.length === 0 }">
           <a href="#" v-if="rounds.length > 0" @click="resetRound(0)">1</a>
           <span v-if="rounds.length === 0">1</span>
@@ -19,8 +18,6 @@
         </span>
       </nav>
     </div>
-
-    <div v-if="currentRoundType">{{ currentRoundType }}</div>
 
     <button class="btn mt-2 btn-success btn-sm" @click="nextRound()" v-if="!finished">Next Round</button>
     <button class="btn mt-2 btn-success btn-sm" @click="showAuctionResults()" v-if="finished">Show Auction Result</button>

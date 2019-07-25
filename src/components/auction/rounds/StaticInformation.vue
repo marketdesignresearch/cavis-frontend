@@ -1,14 +1,13 @@
 <template>
   <div>
-    <div class="small pb-2">{{ auctionType }}</div>
-
-    <button class="btn btn-success btn-sm" @click="getAuctionResults()">Get Auction Results</button>
+    <div class="small">{{ auctionType }}</div>
+    <div class="small" v-if="currentRoundType">{{ currentRoundType }}</div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid } from '../../../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound } from '../../../store/modules/auction'
 import selection from '../../../store/modules/selection'
 import RoundMixinVue from './RoundMixin.vue'
 
@@ -28,9 +27,20 @@ export default Vue.extend({
           return 'Simultaneous Multi-Item Second Price Auction'
         case ApiAuctionType.VCG_XOR:
           return 'VCG Auction'
+        case ApiAuctionType.SEQUENTIAL_FIRST_PRICE:
+          return 'Sequential First-Price'
+        case ApiAuctionType.SEQUENTIAL_SECOND_PRICE:
+          return 'Sequential Second-Price'
+        case ApiAuctionType.CCA_VCG:
+          return 'Combinatorial Clock Auction (CCA)'
+        case ApiAuctionType.PVM_VCG:
+          return 'PVM Auction'
         default:
           return ''
       }
+    },
+    currentRoundType(): string {
+      return this.$props.auction.auction.currentRoundType
     }
   },
   methods: {

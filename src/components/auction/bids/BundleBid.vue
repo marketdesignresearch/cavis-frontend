@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="input-group" v-if="selectedGoods.length > 0 && allowedToBid">
-      <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" :disabled="bidEditable" />
+      <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" :disabled="bidEditable || alreadyBid" />
       <button @click="placeBid" :disabled="alreadyBid" class="btn btn-primary btn-sm float-right">Bid</button>
     </div>
     <div v-if="!allowedToBid" class="text-center">

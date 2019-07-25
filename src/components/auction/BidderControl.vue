@@ -1,32 +1,31 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
     <bidder-circle :name="selectedBidder.name" class="selected bidder-circle" />
-    <div class="mt-3">
-      <h4>Detailed Bidder Information from Bidder {{ selectedBidder.name }}</h4>
+    <div>
       <div class="table-responsive">
         <table class="table table-bidder table-hover">
           <thead>
             <tr>
               <th>Currently Selected Bundle</th>
-              <th>Value</th>
-              <th v-if="pricedAuction">Price</th>
-              <th v-if="pricedAuction">Utility</th>
-              <th>Bid</th>
+              <th>Value <font-awesome-icon icon="coins" /></th>
+              <th v-if="pricedAuction">Price <font-awesome-icon icon="coins" /></th>
+              <th v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /></th>
+              <th>Bid <font-awesome-icon icon="coins" /></th>
               <th></th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><good-badge :ids="selectedBundle.entries" /></td>
-              <td>$ {{ valueForGood(selectedBundle) | formatNumber }}</td>
-              <td v-if="pricedAuction">$ {{ priceForGood(selectedBundle) | formatNumber }}</td>
-              <td v-if="pricedAuction">$ {{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
+              <td>{{ valueForGood(selectedBundle) | formatNumber }}</td>
+              <td v-if="pricedAuction">{{ priceForGood(selectedBundle) | formatNumber }}</td>
+              <td v-if="pricedAuction">{{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
               <td>
                 <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId"> </component>
               </td>
               <td class="text-right">
                 <button v-if="bidForGood(selectedBundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(selectedBundle)">
-                  Remove Bid
+                  Remove Bid <font-awesome-icon icon="trash-alt" />
                 </button>
               </td>
             </tr>
@@ -34,10 +33,10 @@
           <thead>
             <tr>
               <th>Bundle</th>
-              <th>Value</th>
-              <th v-if="pricedAuction">Price</th>
-              <th v-if="pricedAuction">Utility</th>
-              <th>Bid</th>
+              <th>Value <font-awesome-icon icon="coins" /></th>
+              <th v-if="pricedAuction">Price <font-awesome-icon icon="coins" /></th>
+              <th v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /></th>
+              <th>Bid <font-awesome-icon icon="coins" /></th>
               <th></th>
             </tr>
           </thead>
@@ -49,13 +48,13 @@
               @click="selectGoods(bundle)"
             >
               <td><good-badge :ids="bundle.entries" /></td>
-              <td>$ {{ valueForGood(bundle) | formatNumber }}</td>
-              <td v-if="pricedAuction">$ {{ priceForGood(bundle) | formatNumber }}</td>
-              <td v-if="pricedAuction">$ {{ (valueForGood(bundle) - priceForGood(bundle)) | formatNumber }}</td>
+              <td>{{ valueForGood(bundle) | formatNumber }}</td>
+              <td v-if="pricedAuction">{{ priceForGood(bundle) | formatNumber }}</td>
+              <td v-if="pricedAuction">{{ (valueForGood(bundle) - priceForGood(bundle)) | formatNumber }}</td>
               <td>{{ bidForGood(bundle) | formatNumber }}</td>
               <td class="text-right">
                 <button v-if="bidForGood(bundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">
-                  Remove Bid
+                  Remove Bid <font-awesome-icon icon="trash-alt" />
                 </button>
               </td>
             </tr>

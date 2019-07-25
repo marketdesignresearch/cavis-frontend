@@ -4,7 +4,7 @@
       <div class="col">
         <h1>Result of Auction</h1>
 
-        <p>Total Payments: $ {{ result.payments.totalPayments | formatNumber }}</p>
+        <p>Total Payments: {{ result.payments.totalPayments | formatNumber }}</p>
 
         <h2>Allocation</h2>
         <table class="table table-striped">

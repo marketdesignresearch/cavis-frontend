@@ -23,7 +23,7 @@
 
                   <div class="mt-4" v-if="selectedBidder">
                     Bidder {{ selectedBidder.name }}'s value for bundle <good-badge :ids="selectedGoods" />
-                    <h2 class="mt-4">{{ valueForGoods | formatNumber }} $</h2>
+                    <h2 class="mt-4">{{ valueForGoods | formatNumber }}</h2>
 
                     <button v-if="selectedGoods.length > 0" class="btn btn-primary mt-4" @click="deselect">Deselect All</button>
                   </div>

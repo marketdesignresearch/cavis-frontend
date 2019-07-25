@@ -2,8 +2,10 @@
   <div class="flex-column">
     <div class="good" :class="{ selected: isSelected, disabled: !isAllowed }">
       <div class="name">{{ good.name }}</div>
-      <span class="badge badge-success badge-pill badge-price" v-if="priceForGood">{{ priceForGood | formatNumber }} $</span>
-      <div class="proposedValue" v-if="showProposedValue">{{ proposedBundleValue | formatNumber }} $</div>
+      <span class="badge badge-success badge-pill badge-price" v-if="priceForGood">
+        {{ priceForGood | formatNumber }} <font-awesome-icon icon="coins" />
+      </span>
+      <div class="proposedValue" v-if="showProposedValue">{{ proposedBundleValue | formatNumber }}</div>
     </div>
   </div>
 </template>

@@ -1,7 +1,11 @@
 <template>
   <div v-if="auction">
     <div class="row">
-      <div class="col"></div>
+      <div class="col">
+        <p class="my-4">
+          <auction-static-information :auction="auction" />
+        </p>
+      </div>
       <div class="col text-center">
         <img src="../../assets/auctioneer.png" class="logo mt-3" v-b-toggle.collapse-auctioneer />
         <p>
@@ -19,7 +23,7 @@
 
     <b-collapse id="collapse-auctioneer" v-model="isAuctioneerVisible" class="mt-2 text-left">
       <b-tabs content-class="mt-3" v-model="selectedRound">
-        <b-tab v-for="round in rounds" :title="'Round ' + round.roundNumber" :key="round.roundNumber">
+        <b-tab v-for="round in rounds" :title="round.roundNumber" :key="round.roundNumber">
           <table class="table table-bidder">
             <thead>
               <tr>
@@ -49,13 +53,13 @@
                 </td>
                 <td>
                   <div v-for="bid in bidsByBidder(bidder, round)" :key="bid.id">
-                    {{ bid.amount | formatNumber }} $ for <good-badge :ids="bid.bundle.entries.map(obj => obj.good)" />
+                    {{ bid.amount | formatNumber }} for <good-badge :ids="bid.bundle.entries.map(obj => obj.good)" />
                   </div>
                 </td>
                 <td>
                   <good-badge :ids="allocationForBidder(bidder, round)" />
                 </td>
-                <td>{{ paymentForGoods(bidder, round) | formatNumber }} $</td>
+                <td>{{ paymentForGoods(bidder, round) | formatNumber }}</td>
               </tr>
             </tbody>
           </table>
@@ -82,7 +86,8 @@ export default Vue.extend({
   name: 'AuctionAuctioneer',
   props: ['auction'],
   components: {
-    'good-badge': GoodBadgeComponent
+    'good-badge': GoodBadgeComponent,
+    'auction-static-information': () => import('./rounds/StaticInformation.vue')
   },
   watch: {
     selectedRound (currentValue) {
