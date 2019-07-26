@@ -1,4 +1,4 @@
-import auction, { ApiBundleValue, ApiBundleEntryWrapper } from '@/store/modules/auction'
+import auction, { ApiBundleValue, ApiBundleEntryWrapper, ApiBidderStrategy } from '@/store/modules/auction'
 import hashBundle from './bundleHash'
 
 export default {
@@ -7,6 +7,7 @@ export default {
       bidderId: bidderId,
       bundle: bundle
     })
+    auction.commitChangeBidderStrategy({ bidderId: bidderId, strategy: ApiBidderStrategy.CUSTOM })
   },
   bidForBundle(bidderId: string, bundle: ApiBundleEntryWrapper, auctionId: string) {
     const auctionInstance = auction.auctionById()(auctionId)

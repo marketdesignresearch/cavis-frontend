@@ -46,7 +46,8 @@ export enum ApiDomainType {
 }
 
 export enum ApiBidderStrategy {
-  TRUTHFUL = 'TRUTHFUL'
+  TRUTHFUL = 'TRUTHFUL',
+  CUSTOM = 'CUSTOM'
 }
 
 export interface ApiBidderCreateDTO {
@@ -107,6 +108,7 @@ export interface ApiBidder {
   name: string
   bids: ApiBid[]
   defaultStrategy: ApiBidderStrategy
+  strategy: ApiBidderStrategy
   value?: {
     bundleValues: ApiBundleValue[]
   }
@@ -179,15 +181,6 @@ const goodsById = moduleBuilder.read(
   'goodsById'
 )
 
-const bidsByBidderId = moduleBuilder.read(
-  state => (auctionId: string, bidderId: string, round: number) => {
-    return state.auctions[auctionId] && state.auctions[auctionId].auction.rounds.length > round
-      ? state.auctions[auctionId].auction.rounds[round].bids.filter(bid => bid.bidderId === bidderId)
-      : []
-  },
-  'bidsByBidderId'
-)
-
 const auctionResultById = moduleBuilder.read(
   state => (auctionId: string) =>
     state.auctions[auctionId] ? (state.auctions[auctionId].result ? state.auctions[auctionId].result : null) : null,
@@ -230,6 +223,7 @@ function appendAuctionMutation(state: AuctionState, payload: { auction: ApiAucti
   if (normalizedData.entities.bidders) {
     Object.keys(normalizedData.entities.bidders).forEach(bidderId => {
       Vue.set(state.bidders, bidderId, normalizedData.entities.bidders[bidderId])
+      Vue.set(state.bidders[bidderId], 'strategy', ApiBidderStrategy.TRUTHFUL)
     })
   }
 
@@ -253,7 +247,9 @@ function addBundleValue(state: AuctionState, payload: { bidderId: string; bundle
     if (!bidder.value) {
       Vue.set(bidder, 'value', { bundleValues: [payload.bundleValue] })
     } else {
-      bidder.value.bundleValues.push(payload.bundleValue)
+      if (!bidder.value.bundleValues.find(value => value.bundle.hash === payload.bundleValue.bundle.hash)) {
+        bidder.value.bundleValues.push(payload.bundleValue)
+      }
     }
   }
 }
@@ -286,6 +282,24 @@ function removeBid(state: AuctionState, payload: { bidderId: string; bundle: Api
 
     if (bidIndex !== -1) {
       existingBidder.bids.splice(bidIndex, 1)
+    }
+  }
+}
+
+function changeBidderStrategy(state: AuctionState, payload: { bidderId: string; strategy: ApiBidderStrategy }) {
+  const existingBidder = state.bidders[payload.bidderId]
+
+  if (existingBidder) {
+    Vue.set(existingBidder, 'strategy', payload.strategy)
+  }
+}
+
+function removeBids(state: AuctionState, payload: { bidderId: string }) {
+  const existingBidder = state.bidders[payload.bidderId]
+
+  if (existingBidder && existingBidder.bids) {
+    while (existingBidder.bids.length > 0) {
+      existingBidder.bids.pop()
     }
   }
 }
@@ -520,10 +534,6 @@ const auction = {
     return auctionResultById
   },
 
-  get bidsByBidderId() {
-    return bidsByBidderId
-  },
-
   get goodsById() {
     return goodsById
   },
@@ -540,6 +550,8 @@ const auction = {
   commitAppendAuction: moduleBuilder.commit(appendAuctionMutation),
   commitUpdateBidder: moduleBuilder.commit(updateBid),
   commitRemoveBid: moduleBuilder.commit(removeBid),
+  commitRemoveBids: moduleBuilder.commit(removeBids),
+  commitChangeBidderStrategy: moduleBuilder.commit(changeBidderStrategy),
   commitResult: moduleBuilder.commit(addResult),
   commitBundleValue: moduleBuilder.commit(addBundleValue),
   commitRemoveAuction: moduleBuilder.commit(removeAuctionMutation),

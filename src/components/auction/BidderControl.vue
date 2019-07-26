@@ -1,5 +1,8 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
+    <div class="small text-secondary bold">Current Strategy:</div>
+    <b-form-select v-model="strategy.selected" :options="strategy.options"></b-form-select>
+      
     <div>
       <div class="table-responsive">
         <table class="table table-bidder table-hover">
@@ -20,7 +23,7 @@
               <td v-if="pricedAuction">{{ priceForGood(selectedBundle) | formatNumber }}</td>
               <td v-if="pricedAuction">{{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
               <td>
-                <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId"> </component>
+                <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId"></component>
               </td>
               <td class="text-right">
                 <button v-if="bidForGood(selectedBundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(selectedBundle)">
@@ -66,7 +69,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood, ApiBundleEntry, ApiBundleEntryWrapper } from '../../store/modules/auction'
+import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood, ApiBundleEntry, ApiBundleEntryWrapper, ApiBidderStrategy } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
 import BidderCircleVue from './BidderCircle.vue'
@@ -83,19 +86,64 @@ export default Vue.extend({
     'sort-marker': SortMarker
   },
   props: ['auctionId'],
+  watch: {
+    'selectedBidderStrategy': function (newStrategy) {
+      this.strategy.selected = newStrategy
+    },
+    'strategy.selected': async function(newStrategy) {
+      if (!this.selectedBidder) {
+        return
+      }
+
+      try {
+        if (newStrategy === ApiBidderStrategy.TRUTHFUL) {
+          await this.$bvModal.msgBoxConfirm('All your bids will be overriden, are you sure?')
+          const bids: ApiBid[] = await auction.dispatchPropose({
+            auctionId: this.auctionId,
+            bidderIds: [this.selectedBidder.id!]
+          })
+
+          auction.commitRemoveBids({ bidderId: this.selectedBidder.id! })
+
+          bids.forEach(bid => {
+            auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
+          })
+
+          auction.commitChangeBidderStrategy({ bidderId: this.selectedBidder.id!, strategy: ApiBidderStrategy.TRUTHFUL })
+        } else {
+          auction.commitChangeBidderStrategy({ bidderId: this.selectedBidder.id!, strategy: ApiBidderStrategy.CUSTOM })
+        }
+      } catch (error) {
+        console.warn(error)
+      }
+    }
+  },
   data () {
     return {
       sort: {
         sortBy: 'value',
         sortASC: false
+      },
+      strategy: {
+        selected: ApiBidderStrategy.TRUTHFUL,
+        options: [
+          { value: ApiBidderStrategy.TRUTHFUL, text: 'Truthful' },
+          { value: ApiBidderStrategy.CUSTOM, text: 'Custom' }
+        ]
       }
     }
   },
   computed: {
-    selectedBidder() {
+    selectedBidder(): ApiBidder | undefined {
       const bidderId = selection.selectedBidder()
       if (bidderId) {
         return auction.bidderById()(bidderId)
+      }
+    },
+    selectedBidderStrategy(): string | undefined {
+      const bidderId = selection.selectedBidder()
+      if (bidderId) {
+        return auction.bidderById()(bidderId).strategy
       }
     },
     selectedBundle(): ApiBundleEntryWrapper {
