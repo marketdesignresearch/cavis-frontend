@@ -94,6 +94,9 @@ export interface ApiAuction {
 export interface ApiRound {
   roundNumber: number
   bids: ApiBid[]
+  prices?: {
+    [x: string]: number
+  }
   mechanismResult?: ApiAuctionAllocation
 }
 

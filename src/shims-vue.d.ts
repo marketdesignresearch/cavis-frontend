@@ -4,3 +4,4 @@ declare module '*.vue' {
 }
 
 declare module 'vue-form-generator'
+declare module 'color-scheme'

@@ -18,7 +18,9 @@
           </thead>
           <tbody>
             <tr v-for="(value, key) in result.allocation" :key="key">
-              <td>{{ getBidderName(key) }}</td>
+              <td>
+                <bidder-circle :name="getBidderName(key)" />
+              </td>
               <td>$ {{ value.value | formatNumber }}</td>
               <td>$ {{ result.payments[key] | formatNumber }}</td>
               <td><good-badge :ids="value.bundle.entries"></good-badge></td>
@@ -56,11 +58,13 @@
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiAuctionAllocation, AuctionState } from '../store/modules/auction'
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
+import BidderCircleVue from '@/components/auction/BidderCircle.vue'
 
 export default Vue.extend({
   name: 'AuctionResultView',
   components: {
-    'good-badge': GoodBadgeComponent
+    'good-badge': GoodBadgeComponent,
+    'bidder-circle': BidderCircleVue
   },
   methods: {
     getBidderName(id: string) {

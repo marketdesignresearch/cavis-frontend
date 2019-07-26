@@ -87,7 +87,8 @@ export default Vue.extend({
   props: ['auction'],
   components: {
     'good-badge': GoodBadgeComponent,
-    'auction-static-information': () => import('./rounds/StaticInformation.vue')
+    'auction-static-information': () => import('./rounds/StaticInformation.vue'),
+    'price-development-chart': () => import('./charts/PriceDevelopmentChart.vue')
   },
   watch: {
     selectedRound (currentValue) {
