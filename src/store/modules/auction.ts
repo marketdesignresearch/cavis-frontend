@@ -80,7 +80,9 @@ export interface ApiAuction {
         bundleBids: ApiBid[]
       }
     }
-    restrictedBids: any
+    restrictedBids: {
+      [x: string]: ApiBundleEntryWrapper[]
+    }
     currentPrices: {
       [x: string]: number
     }

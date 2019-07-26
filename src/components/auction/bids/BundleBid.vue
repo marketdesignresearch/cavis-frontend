@@ -1,11 +1,14 @@
 <template>
   <div>
-    <div class="input-group" v-if="selectedGoods.length > 0 && allowedToBid">
+    <div class="input-group" v-if="selectedGoods.length > 0 && bidsLeft && bidsAllowed">
       <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" :disabled="bidEditable || alreadyBid" />
       <button @click="placeBid" :disabled="alreadyBid" class="btn btn-primary btn-sm float-right">Bid</button>
     </div>
-    <div v-if="!allowedToBid" class="text-center">
+    <div v-if="!bidsLeft" class="text-center">
       You have reached the maximum amount of bids.
+    </div>
+    <div v-if="bidsLeft && !bidsAllowed" class="text-center">
+      Bids on this good are not allowed in this round.
     </div>
   </div>
 </template>
@@ -44,7 +47,7 @@ export default Vue.extend({
       const bidderId = selection.selectedBidder()
       return GoodsService.bidForGood(selection.selectedBundle(), bidderId!) !== null
     },
-    allowedToBid: function() {
+    bidsLeft(): boolean {
       const bidderId = selection.selectedBidder()
 
       if (!bidderId) {
@@ -61,6 +64,17 @@ export default Vue.extend({
       }
 
       return allowedNumberOfBids > numberOfPlacedBids
+    },
+    bidsAllowed(): boolean {
+      const bidderId = selection.selectedBidder()
+      const selectedBundle = selection.selectedBundle()
+
+      if (!bidderId) {
+        return false
+      }
+
+      const restrictedBids = auction.auctionById()(this.$props.auctionId).auction.restrictedBids
+      return restrictedBids[bidderId].some(value => value.hash === selectedBundle.hash)
     }
   },
   watch: {

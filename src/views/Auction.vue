@@ -23,8 +23,8 @@
                     <AuctionGood class="align-self-center d-inline-flex" :goodId="goodId" :auctionId="auctionId" />
                   </span>
 
-                  <div class="pb-3" v-if="selectedGoods.length > 0">
-                    <button class="btn btn-outline-secondary btn-sm mt-4" @click="deselect">Deselect All</button>
+                  <div class="pb-3">
+                    <button v-if="selectedGoods.length > 0" class="btn btn-outline-secondary btn-sm mt-4" @click="deselect">Deselect All</button>
                   </div>
 
                   <div class="goods-bidder" v-if="selectedBidder">
