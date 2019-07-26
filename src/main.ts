@@ -7,6 +7,7 @@ import store from './store/'
 
 // filters
 import './filters/numeral'
+import './filters/date'
 
 import BundleBid from './components/auction/bids/BundleBid.vue'
 import SingleRound from './components/auction/rounds/SingleRound.vue'
