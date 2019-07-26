@@ -49,3 +49,21 @@ $body-bg: darken(white, 5%);
       vertical-align: middle;
   }
 }
+
+// Sorting
+.onParentHoverShow {
+  opacity: 0.25;
+}
+
+.parentHover {
+  cursor: pointer;
+}
+
+.parentHover:hover {
+  .onParentHoverHide {
+    opacity: 0.25;
+  }
+  .onParentHoverShow {
+    opacity: 1;
+  }
+}

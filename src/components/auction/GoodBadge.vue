@@ -1,6 +1,6 @@
 <template>
   <span>
-    <span v-if="unifiedBundleEntries.length === 0">{}</span>
+    <span v-if="unifiedBundleEntries.length === 0">Empty Bundle</span>
     <span class="bundle-card" v-for="(entry, index) in unifiedBundleEntries" :key="index">
       <span v-if="hasMultiGoods">{{ entry.amount }}x </span>
       <span>{{ entry.good.name }}</span>

@@ -6,11 +6,11 @@
         <table class="table table-bidder table-hover">
           <thead>
             <tr>
-              <th>Currently Selected Bundle</th>
+              <th class="w-25">Currently Selected Bundle</th>
               <th>Value <font-awesome-icon icon="coins" /></th>
               <th v-if="pricedAuction">Price <font-awesome-icon icon="coins" /></th>
               <th v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /></th>
-              <th>Bid <font-awesome-icon icon="coins" /></th>
+              <th class="w-25">Bid <font-awesome-icon icon="coins" /></th>
               <th></th>
             </tr>
           </thead>
@@ -32,11 +32,11 @@
           </tbody>
           <thead>
             <tr>
-              <th>Bundle</th>
-              <th>Value <font-awesome-icon icon="coins" /></th>
-              <th v-if="pricedAuction">Price <font-awesome-icon icon="coins" /></th>
-              <th v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /></th>
-              <th>Bid <font-awesome-icon icon="coins" /></th>
+              <th @click="sortBy('entriesString')" class="parentHover">Bundle <sort-marker :sortable="sort" :property="'entriesString'"></sort-marker></th>
+              <th @click="sortBy('value')" class="parentHover">Value <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'value'"></sort-marker></th>
+              <th @click="sortBy('price')" class="parentHover" v-if="pricedAuction">Price <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'price'"></sort-marker></th>
+              <th @click="sortBy('utility')" class="parentHover" v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /> <sort-marker :sortable="sort" :property="'utility'"></sort-marker></th>
+              <th @click="sortBy('bid')" class="parentHover">Bid <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'bid'"></sort-marker></th>
               <th></th>
             </tr>
           </thead>
@@ -48,12 +48,12 @@
               @click="selectGoods(bundle)"
             >
               <td><good-badge :ids="bundle.entries" /></td>
-              <td>{{ valueForGood(bundle) | formatNumber }}</td>
-              <td v-if="pricedAuction">{{ priceForGood(bundle) | formatNumber }}</td>
-              <td v-if="pricedAuction">{{ (valueForGood(bundle) - priceForGood(bundle)) | formatNumber }}</td>
-              <td>{{ bidForGood(bundle) | formatNumber }}</td>
+              <td>{{ bundle.value | formatNumber }}</td>
+              <td v-if="pricedAuction">{{ bundle.price | formatNumber }}</td>
+              <td v-if="pricedAuction">{{ bundle.utility | formatNumber }}</td>
+              <td>{{ bundle.bid | formatNumber }}</td>
               <td class="text-right">
-                <button v-if="bidForGood(bundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">
+                <button v-if="bundle.bid" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">
                   Remove Bid <font-awesome-icon icon="trash-alt" />
                 </button>
               </td>
@@ -73,12 +73,25 @@ import GoodsService from '../../services/goods'
 import BidderCircleVue from './BidderCircle.vue'
 import GoodBadgeComponent from './GoodBadge.vue'
 import selection from '../../store/modules/selection'
-import hashBundle from '../../services/bundleHash';
+import hashBundle from '../../services/bundleHash'
+import SortMarker from '../utils/sort-marker.vue'
 
 export default Vue.extend({
   name: 'BidderControl',
-  components: { 'bidder-circle': BidderCircleVue, 'good-badge': GoodBadgeComponent },
+  components: { 
+    'bidder-circle': BidderCircleVue,
+    'good-badge': GoodBadgeComponent,
+    'sort-marker': SortMarker
+  },
   props: ['auctionId'],
+  data () {
+    return {
+      sort: {
+        sortBy: 'value',
+        sortASC: false
+      }
+    }
+  },
   computed: {
     selectedBidder() {
       const bidderId = selection.selectedBidder()
@@ -101,7 +114,27 @@ export default Vue.extend({
     goodCombinations(): ApiBundleEntryWrapper[] {
       const bidderId = selection.selectedBidder()
       if (bidderId) {
-        return GoodsService.bundleForBidder(bidderId)
+        const apiBundleEntryWrapper = GoodsService.bundleForBidder(bidderId)
+        
+        const sortedArray = Array.from(apiBundleEntryWrapper).map(obj => {
+          const value = GoodsService.valueForGood(obj, selection.selectedBidder()!)
+          const price = GoodsService.priceForGood(this.$props.auctionId, obj, selection.selectedBidder()!)
+          return {
+            hash: obj.hash,
+            entries: obj.entries,
+            entriesString: obj.entries.map(entry => entry.good).join(),
+            value: value,
+            price: price,
+            bid: value! - price!
+          }
+        }).sort((a, b) => {
+          if (!this.sort.sortASC) {
+            return (a as any)[this.sort.sortBy] >= (b as any)[this.sort.sortBy] ? -1 : 1
+          }
+          return (a as any)[this.sort.sortBy] < (b as any)[this.sort.sortBy] ? -1 : 1
+        })
+
+        return sortedArray
       }
       return []
     },
@@ -112,6 +145,10 @@ export default Vue.extend({
     }
   },
   methods: {
+    sortBy(property: string) {
+      this.sort.sortASC = !this.sort.sortASC
+      this.sort.sortBy = property
+    },
     isAllowed(goods: ApiBundleEntryWrapper): boolean {
       return GoodsService.isAllowed(goods, selection.selectedBidder(), this.$props.auctionId)
     },

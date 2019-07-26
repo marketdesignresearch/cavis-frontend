@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="small">{{ auctionType }}</div>
-    <div class="small" v-if="currentRoundType">{{ currentRoundType }}</div>
+    <div class="small">Type: <b>{{ auctionType }}</b></div>
+    <div class="small" v-if="currentRoundType">Type of Round: <b>{{ currentRoundType }}</b></div>
   </div>
 </template>
 

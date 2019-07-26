@@ -7,7 +7,7 @@
         </p>
       </div>
       <div class="col text-center">
-        <img src="../../assets/auctioneer.png" class="logo mt-3" v-b-toggle.collapse-auctioneer />
+        <img src="../../assets/auctioneer2.png" class="logo mt-3" v-b-toggle.collapse-auctioneer />
         <p>
           <b-button v-b-toggle.collapse-auctioneer size="sm" class="mt-3">
             {{ isAuctioneerVisible ? 'Hide Auctioneer View' : 'Show Auctioneer View' }}
@@ -23,7 +23,7 @@
 
     <b-collapse id="collapse-auctioneer" v-model="isAuctioneerVisible" class="mt-2 text-left">
       <b-tabs content-class="mt-3" v-model="selectedRound">
-        <b-tab v-for="round in rounds" :title="round.roundNumber" :key="round.roundNumber">
+        <b-tab v-for="round in rounds" :title="'' + round.roundNumber" :key="round.roundNumber">
           <table class="table table-bidder">
             <thead>
               <tr>

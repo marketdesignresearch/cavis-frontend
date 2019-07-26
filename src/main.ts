@@ -17,10 +17,10 @@ Vue.use(BootstrapVue)
 
 // font-awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCircle, faCoins, faWrench, faTrashAlt } from '@fortawesome/free-solid-svg-icons'
+import { faUserCircle, faCoins, faWrench, faTrashAlt, faSort, faSortUp, faSortDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faUserCircle, faCoins, faWrench, faTrashAlt)
+library.add(faUserCircle, faCoins, faWrench, faTrashAlt, faSort, faSortUp, faSortDown)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 

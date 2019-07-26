@@ -40,7 +40,7 @@ export default Vue.extend({
     left: auto;
   }
 
-  .selected, &:hover {
+  &.selected, &:hover {
     background-color: theme-color('success');
   }
 }
