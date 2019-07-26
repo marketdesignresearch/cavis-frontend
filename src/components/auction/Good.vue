@@ -5,7 +5,7 @@
       <div class="card-edge-bottom">{{ good.name }}</div>
       <div class="name">{{ good.name }}</div>
       <span class="badge badge-success badge-pill badge-price" v-if="priceForGood">
-        {{ priceForGood | formatNumber }} <font-awesome-icon icon="coins" />
+        {{ priceForGood | formatNumber }} <font-awesome-icon icon="dollar-sign" />
       </span>
       <div class="proposedValue" v-if="showProposedValue">{{ proposedBundleValue | formatNumber }}</div>
     </div>
@@ -18,7 +18,7 @@ import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood } from '../../store
 import GoodsService from '@/services/goods'
 import selection from '../../store/modules/selection'
 import api from '../../services/api'
-import hashBundle from '../../services/bundleHash';
+import hashBundle from '../../services/bundleHash'
 
 export interface IAuctionGood {
   name: string
@@ -122,6 +122,7 @@ export { AuctionGoodComponent }
     top: 5px;
     left: 8px;
     font-size: 10px;
+    opacity: 0.5;
   }
 
   .card-edge-bottom {
@@ -129,7 +130,8 @@ export { AuctionGoodComponent }
     bottom: 5px;
     right: 8px;
     font-size: 10px;
-    transform: rotate(180deg)
+    transform: rotate(180deg);
+    opacity: 0.5;
   }
 
   .name {

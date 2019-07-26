@@ -6,12 +6,12 @@
         <table class="table table-bidder table-hover">
           <thead>
             <tr>
-              <th class="w-25">Currently Selected Bundle</th>
+              <th>Currently Selected Bundle</th>
               <th>Value <font-awesome-icon icon="coins" /></th>
-              <th v-if="pricedAuction">Price <font-awesome-icon icon="coins" /></th>
+              <th v-if="pricedAuction">Price <font-awesome-icon icon="dollar-sign" /></th>
               <th v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /></th>
-              <th class="w-25">Bid <font-awesome-icon icon="coins" /></th>
-              <th></th>
+              <th class="w-25">Bid <font-awesome-icon icon="dollar-sign" /></th>
+              <th class="w-12-5"></th>
             </tr>
           </thead>
           <tbody>
@@ -34,10 +34,10 @@
             <tr>
               <th @click="sortBy('entriesString')" class="parentHover">Bundle <sort-marker :sortable="sort" :property="'entriesString'"></sort-marker></th>
               <th @click="sortBy('value')" class="parentHover">Value <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'value'"></sort-marker></th>
-              <th @click="sortBy('price')" class="parentHover" v-if="pricedAuction">Price <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'price'"></sort-marker></th>
+              <th @click="sortBy('price')" class="parentHover" v-if="pricedAuction">Price <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'price'"></sort-marker></th>
               <th @click="sortBy('utility')" class="parentHover" v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /> <sort-marker :sortable="sort" :property="'utility'"></sort-marker></th>
-              <th @click="sortBy('bid')" class="parentHover">Bid <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'bid'"></sort-marker></th>
-              <th></th>
+              <th @click="sortBy('bid')" class="parentHover w-25">Bid <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'bid'"></sort-marker></th>
+              <th class="w-12-5"></th>
             </tr>
           </thead>
           <tbody>
@@ -119,13 +119,15 @@ export default Vue.extend({
         const sortedArray = Array.from(apiBundleEntryWrapper).map(obj => {
           const value = GoodsService.valueForGood(obj, selection.selectedBidder()!)
           const price = GoodsService.priceForGood(this.$props.auctionId, obj, selection.selectedBidder()!)
+          const bid = GoodsService.bidForGood(obj, selection.selectedBidder()!)
           return {
             hash: obj.hash,
             entries: obj.entries,
             entriesString: obj.entries.map(entry => entry.good).join(),
             value: value,
             price: price,
-            bid: value! - price!
+            utility: value! - price!,
+            bid: bid
           }
         }).sort((a, b) => {
           if (!this.sort.sortASC) {

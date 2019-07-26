@@ -23,7 +23,7 @@
 
     <b-collapse id="collapse-auctioneer" v-model="isAuctioneerVisible" class="mt-2 text-left">
       <b-tabs content-class="mt-3" v-model="selectedRound">
-        <b-tab v-for="round in rounds" :title="'' + round.roundNumber" :key="round.roundNumber">
+        <b-tab v-for="round in rounds" :title="round.roundNumber === rounds.length ? 'Current Round' : '' + round.roundNumber" :key="round.roundNumber">
           <table class="table table-bidder">
             <thead>
               <tr>
@@ -91,6 +91,10 @@ export default Vue.extend({
   },
   watch: {
     selectedRound (currentValue) {
+      // do not query if this is the current/last round
+      if (currentValue === this.rounds.length - 1) {
+        return
+      }
       auction.dispatchGetRoundResult({ auctionId: this.$props.auction.id, round: currentValue })
     }
   },
