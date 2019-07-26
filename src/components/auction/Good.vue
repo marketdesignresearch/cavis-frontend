@@ -126,6 +126,7 @@ export { AuctionGoodComponent }
   }
 
   .card-edge-bottom {
+    display: none;
     position: absolute;
     bottom: 5px;
     right: 8px;
@@ -136,8 +137,8 @@ export { AuctionGoodComponent }
 
   .name {
     position: absolute;
-    font-size: 36px;
-    width: 70px;
+    font-size: 28px;
+    width: 60px;
     margin-top: 10px;
     text-align: center;
   }
@@ -165,7 +166,7 @@ export { AuctionGoodComponent }
     line-height: 70px;
     text-align: center;
     position: absolute;
-    top: 35px;
+    top: 25px;
     width: 100%;
     opacity: 0.75;
   }
@@ -173,8 +174,8 @@ export { AuctionGoodComponent }
   user-select: none;
   margin: 0 auto;
   cursor: pointer;
-  width: 70px;
-  height: 95px;
+  width: 60px;
+  height: 80px;
   margin: 20px;
   display: inline-flex;
 }

@@ -1,6 +1,5 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
-    <bidder-circle :name="selectedBidder.name" class="selected bidder-circle" />
     <div>
       <div class="table-responsive">
         <table class="table table-bidder table-hover">

@@ -16,16 +16,31 @@
               </div>
 
               <div class="flex-row text-center flex-grow-1 mx-2">
-                <div class="goods-container" :class="{ selected: selectedBidder }">
+                <div class="goods-container justify-content-center" :class="{ selected: selectedBidder }">
+                  <div class="goods-title"><span>Goods</span></div>
+
                   <span v-for="goodId in goods" :key="goodId" @click="selectGood(goodId)">
                     <AuctionGood class="align-self-center d-inline-flex" :goodId="goodId" :auctionId="auctionId" />
                   </span>
 
-                  <div class="mt-4" v-if="selectedBidder">
-                    Bidder {{ selectedBidder.name }}'s value for bundle <good-badge :ids="selectedGoods" />
-                    <h2 class="mt-4">{{ valueForGoods | formatNumber }} <font-awesome-icon icon="coins" /></h2>
+                  <div class="pb-3" v-if="selectedGoods.length > 0">
+                    <button class="btn btn-outline-secondary btn-sm mt-4" @click="deselect">Deselect All</button>
+                  </div>
 
-                    <button v-if="selectedGoods.length > 0" class="btn btn-primary mt-4" @click="deselect">Deselect All</button>
+                  <div class="goods-bidder" v-if="selectedBidder">
+                    <div class="row">
+                      <div class="col d-flex align-items-center">
+                        <bidder-circle :name="selectedBidder.name" class="float-right selected" />
+                      </div>
+
+                      <div class="col d-flex align-items-center justify-content-start">
+                        <good-badge :ids="selectedGoods" />
+                      </div>
+
+                      <div class="col d-flex align-items-center justify-content-start">
+                        Value: {{ valueForGoods | formatNumber }}
+                      </div>
+                    </div>
                   </div>
 
                 </div>
@@ -64,6 +79,7 @@ import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid, ApiBun
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 import selection, { SelectionState } from '../store/modules/selection'
 import { mapGetters, mapState } from 'vuex'
+import BidderCircleVue from '@/components/auction/BidderCircle.vue'
 
 export default Vue.extend({
   components: {
@@ -72,7 +88,8 @@ export default Vue.extend({
     AuctionSetup: AuctionSetup,
     Auctioneer: Auctioneer,
     BidderControl: BidderControl,
-    'good-badge': GoodBadgeComponent
+    'good-badge': GoodBadgeComponent,
+    'bidder-circle': BidderCircleVue
   },
   data() {
     return {
@@ -128,7 +145,7 @@ export default Vue.extend({
         auction.dispatchValueQuery({
           auctionId: this.$route.params.id,
           bidderIds: [selectedBidder],
-          bundle: selectedBundle
+          bundles: [selectedBundle]
         })
       }
 
@@ -166,6 +183,8 @@ export default Vue.extend({
 </script>
 
 <style scoped lang="scss">
+@import '../custom.scss';
+
 .bottom-container {
   padding-top: 20px;
   padding-bottom: 15px;
@@ -173,9 +192,38 @@ export default Vue.extend({
 }
 
 .goods-container {
-  display: inline-block;
-  padding: 30px;
-  border-radius: 10px;
+  .goods-title {
+    position: relative;
+    text-align: center;
+    top: -15px;
+    
+    span {
+      font-weight: bolder;
+      background: $body-bg;
+      border-radius: 10px;
+      padding: 5px;
+    }
+  }
+
+  .goods-bidder {
+    display: inline-block;
+    width: 66.66%;
+
+    position: relative;
+    height: 70px;
+    bottom: -35px;
+
+    border-radius: 35px;
+
+    background: white;
+  }
+
+  margin: 0 50px;
+
+  border-color: darken($body-bg, 10%);
+  border-width: 3px;
+  border-style: solid;
+  border-radius: 50px;
 
   &.selected {
     // background-color: white;

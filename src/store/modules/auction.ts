@@ -457,17 +457,23 @@ async function demandQuery(
 
 async function valueQuery(
   context: BareActionContext<AuctionState, RootState>,
-  payload: { auctionId: string; bidderIds: string[]; bundle: ApiBundleEntryWrapper }
+  payload: { auctionId: string; bidderIds: string[]; bundles: ApiBundleEntryWrapper[] }
 ) {
-  const bundle: { [x: string]: number } = {}
+  const bundles: any[] = []
 
-  payload.bundle.entries.forEach(entry => {
-    bundle[entry.good] = entry.amount
+  payload.bundles.forEach(bundle => {
+    const tmpBundle: { [x: string]: number } = {}
+
+    bundle.entries.forEach(entry => {
+      tmpBundle[entry.good] = entry.amount
+    })
+
+    bundles.push(tmpBundle)
   })
 
   const valueQuery = {
     bidders: payload.bidderIds,
-    bundles: [bundle]
+    bundles: bundles
   }
 
   const { data: valueQueryResult } = await api().post(`/auctions/${payload.auctionId}/valuequery`, valueQuery)

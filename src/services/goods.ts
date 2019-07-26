@@ -1,7 +1,7 @@
 import auction, { ApiBid, ApiMechanismType, ApiBundleEntryWrapper, ApiBundleEntry } from '@/store/modules/auction'
 import hashBundle from './bundleHash'
 
-const powerSet = function(l: any) {
+const powerSet = function(l: string[]): string[][] {
   // TODO: ensure l is actually array-like, and return null if not
   return (function ps(list): any {
     if (list.length === 0) {
@@ -41,7 +41,19 @@ export default {
 
     // check if we have bundle-bids
     if (currentAuction.auction.mechanismType === ApiMechanismType.VCG_XOR) {
-      return powerSet(goods).filter((goods: []) => goods.length > 0)
+      return powerSet(goods).map(entries => {
+        const bundleEntry: ApiBundleEntry[] = entries.map(good => {
+          return {
+            good: good,
+            amount: 1
+          }
+        })
+
+        return {
+          hash: hashBundle(bundleEntry),
+          entries: bundleEntry
+        }
+      })
     }
 
     // TODO: Hard-coded availability of 1

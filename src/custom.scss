@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans&display=swap');
+
+$font-family-sans-serif: 'Noto Sans', sans-serif;
 $grid-columns:      12;
 $grid-gutter-width: 30px;
 
@@ -23,11 +26,9 @@ $container-max-widths: (
 
 $body-bg: darken(white, 5%);
 
-//@import "node_modules/bootswatch/dist/lumen/variables";
 @import 'node_modules/bootstrap/scss/bootstrap';
-//@import "node_modules/bootswatch/dist/lumen/bootswatch";
-
 @import 'node_modules/bootstrap-vue/src/index.scss';
+
 
 .item {
   background: white;
