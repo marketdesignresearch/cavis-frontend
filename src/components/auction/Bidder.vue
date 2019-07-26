@@ -5,7 +5,7 @@
         <bidder-circle
           v-b-tooltip.hover
           :title="bidder.description"
-          :name="bidder.name"
+          :bidder="bidder"
           :class="{ selected: isSelected, bidsPlaced: bidsPlaced(bidder) }"
         />
       </div>

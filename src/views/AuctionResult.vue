@@ -19,7 +19,7 @@
           <tbody>
             <tr v-for="(value, key) in result.allocation" :key="key">
               <td>
-                <bidder-circle :name="getBidderName(key)" />
+                <bidder-circle :bidder="getBidder(key)" />
               </td>
               <td>$ {{ value.value | formatNumber }}</td>
               <td>$ {{ result.payments[key] | formatNumber }}</td>
@@ -42,7 +42,7 @@
             <template v-for="currentRound in auction.auction.rounds">
               <tr v-for="bid of currentRound.bids" :key="bid.id">
                 <td>{{ currentRound.description }}</td>
-                <td>{{ getBidderName(bid.bidderId) }}</td>
+                <td>{{ getBidder(bid.bidderId).shortDescription }}</td>
                 <td><good-badge :key="'bundle'" :ids="bid.bundle.entries"></good-badge></td>
                 <td>$ {{ bid.amount | formatNumber }}</td>
               </tr>
@@ -67,8 +67,8 @@ export default Vue.extend({
     'bidder-circle': BidderCircleVue
   },
   methods: {
-    getBidderName(id: string) {
-      return auction.bidderById()(id).name
+    getBidder(id: string) {
+      return auction.bidderById()(id)
     }
   },
   computed: {

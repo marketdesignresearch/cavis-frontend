@@ -43,7 +43,7 @@
             </thead>
             <tbody>
               <tr v-for="bidder of bidders" :key="bidder.id">
-                <td>{{ bidder.name }}</td>
+                <td>{{ bidder.shortDescription }}</td>
                 <td v-if="goodCombinations.length <= 10">
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">

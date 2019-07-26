@@ -30,7 +30,7 @@
                   <div class="goods-bidder" v-if="selectedBidder">
                     <div class="row">
                       <div class="col d-flex align-items-center">
-                        <bidder-circle :name="selectedBidder.name" class="float-right selected" />
+                        <bidder-circle :bidder="selectedBidder" class="float-right selected" />
                       </div>
 
                       <div class="col d-flex align-items-center justify-content-start">

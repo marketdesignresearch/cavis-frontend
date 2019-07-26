@@ -1,6 +1,6 @@
 <template>
   <div :style="{ 'background-image': backgroundImage }" class="bidder text-center">
-    <span class="badge badge-secondary">Bidder {{ name }}</span>
+    <span class="badge badge-secondary">{{ bidder.shortDescription }}</span>
   </div>
 </template>
 
@@ -8,10 +8,10 @@
 import Vue from 'vue'
 
 export default Vue.extend({
-  props: ['name'],
+  props: ['bidder'],
   computed: {
     backgroundImage: function () {
-      return `url('/avatars/${this.$props.name}.svg')`
+      return `url('/avatars/${this.$props.bidder.name}.svg')`
     }
   }
 })
@@ -36,8 +36,8 @@ export default Vue.extend({
 
   .badge {
     position: absolute;
-    bottom: 0;
-    left: auto;
+    bottom: -9px;
+    left: 0;
   }
 
   &.selected, &:hover {
