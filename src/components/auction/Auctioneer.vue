@@ -23,7 +23,11 @@
 
     <b-collapse id="collapse-auctioneer" v-model="isAuctioneerVisible" class="mt-2 text-left">
       <b-tabs content-class="mt-3" v-model="selectedRound">
-        <b-tab v-for="round in rounds" :title="round.roundNumber === rounds.length ? 'Current Round' : '' + round.roundNumber" :key="round.roundNumber">
+        <b-tab
+          v-for="round in rounds"
+          :title="round.roundNumber === rounds.length ? 'Current Round' : '' + round.roundNumber"
+          :key="round.roundNumber"
+        >
           <table class="table table-bidder">
             <thead>
               <tr>
@@ -70,14 +74,23 @@
         <button @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
         <button @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
       </div>
-
     </b-collapse>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiRound, ApiAuction, ApiBidder, ApiGood, ApiBundleEntry, ApiBid, ApiBundleEntryWrapper, ApiBundleValue } from '../../store/modules/auction'
+import auction, {
+  ApiAuctionType,
+  ApiRound,
+  ApiAuction,
+  ApiBidder,
+  ApiGood,
+  ApiBundleEntry,
+  ApiBid,
+  ApiBundleEntryWrapper,
+  ApiBundleValue
+} from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
 import GoodBadgeComponent from './GoodBadge.vue'
@@ -93,7 +106,7 @@ export default Vue.extend({
     'price-development-chart': () => import('./charts/PriceDevelopmentChart.vue')
   },
   watch: {
-    selectedRound (currentValue) {
+    selectedRound(currentValue) {
       // do not query if this is the current/last round
       if (currentValue === this.rounds.length - 1) {
         return
@@ -102,13 +115,13 @@ export default Vue.extend({
       auction.dispatchGetRoundResult({ auctionId: this.$props.auction.id, round: currentValue })
     }
   },
-  mounted () {
+  mounted() {
     this.valueQuery(auction.biddersById()(this.$props.auction.id), this.goodCombinations, this.$props.auction.id)
   },
   data: () => {
     const data: {
-      selectedRound: number | null,
-      isAuctioneerVisible: boolean,
+      selectedRound: number | null
+      isAuctioneerVisible: boolean
       bundleValues: {
         [x: string]: ApiBundleValue[]
       }
@@ -130,16 +143,23 @@ export default Vue.extend({
     },
     rounds(): ApiRound[] {
       const currentAuction = auction.auctionById()(this.$props.auction.id)
-      const bidArrays = auction.biddersById()(this.$props.auction.id).map(bidderId => {
-        return auction.bidderById()(bidderId).bids || []
-      })
-      
+      const bidArrays = auction
+        .biddersById()(this.$props.auction.id)
+        .map(bidderId => {
+          return auction.bidderById()(bidderId).bids || []
+        })
+
       const currentBids: ApiBid[] = new Array().concat(...bidArrays)
 
-      return currentAuction.auction.finished ? currentAuction.auction.rounds : [...currentAuction.auction.rounds, {
-        roundNumber: currentAuction.auction.rounds.length + 1,
-        bids: currentBids
-      }]
+      return currentAuction.auction.finished
+        ? currentAuction.auction.rounds
+        : [
+            ...currentAuction.auction.rounds,
+            {
+              roundNumber: currentAuction.auction.rounds.length + 1,
+              bids: currentBids
+            }
+          ]
     },
     goods(): ApiGood[] {
       return this.$props.auction.auction.domain.goods.map((goodId: string) => {
@@ -178,20 +198,20 @@ export default Vue.extend({
       return []
     },
     allocationForBidder(bidder: ApiBidder, round: ApiRound): ApiBundleEntry[] {
-      if (!round.mechanismResult || !round.mechanismResult.allocation[bidder.id!]) {
+      if (!round.outcome || !round.outcome.allocation[bidder.id!]) {
         return []
       }
 
-      return round.mechanismResult.allocation[bidder.id!].bundle.entries.map(entry => {
+      return round.outcome.allocation[bidder.id!].bundle.entries.map(entry => {
         return { good: entry.good, amount: entry.amount }
       })
     },
     paymentForGoods(bidder: ApiBidder, round: ApiRound): number | null {
-      if (!round.mechanismResult || !round.mechanismResult.payments[bidder.id!]) {
+      if (!round.outcome || !round.outcome.payments[bidder.id!]) {
         return null
       }
 
-      return round.mechanismResult.payments[bidder.id!]
+      return round.outcome.payments[bidder.id!]
     },
     async valueQuery(bidderIds: string[], queryBundles: ApiBundleEntryWrapper[], auctionId: string) {
       const bundles: any[] = []

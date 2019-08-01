@@ -74,7 +74,7 @@ export default Vue.extend({
       }
 
       const restrictedBids = auction.auctionById()(this.$props.auctionId).auction.restrictedBids
-      return restrictedBids[bidderId].some(value => value.hash === selectedBundle.hash)
+      return !restrictedBids[bidderId] || restrictedBids[bidderId].some(value => value.hash === selectedBundle.hash)
     }
   },
   watch: {

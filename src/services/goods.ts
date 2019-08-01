@@ -56,7 +56,7 @@ export default {
       })
     }
 
-    // TODO: Hard-coded availability of 1
+    // TODO: Hard-coded quantity of 1
     const entries: ApiBundleEntry[][] = goods.map(good => [{ good: good, amount: 1 }])
 
     return entries.map(entryWrapper => {

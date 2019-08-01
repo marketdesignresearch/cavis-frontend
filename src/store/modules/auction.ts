@@ -100,7 +100,7 @@ export interface ApiRound {
   prices?: {
     [x: string]: number
   }
-  mechanismResult?: ApiAuctionAllocation
+  outcome?: ApiAuctionAllocation
 }
 
 export interface ApiBidder {
@@ -122,7 +122,7 @@ export interface BundleEntry {
 export interface ApiGood {
   id?: string
   name: string
-  availability: number
+  quantity: number
   dummyGood: boolean
   isSelected: boolean
 }
@@ -258,7 +258,7 @@ function updateRoundResult(state: AuctionState, payload: { auctionId: string; ro
   const apiRound = state.auctions[payload.auctionId].auction.rounds[payload.round]
 
   if (apiRound) {
-    Vue.set(apiRound, 'mechanismResult', payload.result)
+    Vue.set(apiRound, 'outcome', payload.result)
   }
 }
 
