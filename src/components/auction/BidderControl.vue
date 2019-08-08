@@ -1,7 +1,8 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
     <div class="small text-secondary bold">Current Strategy:</div>
-    <b-form-select v-model="strategy.selected" :options="strategy.options"></b-form-select>
+    
+    <b-form-select v-model="strategy.selected" @change="strategyChanged" :options="strategy.options"></b-form-select>
       
     <div>
       <div class="table-responsive">
@@ -89,33 +90,6 @@ export default Vue.extend({
   watch: {
     'selectedBidderStrategy': function (newStrategy) {
       this.strategy.selected = newStrategy
-    },
-    'strategy.selected': async function(newStrategy) {
-      if (!this.selectedBidder) {
-        return
-      }
-
-      try {
-        if (newStrategy === ApiBidderStrategy.TRUTHFUL) {
-          await this.$bvModal.msgBoxConfirm('All your bids will be overriden, are you sure?')
-          const bids: ApiBid[] = await auction.dispatchPropose({
-            auctionId: this.auctionId,
-            bidderIds: [this.selectedBidder.id!]
-          })
-
-          auction.commitRemoveBids({ bidderId: this.selectedBidder.id! })
-
-          bids.forEach(bid => {
-            auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
-          })
-
-          auction.commitChangeBidderStrategy({ bidderId: this.selectedBidder.id!, strategy: ApiBidderStrategy.TRUTHFUL })
-        } else {
-          auction.commitChangeBidderStrategy({ bidderId: this.selectedBidder.id!, strategy: ApiBidderStrategy.CUSTOM })
-        }
-      } catch (error) {
-        console.warn(error)
-      }
     }
   },
   data () {
@@ -194,6 +168,33 @@ export default Vue.extend({
     }
   },
   methods: {
+    async strategyChanged(newStrategy: ApiBidderStrategy, oldStrategy: ApiBidderStrategy) {
+      if (!this.selectedBidder) {
+        return
+      }
+      
+      try {
+        if (newStrategy === ApiBidderStrategy.TRUTHFUL && newStrategy !== oldStrategy) {
+          await this.$bvModal.msgBoxConfirm('All your bids will be overriden, are you sure?')
+          const bids: ApiBid[] = await auction.dispatchPropose({
+            auctionId: this.auctionId,
+            bidderIds: [this.selectedBidder.id!]
+          })
+
+          auction.commitRemoveBids({ bidderId: this.selectedBidder.id! })
+
+          bids.forEach(bid => {
+            auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
+          })
+
+          auction.commitChangeBidderStrategy({ bidderId: this.selectedBidder.id!, strategy: ApiBidderStrategy.TRUTHFUL })
+        } else {
+          auction.commitChangeBidderStrategy({ bidderId: this.selectedBidder.id!, strategy: ApiBidderStrategy.CUSTOM })
+        }
+      } catch (error) {
+        console.warn(error)
+      }
+    },
     sortBy(property: string) {
       this.sort.sortASC = !this.sort.sortASC
       this.sort.sortBy = property
