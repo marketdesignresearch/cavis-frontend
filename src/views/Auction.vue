@@ -192,6 +192,9 @@ export default Vue.extend({
 }
 
 .goods-container {
+  display: inline-block;
+  min-width: 600px;
+
   .goods-title {
     position: relative;
     text-align: center;

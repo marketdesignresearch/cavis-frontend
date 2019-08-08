@@ -1,17 +1,29 @@
 <template>
   <div :style="{ 'background-image': backgroundImage }" class="bidder text-center">
-    <span class="badge badge-secondary">{{ bidder.shortDescription }}</span>
+    <div class="badges justify-content-center">
+      <div><span class="badge badge-secondary">{{ bidder.shortDescription }}</span></div>
+      <div><span class="badge badge-primary">{{ strategy }}</span></div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
+import { ApiBidderStrategy } from '../../store/modules/auction';
 
 export default Vue.extend({
   props: ['bidder'],
   computed: {
     backgroundImage: function () {
       return `url('/avatars/${this.$props.bidder.name}.svg')`
+    },
+    strategy: function () {
+      switch (this.$props.bidder.strategy) {
+        case ApiBidderStrategy.TRUTHFUL:
+          return 'Truthful'
+        case ApiBidderStrategy.CUSTOM:
+          return 'Custom'
+      }
     }
   }
 })
@@ -34,10 +46,11 @@ export default Vue.extend({
   width: 70px;
   border-radius: 35px;
 
-  .badge {
-    position: absolute;
-    bottom: -9px;
-    left: 0;
+  .badges {
+    position: relative;
+    bottom: -30px;
+    width: 300px;
+    left: -127px;
   }
 
   &.selected, &:hover {

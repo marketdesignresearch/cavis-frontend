@@ -54,7 +54,7 @@ export default Vue.extend({
 }
 
 .bidder-container {
-  padding-bottom: 20px;
+  padding-bottom: 70px;
   border-radius: 10px;
 
   &.selected, &:hover {
