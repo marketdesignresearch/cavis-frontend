@@ -6,6 +6,7 @@
           v-b-tooltip.hover
           :title="bidder.description"
           :bidder="bidder"
+          showStrategy="true"
           :class="{ selected: isSelected, bidsPlaced: bidsPlaced(bidder) }"
         />
       </div>

@@ -68,6 +68,11 @@
             </tbody>
           </table>
         </b-tab>
+        <!--
+        <b-tab title="Price Development">
+          <price-development-chart :rounds="rounds" />
+        </b-tab>
+        -->
       </b-tabs>
 
       <div class="text-right py-3">
@@ -108,7 +113,7 @@ export default Vue.extend({
   watch: {
     selectedRound(currentValue) {
       // do not query if this is the current/last round
-      if (currentValue === this.rounds.length - 1) {
+      if (currentValue >= this.rounds.length - 2) {
         return
       }
 

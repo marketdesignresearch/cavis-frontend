@@ -16,7 +16,7 @@
         </ul>
         <ul class="navbar-nav">
           <li class="nav-item">
-            <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-setup' }">Create new Auction</router-link>
+            <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">Create new Auction</router-link>
           </li>
         </ul>
       </div>

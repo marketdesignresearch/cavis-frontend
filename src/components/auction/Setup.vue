@@ -1,7 +1,5 @@
 <template>
   <form>
-    <b-form-select v-model="selectedHistoricDomain" :options="historicDomains"></b-form-select>
-
     <vue-form-generator :schema="schema" :model="model" :options="formOptions"></vue-form-generator>
   </form>
 </template>
@@ -16,20 +14,9 @@ export default Vue.extend({
     'vue-form-generator': VueFormGenerator.component
   },
   mounted() {
-    this.$data.model = VueFormGenerator.schema.createDefaultObject(this.schema, {
-      auctionType: 'VCG_XOR',
-      domainType: 'additiveValue'
-    })
+    this.$data.model = VueFormGenerator.schema.createDefaultObject(this.schema, this.$props.modelValue || {})
   },
-  watch: {
-    selectedHistoricDomain: function (newDomain) {
-      if (newDomain === {}) {
-        this.defaultModel()
-      } else {
-        this.$data.model = VueFormGenerator.schema.createDefaultObject(this.schema, newDomain)
-      }
-    }
-  },
+  props: ['modelValue'],
   methods: {
     defaultModel: function() {
       this.$data.model = VueFormGenerator.schema.createDefaultObject()
@@ -152,59 +139,12 @@ export default Vue.extend({
       formOptions: {
         validateAfterChanged: true,
         validateAsync: true
-      },
-      selectedHistoricDomain: {},
-      historicDomains: [
-        {
-          value: {},
-          text: 'Custom'
-        },
-        { 
-          value: {
-            numberOfBidders: 6,
-            numberOfGoods: 5,
-            domainType: 'unitDemandValue',
-            auctionType: ApiAuctionType.VCG_XOR,
-            defaultStrategy: ApiBidderStrategy.TRUTHFUL,
-            bidder: {
-              min: 0,
-              max: 100000
-            },
-          }, 
-          text: 'New Zealand (1990)'
-        },
-        { 
-          value: {
-            numberOfBidders: 6,
-            numberOfGoods: 2,
-            domainType: 'unitDemandValue',
-            auctionType: ApiAuctionType.VCG_XOR,
-            defaultStrategy: ApiBidderStrategy.TRUTHFUL,
-            bidder: {
-              min: 100000,
-              max: 1000000
-            },
-          }, 
-          text: 'Swiss Wireless-Local-Loop Auction (March 2000)'
-        },
-        { 
-          value: {
-            numberOfBidders: 4,
-            numberOfGoods: 4,
-            domainType: 'unitDemandValue',
-            auctionType: ApiAuctionType.VCG_XOR,
-            defaultStrategy: ApiBidderStrategy.TRUTHFUL,
-            bidder: {
-              min: 100000,
-              max: 1000000
-            },
-          }, 
-          text: 'Swiss UMTS Auction (December 2000)'
-        }
-      ]
+      }
     }
   }
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+@import '../../custom.scss';
+</style>

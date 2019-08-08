@@ -5,26 +5,33 @@ import auction, { ApiRound } from '../../../store/modules/auction'
 import ColorScheme from 'color-scheme'
 
 const PriceDevelopmentChart = Vue.extend({
+  extends: Line,
   name: 'PriceDevelopmentChart',
   props: ['rounds'],
   watch: {
     rounds(rounds) {
-        this.render(this.rounds)
+      this.$data.chartData = this.prepareData(this.$props.rounds)
     }
   },
   mounted() {
-    this.render(this.rounds)
+    this.$data.chartData = this.prepareData(this.$props.rounds)
+    const vueThis: any = this as any
+    vueThis.renderChart(this.chartData, this.options)
   },
-  methods: {
-    render(rounds: ApiRound[]) {
-        let renderData = this.prepareData(rounds)
-        const vueThis: any = this as any
-        vueThis.renderChart(renderData, {
+  data () {
+      return {
+          chartData: {
+            labels: [],
+            datasets: [],
+          },
+          options: {
             responsive: true,
             maintainAspectRatio: false,
             legend: { position: 'bottom' }
-        })
-    },
+          }
+      }
+  },
+  methods: {
     prepareData(rounds: ApiRound[]) {
       // label round numbers
       const labels: any[] = rounds.slice(0, rounds.length - 1).map(value => {
@@ -48,7 +55,8 @@ const PriceDevelopmentChart = Vue.extend({
           return {
             label: good.name,
             data: pricesPerGood[index],
-            fill: false,
+            fill: true,
+            pointRadius: 0,
             steppedLine: true
           }
         }
@@ -59,8 +67,7 @@ const PriceDevelopmentChart = Vue.extend({
         datasets: data
       }
     }
-  },
-  extends: Line
+  }
 })
 
 export default PriceDevelopmentChart
