@@ -2,30 +2,55 @@
   <div id="app" class="d-flex flex-column">
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
       <div class="container">
-      <a class="navbar-brand" href="#">Home</a>
+        <a class="navbar-brand" href="#">Home</a>
 
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-toggle="collapse"
+          data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <router-link tag="a" class="nav-link" :to="{ name: 'auction-list' }">Previous Auctions</router-link>
-          </li>
-        </ul>
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">Create new Auction</router-link>
-          </li>
-        </ul>
-      </div>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item" v-intro="'Click here to get an overview over past auctions.'">
+              <router-link tag="a" class="nav-link" :to="{ name: 'auction-list' }">Previous Auctions</router-link>
+            </li>
+          </ul>
+          <ul class="navbar-nav">
+            <li class="nav-item" v-intro="'Click here to create a new auction.'">
+              <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }"
+                >Create new Auction</router-link
+              >
+            </li>
+          </ul>
+        </div>
+        <button class="btn btn-light" v-intro="'You can restart this tour anytime.'" @click="showTutorial">Show tutorial</button>
       </div>
     </nav>
 
     <router-view />
   </div>
 </template>
+
+<script lang="ts">
+import Vue from 'vue'
+export default Vue.extend({
+  methods: {
+    showTutorial() {
+      this.$intro().showHints()
+      this.$intro()
+        .setOptions({ showStepNumbers: false })
+        .start()
+    }
+  }
+})
+</script>
 
 <style lang="scss" scoped>
 #app {
@@ -36,7 +61,7 @@
 }
 
 .content {
-  flex: 1 0 auto
+  flex: 1 0 auto;
 }
 
 #nav {

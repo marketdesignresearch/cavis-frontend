@@ -25,6 +25,17 @@ library.add(faUserCircle, faCoins, faDollarSign, faWrench, faTrashAlt, faSort, f
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
+// Intro.js
+import VueIntro from 'vue-introjs'
+declare module 'vue/types/vue' {
+  interface Vue {
+    readonly $intro: any
+  }
+}
+Vue.use(VueIntro)
+import 'intro.js/introjs.css'
+import 'intro.js/themes/introjs-modern.css'
+
 import 'nprogress/nprogress.css'
 import './custom.scss'
 import { ApiAuctionType } from './store/modules/auction'
