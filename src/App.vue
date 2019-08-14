@@ -22,6 +22,14 @@
               <router-link tag="a" class="nav-link" :to="{ name: 'auction-list' }">Previous Auctions</router-link>
             </li>
           </ul>
+          <ul class="navbar-nav pr-3">
+          <li class="nav-item">
+            <a class="nav-link" href="/docs" target="_blank">Documentation</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/docs/#/faq" target="_blank">FAQ</a>
+          </li>
+          </ul>
           <ul class="navbar-nav">
             <li class="nav-item" v-intro="'Click here to create a new auction.'">
               <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">
