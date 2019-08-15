@@ -12,7 +12,6 @@ ENV NODE_ENV production
 
 # copy src
 COPY . /app/
-COPY .env.production .env
 
 # compile to check for errors
 RUN npm run build
