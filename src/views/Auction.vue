@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <div class="bg-white">
+    <div class="bg-light">
       <div class="container bottom-container">
         <div class="text-center" v-if="!selectedBidder">
           <h4 class="text-muted">select bidder to view details</h4>
@@ -222,7 +222,7 @@ export default Vue.extend({
     
     span {
       font-weight: bolder;
-      background: $body-bg;
+      background: $light;
       border-radius: 10px;
       padding: 5px;
     }
@@ -237,20 +237,15 @@ export default Vue.extend({
     bottom: -35px;
 
     border-radius: 35px;
-
-    background: white;
+    background: $light;
   }
 
   margin: 0 50px;
 
-  border-color: darken($body-bg, 10%);
+  border-color: darken($light, 5%);
   border-width: 3px;
   border-style: solid;
   border-radius: 50px;
-
-  &.selected {
-    // background-color: white;
-  }
 }
 
 .auction-view {

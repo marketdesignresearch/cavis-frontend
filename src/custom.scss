@@ -24,7 +24,7 @@ $container-max-widths: (
   xl: 1340px
 );
 
-$body-bg: darken(white, 5%);
+$body-bg: white;
 
 @import 'node_modules/bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-vue/src/index.scss';

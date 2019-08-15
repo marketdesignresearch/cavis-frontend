@@ -39,7 +39,7 @@ export default Vue.extend({
 
   cursor: pointer;
   user-select: none;
-  background-color: white;
+  background-color: darken($body-bg, 5%);
   padding: 10px;
   padding-top: 25px;
   height: 70px;

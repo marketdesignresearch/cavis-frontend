@@ -75,6 +75,8 @@
         <button @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
       </div>
     </b-collapse>
+
+    <hr class="py-3">
   </div>
 </template>
 
