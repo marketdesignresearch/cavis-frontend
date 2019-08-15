@@ -4,7 +4,7 @@ import Vue from 'vue'
 import auction, { ApiRound } from '../../../store/modules/auction'
 const { reactiveData } = mixins
 
-const PriceDevelopmentChart = Vue.extend({
+const OverDemandChart = Vue.extend({
   extends: Line,
   props: ['rounds', 'goodIds'],
   mounted () {
@@ -25,7 +25,7 @@ const PriceDevelopmentChart = Vue.extend({
               yAxes: [{
                 scaleLabel: {
                   display: true,
-                  labelString: 'Price'
+                  labelString: 'Overdemand'
                 },
                 ticks: {
                     beginAtZero: true
@@ -37,7 +37,7 @@ const PriceDevelopmentChart = Vue.extend({
   },
   methods: {
     updateChart() {
-      ;(this as any).renderChart(this.prepareData(this.$props.rounds.filter((round: ApiRound)  => round.prices)), this.$data.options)
+      ;(this as any).renderChart(this.prepareData(this.$props.rounds.filter((round: ApiRound)  => round.overDemand)), this.$data.options)
     },
     prepareData(rounds: ApiRound[]) {
       // label round numbers
@@ -45,15 +45,15 @@ const PriceDevelopmentChart = Vue.extend({
           return value.roundNumber
       })
 
-      let goodIds = Object.keys(rounds[0].prices!) 
+      let goodIds = Object.keys(rounds[0].overDemand!) 
 
       if (this.$props.goodIds && this.$props.goodIds.length > 0) {
         goodIds = this.$props.goodIds
       }
 
-      const pricesPerGood = goodIds.map(goodId => {
+      const overDemandPerGood = goodIds.map(goodId => {
           return rounds.map(value => {
-              return value.prices![goodId]
+              return value.overDemand![goodId]
           })
       })
 
@@ -62,7 +62,7 @@ const PriceDevelopmentChart = Vue.extend({
           const good = auction.goodById()(value)
           return {
             label: good.name,
-            data: pricesPerGood[index]
+            data: overDemandPerGood[index]
           }
         }
       )
@@ -75,8 +75,8 @@ const PriceDevelopmentChart = Vue.extend({
   }
 })
 
-export default PriceDevelopmentChart
-export { PriceDevelopmentChart }
+export default OverDemandChart
+export { OverDemandChart }
 </script>
 
 <style scoped lang="scss">

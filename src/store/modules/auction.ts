@@ -99,6 +99,9 @@ export interface ApiRound {
   bids: ApiBid[]
   prices?: {
     [x: string]: number
+  },
+  overDemand?: {
+    [x: string]: number
   }
   outcome?: ApiAuctionAllocation
 }

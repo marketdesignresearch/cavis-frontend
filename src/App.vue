@@ -24,13 +24,15 @@
           </ul>
           <ul class="navbar-nav">
             <li class="nav-item" v-intro="'Click here to create a new auction.'">
-              <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }"
-                >Create new Auction</router-link
-              >
+              <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">
+                Create new Auction
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link btn ml-2 btn-secondary text-white" v-intro="'You can restart this tour anytime.'" @click="showTutorial">Tutorial</button>
             </li>
           </ul>
         </div>
-        <button class="btn btn-light" v-intro="'You can restart this tour anytime.'" @click="showTutorial">Show tutorial</button>
       </div>
     </nav>
 

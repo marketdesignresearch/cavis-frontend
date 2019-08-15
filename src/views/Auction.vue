@@ -23,8 +23,18 @@
                     <AuctionGood class="align-self-center d-inline-flex" :goodId="goodId" :auctionId="auctionId" />
                   </span>
 
-                  <div class="pb-3">
-                    <button v-if="selectedGoods.length > 0" class="btn btn-outline-secondary btn-sm mt-4" @click="deselect">Deselect All</button>
+                  <b-modal id="modal-price-development" title="Price Development">
+                    <price-development-chart :rounds="apiRounds" :goodIds="selectedGoods" />
+                  </b-modal>
+
+                  <b-modal id="modal-over-demand" title="Over-Demand">
+                    <over-demand-chart :rounds="apiRounds" :goodIds="selectedGoods" />
+                  </b-modal>
+
+                  <div class="pb-3 mt-4" v-if="selectedGoods.length > 0">
+                    <button class="btn btn-outline-secondary btn-sm mx-1" @click="deselect">Deselect All</button>
+                    <button v-if="isCCA" class="btn btn-outline-success btn-sm mx-1" v-b-modal.modal-price-development>Price Development</button>
+                    <button v-if="isCCA" class="btn btn-outline-success btn-sm mx-1" v-b-modal.modal-over-demand>Over-Demand History</button>
                   </div>
 
                   <div class="goods-bidder" v-if="selectedBidder">
@@ -75,7 +85,7 @@ import AuctionBidder from '@/components/auction/Bidder.vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
-import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid, ApiBundleEntry, ApiBundleValue, ApiBundleEntryWrapper } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid, ApiBundleEntry, ApiBundleValue, ApiBundleEntryWrapper, ApiRound } from '../store/modules/auction'
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 import selection, { SelectionState } from '../store/modules/selection'
 import { mapGetters, mapState } from 'vuex'
@@ -89,7 +99,9 @@ export default Vue.extend({
     Auctioneer: Auctioneer,
     BidderControl: BidderControl,
     'good-badge': GoodBadgeComponent,
-    'bidder-circle': BidderCircleVue
+    'bidder-circle': BidderCircleVue,
+    'price-development-chart': () => import('@/components/auction/charts/PriceDevelopmentChart.vue'),
+    'over-demand-chart': () => import('@/components/auction/charts/OverDemandChart.vue')
   },
   data() {
     return {
@@ -153,6 +165,14 @@ export default Vue.extend({
     },
     rounds(): number[] {
       return Array.from({ length: auction.auctionById()(this.$route.params.id).auction.rounds.length + 1 }, (v, k) => k)
+    },
+    apiRounds(): ApiRound[] {
+      const currentAuction = auction.auctionById()(this.$route.params.id)
+      return currentAuction ? currentAuction.auction.rounds : []
+    },
+    isCCA(): boolean {
+      const currentAuction = auction.auctionById()(this.$route.params.id)
+      return currentAuction.auctionType.startsWith('CCA')
     },
     leftSideBidders() {
       const bidders = auction.biddersById()(this.$route.params.id)

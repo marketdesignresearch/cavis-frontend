@@ -68,11 +68,6 @@
             </tbody>
           </table>
         </b-tab>
-        <!--
-        <b-tab title="Price Development">
-          <price-development-chart :rounds="rounds" />
-        </b-tab>
-        -->
       </b-tabs>
 
       <div class="text-right py-3">
@@ -107,8 +102,7 @@ export default Vue.extend({
   props: ['auction'],
   components: {
     'good-badge': GoodBadgeComponent,
-    'auction-static-information': () => import('./rounds/StaticInformation.vue'),
-    'price-development-chart': () => import('./charts/PriceDevelopmentChart.vue')
+    'auction-static-information': () => import('./rounds/StaticInformation.vue')
   },
   watch: {
     selectedRound(currentValue) {
