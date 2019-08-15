@@ -1,6 +1,6 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
-    <div class="small text-secondary bold">Current Strategy:</div>
+    <div class="small text-secondary font-weight-bold pl-2 pb-2">Current Strategy</div>
     
     <b-form-select v-model="strategy.selected" @change="strategyChanged" :options="strategy.options"></b-form-select>
       
