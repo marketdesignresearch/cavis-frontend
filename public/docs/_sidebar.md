@@ -1,4 +1,4 @@
 - [Home](/)
-- [Tutorial](tutorial.md)
+- [Getting Started](getting-started.md)
 - [Historic Auction Examples](historic-auctions.md)
 - [FAQ](faq.md)

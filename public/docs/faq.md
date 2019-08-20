@@ -1,3 +1,12 @@
 # FAQ
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+## Which auction formats are included in CAVis?
+
+The following auction formats are included:
+
+- Single Item Auctions (First Price & Second Price)
+- Simultaneous Multi Item Auctions (without bundle bids, First Price & Second Price)
+- Sequential Multi Item Auctions (one item after the other, First Price & Second Price)
+- VCG auction
+- Combinatorial Clock Auction (CCA)
+- PVM auction

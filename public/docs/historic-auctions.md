@@ -1,4 +1,4 @@
-# Historic Auctions
+# Historic Auction Examples
 
 ## New Zealand 1990
 
