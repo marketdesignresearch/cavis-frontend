@@ -29,7 +29,7 @@ import auction, {
 export default Vue.extend({
   name: 'AuctionSetupView',
   components: {
-    AuctionSetup: AuctionSetup
+    AuctionSetup: () => import('@/components/auction/setup/AuctionDefaultConfiguration.vue')
   },
   computed: {
     modelValue (): any {
@@ -46,7 +46,17 @@ export default Vue.extend({
           bidders: [],
           goods: []
         },
-        auctionType: model.auctionType
+        auctionType: model.auctionType,
+        maxBids: model.maxBids,
+        demandQueryTimeLimit: model.demandQueryTimeLimit
+      }
+
+      if (model.auctionType === ApiAuctionType.CCA) {
+        auctionObj.ccaConfig = model.ccaConfig
+      }
+      
+      if (model.auctionType === ApiAuctionType.PVM) {
+        auctionObj.pvmConfig = model.pvmConfig
       }
 
       for (let i = 0; i < model.numberOfBidders; i++) {
@@ -141,7 +151,7 @@ export default Vue.extend({
             numberOfBidders: 4,
             numberOfGoods: 4,
             domainType: 'unitDemandValue',
-            auctionType: ApiAuctionType.CCA_VCG,
+            auctionType: ApiAuctionType.CCA,
             defaultStrategy: ApiBidderStrategy.TRUTHFUL,
             bidder: {
               min: 100000,

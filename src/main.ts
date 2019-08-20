@@ -18,10 +18,22 @@ Vue.use(BootstrapVue)
 
 // font-awesome
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserCircle, faCoins, faWrench, faTrashAlt, faSort, faSortUp, faSortDown, faDollarSign } from '@fortawesome/free-solid-svg-icons'
+import {
+  faUserCircle,
+  faCoins,
+  faWrench,
+  faTrashAlt,
+  faSort,
+  faSortUp,
+  faSortDown,
+  faDollarSign,
+  faEdit,
+  faCheck,
+  faTimes
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faUserCircle, faCoins, faDollarSign, faWrench, faTrashAlt, faSort, faSortUp, faSortDown)
+library.add(faUserCircle, faCoins, faDollarSign, faWrench, faTrashAlt, faSort, faSortUp, faSortDown, faEdit, faCheck, faTimes)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
@@ -47,11 +59,9 @@ Vue.component('component-bid-' + ApiAuctionType.SEQUENTIAL_FIRST_PRICE, BundleBi
 Vue.component('component-bid-' + ApiAuctionType.SEQUENTIAL_SECOND_PRICE, BundleBid)
 Vue.component('component-bid-' + ApiAuctionType.SIMULTANEOUS_FIRST_PRICE, BundleBid)
 Vue.component('component-bid-' + ApiAuctionType.SIMULTANEOUS_SECOND_PRICE, BundleBid)
-Vue.component('component-bid-' + ApiAuctionType.VCG_XOR, BundleBid)
-Vue.component('component-bid-' + ApiAuctionType.CCA_VCG, BundleBid)
-//Vue.component('component-bid-' + ApiAuctionType.CCA_CCG, BundleBid)
-Vue.component('component-bid-' + ApiAuctionType.PVM_VCG, BundleBid)
-//Vue.component('component-bid-' + ApiAuctionType.PVM_CCG, BundleBid)
+Vue.component('component-bid-' + ApiAuctionType.VCG, BundleBid)
+Vue.component('component-bid-' + ApiAuctionType.CCA, BundleBid)
+Vue.component('component-bid-' + ApiAuctionType.PVM, BundleBid)
 
 // register auction-specific round-control
 Vue.component('component-round-' + ApiAuctionType.SINGLE_ITEM_FIRST_PRICE, SingleRound)
@@ -60,11 +70,9 @@ Vue.component('component-round-' + ApiAuctionType.SEQUENTIAL_FIRST_PRICE, MultiR
 Vue.component('component-round-' + ApiAuctionType.SEQUENTIAL_SECOND_PRICE, MultiRound)
 Vue.component('component-round-' + ApiAuctionType.SIMULTANEOUS_FIRST_PRICE, SingleRound)
 Vue.component('component-round-' + ApiAuctionType.SIMULTANEOUS_SECOND_PRICE, SingleRound)
-Vue.component('component-round-' + ApiAuctionType.VCG_XOR, SingleRound)
-Vue.component('component-round-' + ApiAuctionType.CCA_VCG, MultiRound)
-//Vue.component('component-round-' + ApiAuctionType.CCA_CCG, CCARound)
-Vue.component('component-round-' + ApiAuctionType.PVM_VCG, MultiRound)
-//Vue.component('component-round-' + ApiAuctionType.PVM_CCG, CCARound)
+Vue.component('component-round-' + ApiAuctionType.VCG, SingleRound)
+Vue.component('component-round-' + ApiAuctionType.CCA, MultiRound)
+Vue.component('component-round-' + ApiAuctionType.PVM, MultiRound)
 
 new Vue({
   router,

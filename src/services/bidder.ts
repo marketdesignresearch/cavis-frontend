@@ -26,6 +26,7 @@ export default {
       const correctValue = bidder.value.bundleValues.find((bid: ApiBundleValue) => {
         return bid.bundle.hash === hashBundle(bundle.entries)
       })
+
       return correctValue ? correctValue.value : null
     }
     return 0

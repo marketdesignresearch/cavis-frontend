@@ -24,7 +24,7 @@ export default Vue.extend({
           return 'Simultaneous Multi-Item First Price Auction'
         case ApiAuctionType.SIMULTANEOUS_FIRST_PRICE:
           return 'Simultaneous Multi-Item Second Price Auction'
-        case ApiAuctionType.VCG_XOR:
+        case ApiAuctionType.VCG:
           return 'VCG Auction'
         default:
           return ''

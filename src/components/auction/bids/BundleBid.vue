@@ -1,8 +1,13 @@
 <template>
   <div>
-    <div class="input-group" v-if="selectedGoods.length > 0 && bidsLeft && bidsAllowed">
-      <input v-model="bid" type="text" class="form-control" placeholder="Your Bid" :disabled="bidEditable || alreadyBid" />
-      <button @click="placeBid" :disabled="alreadyBid" class="btn btn-primary btn-sm float-right">Bid</button>
+    <div class="input-group btn-group" v-if="selectedGoods.length > 0 && bidsLeft && bidsAllowed" @click.stop>
+      <input v-model="bid" type="text" class="form-control w-75" placeholder="Your Bid" :disabled="bidEditable" />
+      <button @click="placeBid" class="btn btn-primary btn-sm float-right">
+        <font-awesome-icon icon="check" />
+      </button>
+      <button @click="cancel" class="btn btn-warning btn-sm float-right">
+        <font-awesome-icon icon="times" />
+      </button>
     </div>
     <div v-if="!bidsLeft" class="text-center">
       You have reached the maximum amount of bids.
@@ -77,6 +82,9 @@ export default Vue.extend({
       return !restrictedBids[bidderId] || restrictedBids[bidderId].some(value => value.hash === selectedBundle.hash)
     }
   },
+  mounted () {
+    ;(this as any).determineBid()
+  },
   watch: {
     selectedGoods() {
       ;(this as any).determineBid()
@@ -88,15 +96,28 @@ export default Vue.extend({
   methods: {
     async determineBid() {
       const bidderId = selection.selectedBidder()
+      const selectedBundle = selection.selectedBundle()
 
       if (bidderId) {
         const bundle = selection.selectedGoods().map(goodId => {
           return { good: goodId, amount: 1 } // FIXME
         })
-        this.$data.bid = await BidderService.bidForBundle(bidderId, { hash: hashBundle(bundle), entries: bundle }, this.$props.auctionId)
+
+        const currentBid = GoodsService.bidForGood({ hash: hashBundle(bundle), entries: bundle }, selection.selectedBidder()!)
+
+        if (currentBid) {
+          this.$data.bid = currentBid
+        } else {
+          this.$data.bid = await BidderService.bidForBundle(bidderId, { hash: hashBundle(bundle), entries: bundle }, this.$props.auctionId)
+        }
       }
     },
     placeBid() {
+      // remove existing bid first
+      if (GoodsService.bidForGood(selection.selectedBundle(), selection.selectedBidder()!)) {
+        BidderService.removeBid(selection.selectedBidder()!, selection.selectedBundle())
+      }
+
       const bidderId = selection.selectedBidder()
 
       if (!bidderId) {
@@ -121,6 +142,11 @@ export default Vue.extend({
         bidderId: bidderId,
         bid: bid
       })
+
+      this.$emit('cancel')
+    },
+    cancel() {
+      this.$emit('cancel')
     }
   },
   name: 'BundleBid'

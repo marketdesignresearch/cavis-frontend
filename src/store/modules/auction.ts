@@ -4,6 +4,7 @@ import { getStoreBuilder, BareActionContext } from 'vuex-typex'
 import { RootState } from '..'
 import { normalize } from 'normalizr'
 import { auctionSchema } from './schemas'
+import selection from './selection'
 
 export interface AuctionState {
   bidders: {
@@ -24,12 +25,14 @@ export enum ApiAuctionType {
   SEQUENTIAL_SECOND_PRICE = 'SEQUENTIAL_SECOND_PRICE',
   SIMULTANEOUS_FIRST_PRICE = 'SIMULTANEOUS_FIRST_PRICE',
   SIMULTANEOUS_SECOND_PRICE = 'SIMULTANEOUS_SECOND_PRICE',
-  VCG_XOR = 'VCG_XOR',
-  VCG_OR = 'VCG_OR',
-  CCA_VCG = 'CCA_VCG',
-  CCA_CCG = 'CCA_CCG',
-  PVM_VCG = 'PVM_VCG',
-  PVM_CCG = 'PVM_CCG'
+  VCG = 'VCG',
+  CCA = 'CCA',
+  PVM = 'PVM'
+}
+
+export enum ApiAuctionPaymentRule {
+  VCG = 'VCG',
+  CCG = 'CCG'
 }
 
 export enum ApiMechanismType {
@@ -63,7 +66,28 @@ export interface ApiAuctionCreateDTO {
     bidders: ApiBidderCreateDTO[]
     goods: ApiGood[]
   }
+  maxBids?: number
+  demandQueryTimeLimit?: number
+  reservePrices?: Map<string, number>
+  useProposedReservePrices?: boolean
+  ccaConfig?: {
+    supplementaryBids: number
+    priceUpdate: number
+    initialPriceUpdateIfPriceEqualsZero: number
+    paymentRule: ApiAuctionPaymentRule
+    maxRounds: number
+  }
+  pvmConfig?: {
+    initialRoundBid: number
+    paymentRule: ApiAuctionPaymentRule
+    maxRounds: number
+  }
   auctionType: ApiAuctionType
+}
+
+export enum ApiAuctionOutcomeRule {
+  VCG_XOR = 'VCG_XOR',
+  CCG = 'CCG'
 }
 
 export interface ApiAuction {
@@ -89,6 +113,7 @@ export interface ApiAuction {
     }
     allowedNumberOfBids: number
     rounds: ApiRound[]
+    outcomeRule: ApiAuctionOutcomeRule
   }
   auctionType: ApiAuctionType
   result?: ApiAuctionAllocation
@@ -99,7 +124,7 @@ export interface ApiRound {
   bids: ApiBid[]
   prices?: {
     [x: string]: number
-  },
+  }
   overDemand?: {
     [x: string]: number
   }
@@ -414,6 +439,9 @@ async function resetAuctionToRound(
   bids.forEach((bid: ApiBid) => {
     auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
   })
+
+  // unselect all after reset
+  selection.commitUnselectAll()
 }
 
 async function advanceRound(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {

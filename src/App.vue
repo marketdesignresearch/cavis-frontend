@@ -37,7 +37,7 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <button class="nav-link btn ml-2 btn-secondary text-white" v-intro="'You can restart this tour anytime.'" @click="showTutorial">Tutorial</button>
+              <button class="nav-link btn ml-2 btn-secondary text-white" v-intro="'You can restart this tour anytime.'" @click="showHelp">Help</button>
             </li>
           </ul>
         </div>
@@ -52,7 +52,7 @@
 import Vue from 'vue'
 export default Vue.extend({
   methods: {
-    showTutorial() {
+    showHelp() {
       this.$intro().showHints()
       this.$intro()
         .setOptions({ showStepNumbers: false })

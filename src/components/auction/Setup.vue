@@ -40,10 +40,9 @@ export default Vue.extend({
               { name: 'Sequential Second Price Auction', id: ApiAuctionType.SEQUENTIAL_SECOND_PRICE },
               { name: 'Simultaneous First Price Auction', id: ApiAuctionType.SIMULTANEOUS_FIRST_PRICE },
               { name: 'Simultaneous Second Price Auction', id: ApiAuctionType.SIMULTANEOUS_SECOND_PRICE },
-              { name: 'VCG Auction', id: ApiAuctionType.VCG_XOR },
-              { name: 'Combinatorial Clock Auction (CCA)', id: ApiAuctionType.CCA_VCG },
-              // { name: 'CCA-CCG Auction', id: 'CCA_CCG' },
-              { name: 'PVM Auction', id: ApiAuctionType.PVM_VCG }
+              { name: 'VCG Auction', id: ApiAuctionType.VCG },
+              { name: 'Combinatorial Clock Auction (CCA)', id: ApiAuctionType.CCA },
+              { name: 'PVM Auction', id: ApiAuctionType.PVM }
             ],
             validator: VueFormGenerator.validators.required
           },

@@ -18,13 +18,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr>
+            <tr :class="{ 'active': selectedBundle.entries.length > 0 }">
               <td><good-badge :ids="selectedBundle.entries" /></td>
               <td>{{ valueForGood(selectedBundle) | formatNumber }}</td>
               <td v-if="pricedAuction">{{ priceForGood(selectedBundle) | formatNumber }}</td>
               <td v-if="pricedAuction">{{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
               <td>
-                <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId"></component>
+                <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId" @cancel="unselect"></component>
               </td>
               <td class="text-right">
                 <button v-if="bidForGood(selectedBundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(selectedBundle)">
@@ -47,16 +47,21 @@
             <tr
               v-for="(bundle, index) in goodCombinations"
               :key="'set' + index"
-              :class="{ active: isActive(bundle), disabled: !isAllowed(bundle) }"
+              :class="{ active: bundle.hash === selectedBundleHash, disabled: !isAllowed(bundle) }"
               @click="selectGoods(bundle)"
             >
               <td><good-badge :ids="bundle.entries" /></td>
               <td>{{ bundle.value | formatNumber }}</td>
               <td v-if="pricedAuction">{{ bundle.price | formatNumber }}</td>
               <td v-if="pricedAuction">{{ bundle.utility | formatNumber }}</td>
-              <td>{{ bundle.bid | formatNumber }}</td>
+              <td @click.stop>
+                <component v-if="selectedBundleHash && selectedBundleHash === bundle.hash" :is="'component-bid-' + auctionType" :auctionId="auctionId" @cancel="unselect"></component>
+                <span v-if="selectedBundleHash !== bundle.hash">
+                  {{ bundle.bid | formatNumber }} <font-awesome-icon class="ml-2" @click.stop="selectedBundleHash = bundle.hash; selectGoods(bundle, false)" icon="edit" />
+                </span>
+              </td>
               <td class="text-right">
-                <button v-if="bundle.bid" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">
+                <button v-if="bundle.bid !== null" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">
                   Remove Bid <font-awesome-icon icon="trash-alt" />
                 </button>
               </td>
@@ -94,6 +99,7 @@ export default Vue.extend({
   },
   data () {
     return {
+      selectedBundleHash: null,
       sort: {
         sortBy: 'value',
         sortASC: false
@@ -206,9 +212,15 @@ export default Vue.extend({
       if (!this.$props.selectedGoods) {
         return false
       }
-      return goods.hash === hashBundle(this.$props.selectedGoods)
+      return goods.hash === selection.selectedBundle().hash
     },
-    selectGoods(bundle: ApiBundleEntryWrapper) {
+    unselect() {
+      this.$data.selectedBundleHash = null
+    },
+    selectGoods(bundle: ApiBundleEntryWrapper, nullSelected = true) {
+      if (nullSelected) {
+        this.$data.selectedBundleHash = null
+      }
       selection.commitUnselectGoods()
       bundle.entries.forEach(entry => selection.commitSelectGood({ goodId: entry.good }))
     },

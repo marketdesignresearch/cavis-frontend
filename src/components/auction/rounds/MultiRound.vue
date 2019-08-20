@@ -26,7 +26,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound, ApiMechanismType } from '../../../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound } from '../../../store/modules/auction'
 import selection from '../../../store/modules/selection'
 import RoundMixinVue from './RoundMixin.vue'
 
@@ -40,9 +40,9 @@ export default Vue.extend({
           return 'Sequential First-Price'
         case ApiAuctionType.SEQUENTIAL_SECOND_PRICE:
           return 'Sequential Second-Price'
-        case ApiAuctionType.CCA_VCG:
+        case ApiAuctionType.CCA:
           return 'Combinatorial Clock Auction (CCA)'
-        case ApiAuctionType.PVM_VCG:
+        case ApiAuctionType.PVM:
           return 'PVM Auction'
         default:
           return ''

@@ -67,13 +67,15 @@
               </tr>
             </tbody>
           </table>
+
+          <div class="text-right py-3">
+            <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">Reset to Round #{{ round.roundNumber }}</button>
+            <button @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
+            <button v-if="isMultiPhase" @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
+          </div>
         </b-tab>
       </b-tabs>
 
-      <div class="text-right py-3">
-        <button @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
-        <button @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
-      </div>
     </b-collapse>
 
     <hr class="py-3">
@@ -137,6 +139,10 @@ export default Vue.extend({
   computed: {
     roundType(): string {
       return 'component-round-' + this.$props.auction.auctionType
+    },
+    isMultiPhase(): boolean {
+      const currentAuction = auction.auctionById()(this.$props.auction.id)
+      return true
     },
     currentRound(): ApiRound | null {
       const rounds = this.$props.auction.auction.rounds
@@ -246,6 +252,9 @@ export default Vue.extend({
     },
     resetAuction() {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: 0, standardBids: true })
+    },
+    resetRound(round: number) {
+      auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: round })
     }
   }
 })
