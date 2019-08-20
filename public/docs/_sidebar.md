@@ -1,5 +1,4 @@
-* [Home](/)
-* [Tutorial](tutorial.md)
-    * [Getting Started](tutorial.md#getting-started)
-
-* [FAQ](faq.md)
+- [Home](/)
+- [Getting Started](getting-started.md)
+- [Historic Auction Examples](historic-auctions.md)
+- [FAQ](faq.md)

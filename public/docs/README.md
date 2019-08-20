@@ -1,10 +1,17 @@
-# Combinatorial Auction Visualizer
+# Welcome {docsify-ignore-all}
 
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+You have found the Combinatorial Auction Visualizer (CAVis) - an online, interactive platform for **combinatorial auctions**. The goal is that students/instructors/researchers can use this platform to learn about different auction formats and their advantages and disadvantages in an interactive way.
+
+In this documentation, you will find plenty of relevant information about how to use the software and some background information about certain interesting problems that arose in combinatorial auctions from the past.
 
 ## About
-Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. 
 
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. 
+CAVis was developed at the [University of Zurich](https://www.uzh.ch/) in collaboration with [Boston University](https://www.bu.edu/).
 
-Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. 
+CAVis is an open-source web application, published under the GNU Affero license (Contributions are welcome!).
+The source code of all components is [published](https://github.com/marketdesignresearch/) on GitHub.
+
+Notable dependencies (each also developed and open-sourced by us) that enable this visualization are:
+
+- [Mechanism Library](https://github.com/marketdesignresearch/mechlib/): A java library that provides the core concepts for several kinds of market mechanisms
+- [SATS](http://spectrumauctions.org/): A "Spectrum Auction Test Suite" that provides the models and Winner Determination Problems of several spectrum auction domains
