@@ -59,13 +59,26 @@ export default Vue.extend({
         auctionObj.pvmConfig = model.pvmConfig
       }
 
-      for (let i = 0; i < model.numberOfBidders; i++) {
-        auctionObj.domain.bidders.push({
-          name: `${i + 1}`,
-          defaultStrategy: model.defaultStrategy,
-          min: model.bidder.min,
-          max: model.bidder.max
-        })
+      switch (model.domainType) {
+        case 'gsvm':
+          auctionObj.domain.numberOfNationalBidders = model.gsvmConfig.numberOfNationalBidders
+          auctionObj.domain.numberOfRegionalBidders = model.gsvmConfig.numberOfRegionalBidders
+          break
+        case 'lsvm':
+          auctionObj.domain.numberOfNationalBidders = model.lsvmConfig.numberOfNationalBidders
+          auctionObj.domain.numberOfRegionalBidders = model.lsvmConfig.numberOfRegionalBidders
+          break
+          break
+        default:
+          for (let i = 0; i < model.numberOfBidders; i++) {
+            auctionObj.domain.bidders.push({
+              name: `${i + 1}`,
+              defaultStrategy: model.defaultStrategy,
+              min: model.bidder.min,
+              max: model.bidder.max
+            })
+          }
+          break
       }
 
       const alphabet = [

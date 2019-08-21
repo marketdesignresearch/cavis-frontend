@@ -65,6 +65,8 @@ export interface ApiAuctionCreateDTO {
     type: ApiDomainType
     bidders: ApiBidderCreateDTO[]
     goods: ApiGood[]
+    numberOfNationalBidders?: number
+    numberOfRegionalBidders?: number
   }
   maxBids?: number
   demandQueryTimeLimit?: number
