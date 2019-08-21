@@ -9,14 +9,26 @@
         <div class="row">
           <div class="col">
             <div class="d-flex pt-4">
-              <div>
-                <span v-for="bidderId in leftSideBidders" :key="bidderId" @click="selectBidder(bidderId)">
+              <div v-intro="'This, together with the righ-hand side, visualizes the bidders that take part in the auction.'">
+                <span
+                  v-for="(bidderId, index) in leftSideBidders"
+                  :key="bidderId"
+                  @click="selectBidder(bidderId)"
+                  v-intro="
+                    'You can hover over the bidder to get more information, and click to interact (e.g., to bid for goods). Each round, it is calculated what the best bids would be given the bidder\'s strategy. Once this calculation has completed, a green circle appears around the bidder.'
+                  "
+                  v-intro-if="index === 0"
+                >
                   <AuctionBidder class="align-self-start" :auctionId="auctionId" :bidderId="bidderId" />
                 </span>
               </div>
 
               <div class="flex-row text-center flex-grow-1 mx-2">
-                <div class="goods-container justify-content-center" :class="{ selected: selectedBidder }">
+                <div
+                  class="goods-container justify-content-center"
+                  :class="{ selected: selectedBidder }"
+                  v-intro="'Here, you can see the goods that are auctioned off.'"
+                >
                   <div class="goods-title"><span>Goods</span></div>
 
                   <span v-for="goodId in goods" :key="goodId" @click="selectGood(goodId)">
@@ -33,8 +45,22 @@
 
                   <div class="pb-3 mt-4" v-if="selectedGoods.length > 0">
                     <button class="btn btn-outline-secondary btn-sm mx-1" @click="deselect">Deselect All</button>
-                    <button v-if="isCCA" class="btn btn-outline-success btn-sm mx-1" v-b-modal.modal-price-development>Price Development</button>
-                    <button v-if="isCCA" class="btn btn-outline-success btn-sm mx-1" v-b-modal.modal-over-demand>Over-Demand History</button>
+                    <button
+                      v-if="isCCA"
+                      class="btn btn-outline-success btn-sm mx-1"
+                      v-b-modal.modal-price-development
+                      v-intro="'This brings you to the publicly available information about past prices of the selected goods.'"
+                    >
+                      Price Development
+                    </button>
+                    <button
+                      v-if="isCCA"
+                      class="btn btn-outline-success btn-sm mx-1"
+                      v-b-modal.modal-over-demand
+                      v-intro="'Similarly, here you find the public information about past over-demand of the selected goods.'"
+                    >
+                      Over-Demand History
+                    </button>
                   </div>
 
                   <div class="goods-bidder" v-if="selectedBidder">
@@ -47,12 +73,9 @@
                         <good-badge :ids="selectedGoods" />
                       </div>
 
-                      <div class="col d-flex align-items-center justify-content-start">
-                        Value: {{ valueForGoods | formatNumber }}
-                      </div>
+                      <div class="col d-flex align-items-center justify-content-start">Value: {{ valueForGoods | formatNumber }}</div>
                     </div>
                   </div>
-
                 </div>
               </div>
 
@@ -68,7 +91,12 @@
     </div>
 
     <div class="bg-light">
-      <div class="container bottom-container">
+      <div
+        class="container bottom-container"
+        v-intro="
+          'If a bidder is selected, you can get more details about this bidder in this panel. This is also where you can manipulate the bids.'
+        "
+      >
         <div class="text-center" v-if="!selectedBidder">
           <h4 class="text-muted">select bidder to view details</h4>
         </div>
@@ -85,7 +113,17 @@ import AuctionBidder from '@/components/auction/Bidder.vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
-import auction, { ApiAuctionType, ApiGood, ApiAuction, ApiBidder, ApiBid, ApiBundleEntry, ApiBundleValue, ApiBundleEntryWrapper, ApiRound } from '../store/modules/auction'
+import auction, {
+  ApiAuctionType,
+  ApiGood,
+  ApiAuction,
+  ApiBidder,
+  ApiBid,
+  ApiBundleEntry,
+  ApiBundleValue,
+  ApiBundleEntryWrapper,
+  ApiRound
+} from '../store/modules/auction'
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 import selection, { SelectionState } from '../store/modules/selection'
 import { mapGetters, mapState } from 'vuex'
@@ -219,7 +257,7 @@ export default Vue.extend({
     position: relative;
     text-align: center;
     top: -15px;
-    
+
     span {
       font-weight: bolder;
       background: $light;

@@ -25,7 +25,11 @@
             <td>{{ auction.auction.domain.goods.length }}</td>
             <td>{{ auction.auction.domain.bidders.length }}</td>
             <td>{{ auction.auction.rounds.length }}</td>
-            <td class="text-right">
+            <td
+              class="text-right"
+              v-intro="'To load the auction, you can simply click on the button. To delete the auction, press on the small arrow.'"
+              v-intro-if="index === 0"
+            >
               <b-dropdown right variant="primary" split text="Load" class="m-2" :split-to="{ name: 'auction', params: { id: auction.id } }">
                 <b-dropdown-item @click="remove(auction.id)">Delete</b-dropdown-item>
               </b-dropdown>
