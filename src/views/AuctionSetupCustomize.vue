@@ -2,9 +2,9 @@
   <div>
     <div class="container">
       <h1>Setup an Auction</h1>
-      
-      <hr>
-      
+
+      <hr />
+
       <div class="row">
         <div class="col">
           <AuctionSetup @createAuction="createAuction" :modelValue="modelValue" />
@@ -32,7 +32,7 @@ export default Vue.extend({
     AuctionSetup: () => import('@/components/auction/setup/AuctionDefaultConfiguration.vue')
   },
   computed: {
-    modelValue (): any {
+    modelValue(): any {
       const value = this.historicDomains.find((obj: any) => obj.id === this.$route.query.domain)
       return value ? value.value : {}
     }
@@ -54,7 +54,7 @@ export default Vue.extend({
       if (model.auctionType === ApiAuctionType.CCA) {
         auctionObj.ccaConfig = model.ccaConfig
       }
-      
+
       if (model.auctionType === ApiAuctionType.PVM) {
         auctionObj.pvmConfig = model.pvmConfig
       }
@@ -114,23 +114,23 @@ export default Vue.extend({
           title: 'Custom',
           description: 'Build a custom auction instance, selecting your domain, mechanism and advanced parameters.'
         },
-        { 
+        {
           id: 'new-zealand-1990',
           value: {
             numberOfBidders: 6,
             numberOfGoods: 5,
             domainType: 'unitDemandValue',
-            auctionType: ApiAuctionType.SEQUENTIAL_SECOND_PRICE,
+            auctionType: ApiAuctionType.SIMULTANEOUS_SECOND_PRICE,
             defaultStrategy: ApiBidderStrategy.TRUTHFUL,
             bidder: {
               min: 0,
               max: 100000
-            },
-          }, 
+            }
+          },
           title: 'New Zealand (1990)',
           description: ''
         },
-        { 
+        {
           id: 'swiss-march-2000',
           value: {
             numberOfBidders: 6,
@@ -141,23 +141,23 @@ export default Vue.extend({
             bidder: {
               min: 100000,
               max: 1000000
-            },
-          }, 
+            }
+          },
           title: 'Swiss Wireless-Local-Loop Auction (March 2000)'
         },
-        { 
+        {
           id: 'swiss-december-2000',
           value: {
             numberOfBidders: 4,
             numberOfGoods: 4,
             domainType: 'unitDemandValue',
-            auctionType: ApiAuctionType.CCA,
+            auctionType: ApiAuctionType.SIMULTANEOUS_SECOND_PRICE,
             defaultStrategy: ApiBidderStrategy.TRUTHFUL,
             bidder: {
               min: 100000,
               max: 1000000
-            },
-          }, 
+            }
+          },
           title: 'Swiss UMTS Auction (December 2000)'
         }
       ]

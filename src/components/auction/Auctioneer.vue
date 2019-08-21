@@ -32,7 +32,7 @@
             <thead>
               <tr>
                 <th scope="col">Bidder</th>
-                <th scope="col" v-if="goodCombinations.length <= 10">
+                <th scope="col" v-if="goodCombinations.length <= 4">
                   <div>Values</div>
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
@@ -48,7 +48,7 @@
             <tbody>
               <tr v-for="bidder of bidders" :key="bidder.id">
                 <td>{{ bidder.shortDescription }}</td>
-                <td v-if="goodCombinations.length <= 10">
+                <td v-if="goodCombinations.length <= 4">
                   <div class="d-flex d-flex-column">
                     <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
                       {{ valueForGood(bidder, goodSet) | formatNumber }}
@@ -69,16 +69,17 @@
           </table>
 
           <div class="text-right py-3">
-            <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">Reset to Round #{{ round.roundNumber }}</button>
+            <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">
+              Reset to Round #{{ round.roundNumber }}
+            </button>
             <button @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
             <button v-if="isMultiPhase" @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
           </div>
         </b-tab>
       </b-tabs>
-
     </b-collapse>
 
-    <hr class="py-3">
+    <hr class="py-3" />
   </div>
 </template>
 
