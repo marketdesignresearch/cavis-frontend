@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div class="input-group btn-group" v-if="selectedGoods.length > 0 && bidsLeft && bidsAllowed" @click.stop>
+    <div
+      class="input-group btn-group"
+      v-if="selectedGoods.length > 0 && (bidsLeft || (!bidsLeft && alreadyBid)) && bidsAllowed"
+      @click.stop
+    >
       <input v-model="bid" type="text" class="form-control w-75" placeholder="Your Bid" :disabled="bidEditable" />
       <button @click="placeBid" class="btn btn-primary btn-sm float-right">
         <font-awesome-icon icon="check" />
@@ -9,7 +13,7 @@
         <font-awesome-icon icon="times" />
       </button>
     </div>
-    <div v-if="!bidsLeft" class="text-center">
+    <div v-if="!bidsLeft && !alreadyBid" class="text-center">
       You have reached the maximum amount of bids.
     </div>
     <div v-if="bidsLeft && !bidsAllowed" class="text-center">
@@ -82,7 +86,7 @@ export default Vue.extend({
       return !restrictedBids[bidderId] || restrictedBids[bidderId].some(value => value.hash === selectedBundle.hash)
     }
   },
-  mounted () {
+  mounted() {
     ;(this as any).determineBid()
   },
   watch: {

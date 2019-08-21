@@ -1,9 +1,9 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
     <div class="small text-secondary font-weight-bold pl-2 pb-2">Current Strategy</div>
-    
+
     <b-form-select v-model="strategy.selected" @change="strategyChanged" :options="strategy.options"></b-form-select>
-      
+
     <div>
       <div class="table-responsive">
         <table class="table table-bidder table-hover">
@@ -17,14 +17,14 @@
               <th class="w-12-5"></th>
             </tr>
           </thead>
-          <tbody>
-            <tr :class="{ 'active': selectedBundle.entries.length > 0 }">
+          <tbody class="border-bottom pb-3">
+            <tr :class="{ active: selectedBundle.entries.length > 0 }">
               <td><good-badge :ids="selectedBundle.entries" /></td>
               <td>{{ valueForGood(selectedBundle) | formatNumber }}</td>
               <td v-if="pricedAuction">{{ priceForGood(selectedBundle) | formatNumber }}</td>
               <td v-if="pricedAuction">{{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
               <td>
-                <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId" @cancel="unselect"></component>
+                <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId" @cancel="unselectAll"></component>
               </td>
               <td class="text-right">
                 <button v-if="bidForGood(selectedBundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(selectedBundle)">
@@ -35,11 +35,21 @@
           </tbody>
           <thead>
             <tr>
-              <th @click="sortBy('entriesString')" class="parentHover">Bundle <sort-marker :sortable="sort" :property="'entriesString'"></sort-marker></th>
-              <th @click="sortBy('value')" class="parentHover">Value <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'value'"></sort-marker></th>
-              <th @click="sortBy('price')" class="parentHover" v-if="pricedAuction">Price <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'price'"></sort-marker></th>
-              <th @click="sortBy('utility')" class="parentHover" v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /> <sort-marker :sortable="sort" :property="'utility'"></sort-marker></th>
-              <th @click="sortBy('bid')" class="parentHover w-25">Bid <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'bid'"></sort-marker></th>
+              <th @click="sortBy('entriesString')" class="parentHover">
+                Bundle <sort-marker :sortable="sort" :property="'entriesString'"></sort-marker>
+              </th>
+              <th @click="sortBy('value')" class="parentHover">
+                Value <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'value'"></sort-marker>
+              </th>
+              <th @click="sortBy('price')" class="parentHover" v-if="pricedAuction">
+                Price <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'price'"></sort-marker>
+              </th>
+              <th @click="sortBy('utility')" class="parentHover" v-if="pricedAuction">
+                Utility <font-awesome-icon icon="wrench" /> <sort-marker :sortable="sort" :property="'utility'"></sort-marker>
+              </th>
+              <th @click="sortBy('bid')" class="parentHover w-25">
+                Bid <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'bid'"></sort-marker>
+              </th>
               <th class="w-12-5"></th>
             </tr>
           </thead>
@@ -55,9 +65,22 @@
               <td v-if="pricedAuction">{{ bundle.price | formatNumber }}</td>
               <td v-if="pricedAuction">{{ bundle.utility | formatNumber }}</td>
               <td @click.stop>
-                <component v-if="selectedBundleHash && selectedBundleHash === bundle.hash" :is="'component-bid-' + auctionType" :auctionId="auctionId" @cancel="unselect"></component>
+                <component
+                  v-if="selectedBundleHash && selectedBundleHash === bundle.hash"
+                  :is="'component-bid-' + auctionType"
+                  :auctionId="auctionId"
+                  @cancel="unselect"
+                ></component>
                 <span v-if="selectedBundleHash !== bundle.hash">
-                  {{ bundle.bid | formatNumber }} <font-awesome-icon class="ml-2" @click.stop="selectedBundleHash = bundle.hash; selectGoods(bundle, false)" icon="edit" />
+                  {{ bundle.bid | formatNumber }}
+                  <font-awesome-icon
+                    class="ml-2"
+                    @click.stop="
+                      selectedBundleHash = bundle.hash
+                      selectGoods(bundle, false)
+                    "
+                    icon="edit"
+                  />
                 </span>
               </td>
               <td class="text-right">
@@ -75,7 +98,15 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiBidder, ApiBid, ApiGood, ApiBundleEntry, ApiBundleEntryWrapper, ApiBidderStrategy } from '../../store/modules/auction'
+import auction, {
+  ApiAuctionType,
+  ApiBidder,
+  ApiBid,
+  ApiGood,
+  ApiBundleEntry,
+  ApiBundleEntryWrapper,
+  ApiBidderStrategy
+} from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
 import BidderCircleVue from './BidderCircle.vue'
@@ -86,18 +117,18 @@ import SortMarker from '../utils/sort-marker.vue'
 
 export default Vue.extend({
   name: 'BidderControl',
-  components: { 
+  components: {
     'bidder-circle': BidderCircleVue,
     'good-badge': GoodBadgeComponent,
     'sort-marker': SortMarker
   },
   props: ['auctionId'],
   watch: {
-    'selectedBidderStrategy': function (newStrategy) {
+    selectedBidderStrategy: function(newStrategy) {
       this.strategy.selected = newStrategy
     }
   },
-  data () {
+  data() {
     return {
       selectedBundleHash: null,
       sort: {
@@ -106,10 +137,7 @@ export default Vue.extend({
       },
       strategy: {
         selected: ApiBidderStrategy.TRUTHFUL,
-        options: [
-          { value: ApiBidderStrategy.TRUTHFUL, text: 'Truthful' },
-          { value: ApiBidderStrategy.CUSTOM, text: 'Custom' }
-        ]
+        options: [{ value: ApiBidderStrategy.TRUTHFUL, text: 'Truthful' }, { value: ApiBidderStrategy.CUSTOM, text: 'Custom' }]
       }
     }
   },
@@ -142,26 +170,28 @@ export default Vue.extend({
       const bidderId = selection.selectedBidder()
       if (bidderId) {
         const apiBundleEntryWrapper = GoodsService.bundleForBidder(bidderId)
-        
-        const sortedArray = Array.from(apiBundleEntryWrapper).map(obj => {
-          const value = GoodsService.valueForGood(obj, selection.selectedBidder()!)
-          const price = GoodsService.priceForGood(this.$props.auctionId, obj, selection.selectedBidder()!)
-          const bid = GoodsService.bidForGood(obj, selection.selectedBidder()!)
-          return {
-            hash: obj.hash,
-            entries: obj.entries,
-            entriesString: obj.entries.map(entry => entry.good).join(),
-            value: value,
-            price: price,
-            utility: value! - price!,
-            bid: bid
-          }
-        }).sort((a, b) => {
-          if (!this.sort.sortASC) {
-            return (a as any)[this.sort.sortBy] >= (b as any)[this.sort.sortBy] ? -1 : 1
-          }
-          return (a as any)[this.sort.sortBy] < (b as any)[this.sort.sortBy] ? -1 : 1
-        })
+
+        const sortedArray = Array.from(apiBundleEntryWrapper)
+          .map(obj => {
+            const value = GoodsService.valueForGood(obj, selection.selectedBidder()!)
+            const price = GoodsService.priceForGood(this.$props.auctionId, obj, selection.selectedBidder()!)
+            const bid = GoodsService.bidForGood(obj, selection.selectedBidder()!)
+            return {
+              hash: obj.hash,
+              entries: obj.entries,
+              entriesString: obj.entries.map(entry => entry.good).join(),
+              value: value,
+              price: price,
+              utility: value! - price!,
+              bid: bid
+            }
+          })
+          .sort((a, b) => {
+            if (!this.sort.sortASC) {
+              return (a as any)[this.sort.sortBy] >= (b as any)[this.sort.sortBy] ? -1 : 1
+            }
+            return (a as any)[this.sort.sortBy] < (b as any)[this.sort.sortBy] ? -1 : 1
+          })
 
         return sortedArray
       }
@@ -178,7 +208,7 @@ export default Vue.extend({
       if (!this.selectedBidder) {
         return
       }
-      
+
       try {
         if (newStrategy === ApiBidderStrategy.TRUTHFUL && newStrategy !== oldStrategy) {
           await this.$bvModal.msgBoxConfirm('All your bids will be overriden, are you sure?')
@@ -217,6 +247,10 @@ export default Vue.extend({
     unselect() {
       this.$data.selectedBundleHash = null
     },
+    unselectAll() {
+      this.unselect()
+      selection.commitUnselectGoods()
+    },
     selectGoods(bundle: ApiBundleEntryWrapper, nullSelected = true) {
       if (nullSelected) {
         this.$data.selectedBundleHash = null
@@ -242,6 +276,10 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import '../../custom';
+
+.border-bottom {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.075);
+}
 
 .bidder-control {
   position: relative;
