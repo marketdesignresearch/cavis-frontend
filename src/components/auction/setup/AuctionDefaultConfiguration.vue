@@ -55,7 +55,6 @@ export default Vue.extend({
   methods: {
     showSchema(schemaName: string): boolean {
       if (!this.model) return false
-
       switch (schemaName) {
         case 'defaultDomainSchema':
           return (this.model as any).domainType.indexOf('gsvm') === -1 && (this.model as any).domainType.indexOf('lsvm') === -1
@@ -91,6 +90,9 @@ export default Vue.extend({
               label: 'Auction',
               model: 'auctionType',
               default: ApiAuctionType.SINGLE_ITEM_FIRST_PRICE,
+              selectOptions: {
+                hideNoneSelectedText: true
+              },
               values: [
                 { name: 'Single-Item First Price Auction', id: ApiAuctionType.SINGLE_ITEM_FIRST_PRICE },
                 { name: 'Single-Item Second Price Auction', id: ApiAuctionType.SINGLE_ITEM_SECOND_PRICE },
@@ -109,6 +111,9 @@ export default Vue.extend({
               label: 'Domain',
               model: 'domainType',
               default: 'unitDemandValue',
+              selectOptions: {
+                hideNoneSelectedText: true
+              },
               values: [
                 { name: 'Unit Demand Value', id: 'unitDemandValue' },
                 { name: 'Additive Value', id: 'additiveValue' },
@@ -216,6 +221,9 @@ export default Vue.extend({
               type: 'select',
               label: 'Default Bidder Strategy',
               model: 'defaultStrategy',
+              selectOptions: {
+                hideNoneSelectedText: true
+              },
               default: ApiBidderStrategy.TRUTHFUL,
               values: [{ name: 'Truthful', id: ApiBidderStrategy.TRUTHFUL }],
               required: true,
@@ -252,6 +260,9 @@ export default Vue.extend({
               type: 'select',
               label: 'Payment Rule',
               model: 'ccaConfig.paymentRule',
+              selectOptions: {
+                hideNoneSelectedText: true
+              },
               default: ApiAuctionPaymentRule.VCG,
               values: [{ name: 'VCG', id: ApiAuctionPaymentRule.VCG }, { name: 'CCG', id: ApiAuctionPaymentRule.CCG }]
             },
@@ -280,6 +291,9 @@ export default Vue.extend({
               type: 'select',
               label: 'Payment Rule',
               model: 'pvmConfig.paymentRule',
+              selectOptions: {
+                hideNoneSelectedText: true
+              },
               default: ApiAuctionPaymentRule.VCG,
               values: [{ name: 'VCG', id: ApiAuctionPaymentRule.VCG }, { name: 'CCG', id: ApiAuctionPaymentRule.CCG }]
             },
