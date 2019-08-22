@@ -1,20 +1,25 @@
 <template>
   <form>
-    <b-tabs content-class="mt-3" v-model="selectedTab" small>
-      <b-tab v-for="schema in filteredSchemas" :key="schema.title" :title="schema.title">
-        <vue-form-generator
+
+    <b-card no-body class="mb-1" v-for="(schema, index) in filteredSchemas" :key="schema.title">
+      <b-card-header header-tag="header" class="p-1" role="tab">
+        <b-button block href="#" v-b-toggle="'accordion-' + index" variant="default">{{ schema.title }}</b-button>
+      </b-card-header>
+      <b-collapse :id="'accordion-' + index" :visible="index !== filteredSchemas.length - 1" role="tabpanel">
+        <b-card-body>
+          <vue-form-generator
           :schema="schema"
           :model="model"
           :options="formOptions"
           @validated="schema.validation = $event"
-        ></vue-form-generator>
-      </b-tab>
-      <div class="text-right">
-        <button class="btn btn-primary" v-if="selectedTab > 0" @click.prevent="selectedTab--">Previous</button>
-        <button class="btn btn-primary ml-1" v-if="selectedTab < filteredSchemas.length - 1" @click.prevent="selectedTab++">Next</button>
-        <button class="btn btn-success ml-1" v-if="selectedTab === filteredSchemas.length - 1" @click.prevent="submit">Create</button>
-      </div>
-    </b-tabs>
+          ></vue-form-generator>
+        </b-card-body>
+      </b-collapse>
+    </b-card>
+
+    <div class="text-right">
+      <button class="btn btn-success ml-1" @click.prevent="submit">Create</button>
+    </div>
   </form>
 </template>
 
