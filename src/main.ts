@@ -5,6 +5,16 @@ import App from './App.vue'
 import router from './router'
 import store from './store/'
 
+// Sentry
+import * as Sentry from '@sentry/browser'
+import * as Integrations from '@sentry/integrations'
+if (process.env.VUE_APP_SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.VUE_APP_SENTRY_DSN,
+    integrations: [new Integrations.Vue({ Vue, attachProps: true })]
+  })
+}
+
 // filters
 import './filters/numeral'
 import './filters/date'
