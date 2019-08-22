@@ -60,8 +60,10 @@ export default Vue.extend({
     showSchema(schemaName: string): boolean {
       if (!this.model) return false
       switch (schemaName) {
+        case 'llgDomainSchema':
+          return (this.model as any).domainType.indexOf('llg') !== -1
         case 'defaultDomainSchema':
-          return (this.model as any).domainType.indexOf('gsvm') === -1 && (this.model as any).domainType.indexOf('lsvm') === -1
+          return (this.model as any).domainType.indexOf('additive') !== -1 || (this.model as any).domainType.indexOf('unitDemand') !== -1
         case 'gsvmSchema':
           return (this.model as any).domainType.indexOf('gsvm') !== -1
         case 'lsvmSchema':
@@ -121,6 +123,7 @@ export default Vue.extend({
               values: [
                 { name: 'Unit Demand Value', id: 'unitDemandValue' },
                 { name: 'Additive Value', id: 'additiveValue' },
+                { name: 'Local-Local-Global (LLG)', id: 'llg' },
                 { name: 'GSVM', id: 'gsvm' },
                 { name: 'LSVM', id: 'lsvm' }
               ],
@@ -181,6 +184,27 @@ export default Vue.extend({
               model: 'bidder.max',
               default: 1000,
               validator: [VueFormGenerator.validators.required]
+            }
+          ]
+        },
+        llgDomainSchema: {
+          validation: false,
+          title: 'LLG Configuration',
+          fields: [
+            {
+              type: 'checkbox',
+              label: 'Interesting Case',
+              model: 'llgConfig.interestingCase',
+              default: true,
+              validator: [VueFormGenerator.validators.required]
+            },
+            {
+              type: 'input',
+              inputType: 'number',
+              label: 'Maximum Value of Local Bidders',
+              model: 'llgConfig.maxLocalValue',
+              default: 100,
+              validator: [VueFormGenerator.validators.required, VueFormGenerator.validators.integer]
             }
           ]
         },

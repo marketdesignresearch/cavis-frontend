@@ -67,6 +67,8 @@ export interface ApiAuctionCreateDTO {
     goods: ApiGood[]
     numberOfNationalBidders?: number
     numberOfRegionalBidders?: number
+    interestingCase?: boolean
+    maxLocalValue?: number
   }
   auctionType: ApiAuctionType
   name: string

@@ -63,6 +63,10 @@ export default Vue.extend({
       }
 
       switch (model.domainType) {
+        case 'llg':
+          auctionObj.domain.interestingCase = model.llgConfig.interestingCase
+          auctionObj.domain.maxLocalValue = model.llgConfig.maxLocalValue
+          break
         case 'gsvm':
           auctionObj.domain.numberOfNationalBidders = model.gsvmConfig.numberOfNationalBidders
           auctionObj.domain.numberOfRegionalBidders = model.gsvmConfig.numberOfRegionalBidders
@@ -70,7 +74,6 @@ export default Vue.extend({
         case 'lsvm':
           auctionObj.domain.numberOfNationalBidders = model.lsvmConfig.numberOfNationalBidders
           auctionObj.domain.numberOfRegionalBidders = model.lsvmConfig.numberOfRegionalBidders
-          break
           break
         default:
           for (let i = 0; i < model.numberOfBidders; i++) {
