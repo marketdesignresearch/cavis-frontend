@@ -43,24 +43,26 @@
                     <over-demand-chart :rounds="apiRounds" :goodIds="selectedGoods" />
                   </b-modal>
 
-                  <div class="pb-3 mt-4" v-if="selectedGoods.length > 0">
-                    <button class="btn btn-outline-secondary btn-sm mx-1" @click="deselect">Deselect All</button>
-                    <button
-                      v-if="isCCA"
-                      class="btn btn-outline-success btn-sm mx-1"
-                      v-b-modal.modal-price-development
-                      v-intro="'This brings you to the publicly available information about past prices of the selected goods.'"
-                    >
-                      Price Development
-                    </button>
-                    <button
-                      v-if="isCCA"
-                      class="btn btn-outline-success btn-sm mx-1"
-                      v-b-modal.modal-over-demand
-                      v-intro="'Similarly, here you find the public information about past over-demand of the selected goods.'"
-                    >
-                      Over-Demand History
-                    </button>
+                  <div class="pb-3 mt-4">
+                    <span v-if="selectedGoods.length > 0">
+                      <button class="btn btn-outline-secondary btn-sm mx-1" @click="deselect">Deselect All</button>
+                      <button
+                        v-if="isCCA"
+                        class="btn btn-outline-success btn-sm mx-1"
+                        v-b-modal.modal-price-development
+                        v-intro="'This brings you to the publicly available information about past prices of the selected goods.'"
+                      >
+                        Price Development
+                      </button>
+                      <button
+                        v-if="isCCA"
+                        class="btn btn-outline-success btn-sm mx-1"
+                        v-b-modal.modal-over-demand
+                        v-intro="'Similarly, here you find the public information about past over-demand of the selected goods.'"
+                      >
+                        Over-Demand History
+                      </button>
+                    </span>
                   </div>
 
                   <div class="goods-bidder" v-if="selectedBidder">
