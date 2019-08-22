@@ -14,8 +14,7 @@
           <div
             class="card"
             style="width: 18rem;"
-            @click="selectedDomain = 'custom'"
-            :class="{ 'border border-success': selectedDomain === 'custom' }"
+            @click="configureAndCreate('custom')"
             v-intro="'With this option, you can customize your auction from scratch.'"
           >
             <img src="https://picsum.photos/300/300/?image=41" class="card-img-top" />
@@ -27,8 +26,7 @@
           <div
             class="card"
             style="width: 18rem;"
-            @click="selectedDomain = 'new-zealand-1990'"
-            :class="{ 'border border-success': selectedDomain === 'new-zealand-1990' }"
+            @click="configureAndCreate('new-zealand-1990')"
             v-intro="
               'This option brings you directly into an auction configuration that represents the New Zealand auction of 1990, which was a simultaneous second-price auction on multiple goods.'
             "
@@ -44,8 +42,7 @@
           <div
             class="card"
             style="width: 18rem;"
-            @click="selectedDomain = 'swiss-march-2000'"
-            :class="{ 'border border-success': selectedDomain === 'swiss-march-2000' }"
+            @click="configureAndCreate('swiss-march-2000')"
             v-intro="
               'Similarly, this provides an auction configuration that represents the Swiss auction of March 2000, which was a sequential second-price auction on multiple goods.'
             "
@@ -61,8 +58,7 @@
           <div
             class="card"
             style="width: 18rem;"
-            @click="selectedDomain = 'swiss-december-2000'"
-            :class="{ 'border border-success': selectedDomain === 'swiss-december-2000' }"
+            @click="configureAndCreate('swiss-december-2000')"
             v-intro="'Lastly, this provides an auction configuration that represents the Swiss auction of December 2000.'"
           >
             <img src="https://picsum.photos/300/300/?image=41" class="card-img-top" />
@@ -72,19 +68,6 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
-    <div class="row pt-5">
-      <div class="col text-center">
-        <button
-          class="btn btn-lg btn-success"
-          :disabled="!selectedDomain"
-          @click="configureAndCreate"
-          v-intro="'Once you have chosen, click here to continue.'"
-        >
-          Configure and Create
-        </button>
       </div>
     </div>
   </div>
@@ -99,13 +82,8 @@ export default Vue.extend({
     select(auctionType: string) {
       this.$data.modelValue = this.$data.historicDomains.find((obj: any) => obj.id === auctionType)
     },
-    configureAndCreate() {
-      this.$router.push({ name: 'auction-customize', query: { domain: this.$data.selectedDomain } })
-    }
-  },
-  data() {
-    return {
-      selectedDomain: null
+    configureAndCreate(domain: string) {
+      this.$router.push({ name: 'auction-customize', query: { domain: domain } })
     }
   }
 })
