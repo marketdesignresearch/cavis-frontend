@@ -124,6 +124,7 @@ export default Vue.extend({
                 { name: 'Unit Demand Value', id: 'unitDemandValue' },
                 { name: 'Additive Value', id: 'additiveValue' },
                 { name: 'Local-Local-Global (LLG)', id: 'llg' },
+                { name: 'Synergy Domain', id: 'synergy' },
                 { name: 'GSVM', id: 'gsvm' },
                 { name: 'LSVM', id: 'lsvm' }
               ],
@@ -183,6 +184,18 @@ export default Vue.extend({
               label: 'Max Value of Bidders',
               model: 'bidder.max',
               default: 1000,
+              validator: [VueFormGenerator.validators.required]
+            },
+            {
+              type: 'input',
+              inputType: 'number',
+              label: 'Synergy factor',
+              model: 'bidder.synergy',
+              default: 0.2,
+              step: 0.01,
+              visible: (model: any) => model.domainType.indexOf('synergy') !== -1,
+              hint:
+                'A factor for the synergy among multiple goods. Positive means they are complements, negative means they are subsitute.',
               validator: [VueFormGenerator.validators.required]
             }
           ]

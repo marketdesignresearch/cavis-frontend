@@ -75,6 +75,8 @@ export default Vue.extend({
           auctionObj.domain.numberOfNationalBidders = model.lsvmConfig.numberOfNationalBidders
           auctionObj.domain.numberOfRegionalBidders = model.lsvmConfig.numberOfRegionalBidders
           break
+        case 'synergy':
+          auctionObj.domain.synergy = model.bidder.synergy
         default:
           for (let i = 0; i < model.numberOfBidders; i++) {
             auctionObj.domain.bidders.push({

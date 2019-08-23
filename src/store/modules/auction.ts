@@ -65,6 +65,7 @@ export interface ApiAuctionCreateDTO {
     type: ApiDomainType
     bidders: ApiBidderCreateDTO[]
     goods: ApiGood[]
+    synergy?: number
     numberOfNationalBidders?: number
     numberOfRegionalBidders?: number
     interestingCase?: boolean
