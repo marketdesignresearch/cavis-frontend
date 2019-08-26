@@ -24,7 +24,7 @@
               <td v-if="pricedAuction">{{ priceForGood(selectedBundle) | formatNumber }}</td>
               <td v-if="pricedAuction">{{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
               <td>
-                <component v-if="auctionType" :is="'component-bid-' + auctionType" :auctionId="auctionId" @cancel="unselectAll"></component>
+                 {{ bidForGood(selectedBundle) | formatNumber }}
               </td>
               <td class="text-right">
                 <button v-if="bidForGood(selectedBundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(selectedBundle)">
@@ -64,24 +64,8 @@
               <td>{{ bundle.value | formatNumber }}</td>
               <td v-if="pricedAuction">{{ bundle.price | formatNumber }}</td>
               <td v-if="pricedAuction">{{ bundle.utility | formatNumber }}</td>
-              <td @click.stop>
-                <component
-                  v-if="selectedBundleHash && selectedBundleHash === bundle.hash"
-                  :is="'component-bid-' + auctionType"
-                  :auctionId="auctionId"
-                  @cancel="unselect"
-                ></component>
-                <span v-if="selectedBundleHash !== bundle.hash">
-                  {{ bundle.bid | formatNumber }}
-                  <font-awesome-icon
-                    class="ml-2"
-                    @click.stop="
-                      selectedBundleHash = bundle.hash
-                      selectGoods(bundle, false)
-                    "
-                    icon="edit"
-                  />
-                </span>
+              <td>
+                {{ bundle.bid | formatNumber }}
               </td>
               <td class="text-right">
                 <button v-if="bundle.bid !== null" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">

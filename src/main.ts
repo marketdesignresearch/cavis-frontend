@@ -39,11 +39,27 @@ import {
   faDollarSign,
   faEdit,
   faCheck,
-  faTimes
+  faTimes,
+  faChevronDown,
+  faChevronUp
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
-library.add(faUserCircle, faCoins, faDollarSign, faWrench, faTrashAlt, faSort, faSortUp, faSortDown, faEdit, faCheck, faTimes)
+library.add(
+  faChevronDown,
+  faChevronUp,
+  faUserCircle,
+  faCoins,
+  faDollarSign,
+  faWrench,
+  faTrashAlt,
+  faSort,
+  faSortUp,
+  faSortDown,
+  faEdit,
+  faCheck,
+  faTimes
+)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 

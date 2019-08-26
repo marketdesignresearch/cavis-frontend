@@ -55,7 +55,7 @@ export default Vue.extend({
     showHelp() {
       this.$intro().showHints()
       this.$intro()
-        .setOptions({ showStepNumbers: false })
+        .setOptions({ showStepNumbers: false, skipLabel: 'End' })
         .start()
     }
   }

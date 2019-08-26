@@ -22,10 +22,11 @@
     </div>
 
     <b-collapse id="collapse-auctioneer" v-model="isAuctioneerVisible" class="mt-2 text-left">
+      <h4>Rounds</h4>
       <b-tabs content-class="mt-3" v-model="selectedRound">
         <b-tab
           v-for="round in rounds"
-          :title="round.roundNumber === rounds.length ? 'Current Round' : '' + round.roundNumber"
+          :title="round.roundNumber === rounds.length ? `${rounds.length} (Current Round)` : '' + round.roundNumber"
           :key="round.roundNumber"
         >
           <table class="table table-bidder">
@@ -41,8 +42,8 @@
                   </div>
                 </th>
                 <th scope="col">Bids</th>
-                <th scope="col">Allocation</th>
-                <th scope="col">Payment</th>
+                <th scope="col" v-if="isMultiRound">Interim Allocation</th>
+                <th scope="col" v-if="isMultiRound">Payment</th>
               </tr>
             </thead>
             <tbody>
@@ -60,10 +61,10 @@
                     {{ bid.amount | formatNumber }} for <good-badge :ids="bid.bundle.entries.map(obj => obj.good)" />
                   </div>
                 </td>
-                <td>
+                <td v-if="isMultiRound">
                   <good-badge :ids="allocationForBidder(bidder, round)" />
                 </td>
-                <td>{{ paymentForGoods(bidder, round) | formatNumber }}</td>
+                <td v-if="isMultiRound">{{ paymentForGoods(bidder, round) | formatNumber }}</td>
               </tr>
             </tbody>
           </table>
@@ -144,6 +145,10 @@ export default Vue.extend({
     isMultiPhase(): boolean {
       const currentAuction = auction.auctionById()(this.$props.auction.id)
       return true
+    },
+    isMultiRound(): boolean {
+      const multiRoundAuctions = [ApiAuctionType.SEQUENTIAL_FIRST_PRICE, ApiAuctionType.SEQUENTIAL_SECOND_PRICE, ApiAuctionType.CCA, ApiAuctionType.PVM]
+      return multiRoundAuctions.includes(this.$props.auction.auctionType as ApiAuctionType)
     },
     currentRound(): ApiRound | null {
       const rounds = this.$props.auction.auction.rounds

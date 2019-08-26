@@ -1,5 +1,4 @@
 import auction, { ApiBundleValue, ApiBundleEntryWrapper, ApiBidderStrategy } from '@/store/modules/auction'
-import hashBundle from './bundleHash'
 
 export default {
   removeBid(bidderId: string, bundle: ApiBundleEntryWrapper) {
@@ -22,6 +21,7 @@ export default {
         })
     }
 
+    /* do not return bid for non-priced bundles for now
     if (bidder.value && bidder.value.bundleValues) {
       const correctValue = bidder.value.bundleValues.find((bid: ApiBundleValue) => {
         return bid.bundle.hash === hashBundle(bundle.entries)
@@ -29,6 +29,8 @@ export default {
 
       return correctValue ? correctValue.value : null
     }
-    return 0
+    */
+
+    return null
   }
 }

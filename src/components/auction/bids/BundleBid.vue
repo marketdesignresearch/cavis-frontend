@@ -1,30 +1,30 @@
 <template>
-  <div>
-    <div
+  <div class="d-flex flex-column">
+    <form 
       class="input-group btn-group"
       v-if="selectedGoods.length > 0 && (bidsLeft || (!bidsLeft && alreadyBid)) && bidsAllowed"
-      @click.stop
+      @submit.enter.prevent="placeBid"
     >
       <input v-model="bid" type="text" class="form-control w-75" placeholder="Your Bid" :disabled="bidEditable" />
-      <button @click="placeBid" class="btn btn-primary btn-sm float-right">
+      <button @click="placeBid" class="btn btn-secondary btn-sm float-right" :class="{ 'btn-success': bidChanged }" :disabled="!bidChanged">
         <font-awesome-icon icon="check" />
       </button>
-      <button @click="cancel" class="btn btn-warning btn-sm float-right">
+      <button type="button" @click="removeBid(selectedBundle)" class="btn btn-danger btn-sm float-right" :disabled="!alreadyBid">
         <font-awesome-icon icon="times" />
       </button>
-    </div>
-    <div v-if="!bidsLeft && !alreadyBid" class="text-center">
-      You have reached the maximum amount of bids.
-    </div>
-    <div v-if="bidsLeft && !bidsAllowed" class="text-center">
+    </form>
+    <div v-if="selectedGoods.length > 0 && !bidsAllowed" class="alert alert-warning text-center">
       Bids on this good are not allowed in this round.
+    </div>
+    <div v-if="!bidsLeft && !alreadyBid" class="alert alert-warning text-center">
+      You have reached the maximum number of bids.
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder, ApiBundleEntry } from '../../../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder, ApiBundleEntry, ApiBundleEntryWrapper } from '../../../store/modules/auction'
 import GoodBadgeComponent from '../GoodBadge.vue'
 import BidderService from '@/services/bidder'
 import GoodsService from '@/services/goods'
@@ -43,10 +43,14 @@ export default Vue.extend({
     }
   },
   computed: {
-    ...mapGetters('selection', ['selectedGoods', 'selectedBidder']),
+    ...mapGetters('selection', ['selectedGoods', 'selectedBidder', 'selectedBundle']),
     bidEditable: function() {
       const auctionInstance = auction.auctionById()(this.$props.auctionId)
       return auctionInstance.auction.currentRoundType && auctionInstance.auction.currentRoundType === 'Clock Round'
+    },
+    bidChanged(): boolean {
+      const currentBid = GoodsService.bidForGood(selection.selectedBundle()!, selection.selectedBidder()!)
+      return this.bid !== currentBid
     },
     isAllowed(): boolean {
       const bidderId = selection.selectedBidder()
@@ -146,11 +150,9 @@ export default Vue.extend({
         bidderId: bidderId,
         bid: bid
       })
-
-      this.$emit('cancel')
     },
-    cancel() {
-      this.$emit('cancel')
+    removeBid(bundle: ApiBundleEntryWrapper) {
+      BidderService.removeBid(selection.selectedBidder()!, bundle)
     }
   },
   name: 'BundleBid'

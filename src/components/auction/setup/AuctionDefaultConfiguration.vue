@@ -1,21 +1,21 @@
 <template>
   <form>
 
-    <b-card no-body class="mb-1" v-for="(schema, index) in filteredSchemas" :key="schema.title">
-      <b-card-header header-tag="header" class="p-1" role="tab">
-        <b-button block href="#" v-b-toggle="'accordion-' + index" variant="default">{{ schema.title }}</b-button>
-      </b-card-header>
+    <div class="my-2" v-for="(schema, index) in filteredSchemas" :key="schema.title">
+      <b-button class="mb-2" variant="secondary" block href="#" v-b-toggle="'accordion-' + index">
+        {{ schema.title }}
+        <font-awesome-icon class="when-closed" icon="chevron-down" />
+        <font-awesome-icon class="when-opened" icon="chevron-up" />
+      </b-button>
       <b-collapse :id="'accordion-' + index" :visible="index !== filteredSchemas.length - 1" role="tabpanel">
-        <b-card-body>
-          <vue-form-generator
-          :schema="schema"
-          :model="model"
-          :options="formOptions"
-          @validated="schema.validation = $event"
-          ></vue-form-generator>
-        </b-card-body>
+        <vue-form-generator
+        :schema="schema"
+        :model="model"
+        :options="formOptions"
+        @validated="schema.validation = $event"
+        ></vue-form-generator>
       </b-collapse>
-    </b-card>
+    </div>
 
     <div class="text-right">
       <button class="btn btn-success ml-1" @click.prevent="submit">Create</button>
@@ -318,7 +318,7 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: 'Maximum amount of bids per bidder & round',
+              label: 'Maximum number of bids per bidder & round',
               model: 'maxBids',
               default: 10,
               validator: [VueFormGenerator.validators.required]
@@ -346,4 +346,10 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import '../../../custom.scss';
+
+.collapsed > .when-opened,
+:not(.collapsed) > .when-closed {
+  display: none;
+}
+
 </style>

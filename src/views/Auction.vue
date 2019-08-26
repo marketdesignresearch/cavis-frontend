@@ -75,7 +75,15 @@
                         <good-badge :ids="selectedGoods" />
                       </div>
 
-                      <div class="col d-flex align-items-center justify-content-start">Value: {{ valueForGoods | formatNumber }}</div>
+                      <div class="col d-flex align-items-center justify-content-start">
+                        <div><div class="small">Value:</div> {{ valueForGoods | formatNumber }}</div>
+                        <div class="pl-4" v-if="bidForGoods"><div class="small">Bid:</div> {{ bidForGoods | formatNumber }}</div>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col d-flex justify-content-center pt-2">
+                        <component :is="'component-bid-' + auctionType" :auctionId="auctionId" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -115,6 +123,7 @@ import AuctionBidder from '@/components/auction/Bidder.vue'
 import AuctionSetup from '@/components/auction/Setup.vue'
 import Auctioneer from '@/components/auction/Auctioneer.vue'
 import BidderControl from '@/components/auction/BidderControl.vue'
+import GoodsService from '@/services/goods'
 import auction, {
   ApiAuctionType,
   ApiGood,
@@ -203,6 +212,9 @@ export default Vue.extend({
 
       return 0
     },
+    bidForGoods(): number | null {
+      return GoodsService.bidForGood(selection.selectedBundle()!, selection.selectedBidder()!)
+    },
     rounds(): number[] {
       return Array.from({ length: auction.auctionById()(this.$route.params.id).auction.rounds.length + 1 }, (v, k) => k)
     },
@@ -213,6 +225,10 @@ export default Vue.extend({
     isCCA(): boolean {
       const currentAuction = auction.auctionById()(this.$route.params.id)
       return currentAuction.auctionType.startsWith('CCA')
+    },
+    auctionType(): string {
+      const currentAuction = auction.auctionById()(this.$route.params.id)
+      return currentAuction.auctionType
     },
     leftSideBidders() {
       const bidders = auction.biddersById()(this.$route.params.id)
@@ -274,7 +290,7 @@ export default Vue.extend({
 
     position: relative;
     height: 70px;
-    bottom: -35px;
+    bottom: -70px;
 
     border-radius: 35px;
     background: $light;

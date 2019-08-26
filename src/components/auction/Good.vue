@@ -143,14 +143,17 @@ export { AuctionGoodComponent }
     text-align: center;
   }
 
-  &.selected, &:hover {
+  &:hover {
     background-image: url('../../assets/card-blank-selected.png');
+  }
+
+  &.selected {
+    background-image: url('../../assets/card-blank-selected-success.png');
+    color: white;
   }
 
   &.disabled {
     opacity: 0.5;
-    pointer-events: none;
-    cursor: not-allowed;
   }
 
   .badge-price {
