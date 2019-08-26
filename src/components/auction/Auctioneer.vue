@@ -143,8 +143,8 @@ export default Vue.extend({
       return 'component-round-' + this.$props.auction.auctionType
     },
     isMultiPhase(): boolean {
-      const currentAuction = auction.auctionById()(this.$props.auction.id)
-      return true
+      const multiPhaseAuctions = [ApiAuctionType.CCA, ApiAuctionType.PVM]
+      return multiPhaseAuctions.includes(this.$props.auction.auctionType as ApiAuctionType)
     },
     isMultiRound(): boolean {
       const multiRoundAuctions = [ApiAuctionType.SEQUENTIAL_FIRST_PRICE, ApiAuctionType.SEQUENTIAL_SECOND_PRICE, ApiAuctionType.CCA, ApiAuctionType.PVM]
