@@ -17,17 +17,14 @@ import { ApiBidderStrategy } from '../../store/modules/auction'
 
 export default Vue.extend({
   props: ['bidder', 'showStrategy'],
-  methods: {
-    hashCode(s: string): number {
-      let i, h
-      for (i = 0, h = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0
-      return h
-    }
-  },
   computed: {
     backgroundImage: function() {
-      if (!(this.$props.bidder.name.length in ['0', '1', '2', '3', '4', '5', '6', '7'])) {
-        const index = Math.abs(this.hashCode(this.$props.bidder.id)) % 8
+      if (!(this.$props.bidder.name in ['0', '1', '2', '3', '4', '5', '6', '7'])) {
+        const uuid = this.$props.bidder.id
+        let i,
+          h = 0
+        for (i = 0, h = 0; i < uuid.length; i++) h = (Math.imul(31, h) + uuid.charCodeAt(i)) | 0
+        const index = Math.abs(h % 8)
         return `url('/avatars/${index}.svg')`
       }
       return `url('/avatars/${this.$props.bidder.name}.svg')`
