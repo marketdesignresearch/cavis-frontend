@@ -63,7 +63,11 @@ export default Vue.extend({
         case 'llgDomainSchema':
           return (this.model as any).domainType.indexOf('llg') !== -1
         case 'defaultDomainSchema':
-          return (this.model as any).domainType.indexOf('additive') !== -1 || (this.model as any).domainType.indexOf('unitDemand') !== -1
+          return (
+            (this.model as any).domainType.indexOf('additive') !== -1 ||
+            (this.model as any).domainType.indexOf('unitDemand') !== -1 ||
+            (this.model as any).domainType.indexOf('synergy') !== -1
+          )
         case 'gsvmSchema':
           return (this.model as any).domainType.indexOf('gsvm') !== -1
         case 'lsvmSchema':
