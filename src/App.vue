@@ -2,7 +2,7 @@
   <div id="app" class="d-flex flex-column">
     <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
       <div class="container">
-        <a class="navbar-brand" :to="{ name: 'auction-create' }">Home</a>
+        <router-link class="navbar-brand" :to="{ name: 'auction-create' }">Home</router-link>
 
         <button
           class="navbar-toggler"
@@ -37,7 +37,9 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <button class="nav-link btn ml-2 btn-secondary text-white" v-intro="'You can restart this tour anytime.'" @click="showHelp">Help</button>
+              <button class="nav-link btn ml-2 btn-secondary text-white" v-intro="'You can restart this tour anytime.'" @click="showHelp">
+                Help
+              </button>
             </li>
           </ul>
         </div>

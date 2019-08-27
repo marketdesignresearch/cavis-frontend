@@ -73,7 +73,7 @@
             <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">
               Reset to Round #{{ round.roundNumber }}
             </button>
-            <button @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
+            <button v-if="rounds.length > 1" @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
             <button v-if="isMultiPhase" @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
           </div>
         </b-tab>
@@ -147,7 +147,12 @@ export default Vue.extend({
       return multiPhaseAuctions.includes(this.$props.auction.auctionType as ApiAuctionType)
     },
     isMultiRound(): boolean {
-      const multiRoundAuctions = [ApiAuctionType.SEQUENTIAL_FIRST_PRICE, ApiAuctionType.SEQUENTIAL_SECOND_PRICE, ApiAuctionType.CCA, ApiAuctionType.PVM]
+      const multiRoundAuctions = [
+        ApiAuctionType.SEQUENTIAL_FIRST_PRICE,
+        ApiAuctionType.SEQUENTIAL_SECOND_PRICE,
+        ApiAuctionType.CCA,
+        ApiAuctionType.PVM
+      ]
       return multiRoundAuctions.includes(this.$props.auction.auctionType as ApiAuctionType)
     },
     currentRound(): ApiRound | null {

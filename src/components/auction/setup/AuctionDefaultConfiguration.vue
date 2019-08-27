@@ -1,6 +1,5 @@
 <template>
   <form>
-
     <div class="my-2" v-for="(schema, index) in filteredSchemas" :key="schema.title">
       <b-button class="mb-2" variant="secondary" block href="#" v-b-toggle="'accordion-' + index">
         {{ schema.title }}
@@ -9,10 +8,10 @@
       </b-button>
       <b-collapse :id="'accordion-' + index" :visible="index !== filteredSchemas.length - 1" role="tabpanel">
         <vue-form-generator
-        :schema="schema"
-        :model="model"
-        :options="formOptions"
-        @validated="schema.validation = $event"
+          :schema="schema"
+          :model="model"
+          :options="formOptions"
+          @validated="schema.validation = $event"
         ></vue-form-generator>
       </b-collapse>
     </div>
@@ -94,7 +93,7 @@ export default Vue.extend({
               type: 'select',
               label: 'Auction',
               model: 'auctionType',
-              default: ApiAuctionType.SINGLE_ITEM_FIRST_PRICE,
+              default: ApiAuctionType.VCG,
               selectOptions: {
                 hideNoneSelectedText: true
               },
@@ -115,7 +114,7 @@ export default Vue.extend({
               type: 'select',
               label: 'Domain',
               model: 'domainType',
-              default: 'unitDemandValue',
+              default: 'additiveValue',
               selectOptions: {
                 hideNoneSelectedText: true
               },
@@ -126,6 +125,12 @@ export default Vue.extend({
                 { name: 'LSVM', id: 'lsvm' }
               ],
               validator: VueFormGenerator.validators.required
+            },
+            {
+              type: 'input',
+              inputType: 'text',
+              label: 'Name (optional)',
+              model: 'name'
             }
           ]
         },
@@ -155,6 +160,7 @@ export default Vue.extend({
               inputType: 'number',
               label: '# of Bidders',
               model: 'numberOfBidders',
+              tooltip: 'This is a tooltip',
               default: 3,
               min: 0,
               max: 20,
@@ -287,9 +293,9 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: 'Maximum # of Rounds',
-              model: 'pvmConfig.maxRounds',
-              default: 100,
+              label: 'Number of Bids in Initial Round',
+              model: 'pvmConfig.initialRoundBids',
+              default: 5,
               validator: [VueFormGenerator.validators.required]
             },
             {
@@ -305,7 +311,7 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: 'Maximum number of Rounds',
+              label: 'Maximum Number of Rounds',
               model: 'pvmConfig.maxRounds',
               default: 100
             }
@@ -351,5 +357,4 @@ export default Vue.extend({
 :not(.collapsed) > .when-closed {
   display: none;
 }
-
 </style>

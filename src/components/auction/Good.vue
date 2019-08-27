@@ -70,13 +70,15 @@ const AuctionGoodComponent = Vue.extend({
   },
   computed: {
     showProposedValue: function(): boolean {
-      return this.$data.proposedBundleValue !== null && this.isAllowed
+      return selection.selectedGoods().indexOf(this.$props.goodId) === -1 && this.$data.proposedBundleValue !== null
     },
     selectedBidder: function(): string | null {
       return selection.state().selectedBidder
     },
     bundleHash: function(): string {
-      return Object.keys(selection.state().selectedGoods).sort().join()
+      return Object.keys(selection.state().selectedGoods)
+        .sort()
+        .join()
     },
     hasBundleValue: function(): boolean {
       return Object.keys(selection.state().selectedGoods).length > 0 && !selection.state().selectedGoods[this.$props.goodId]

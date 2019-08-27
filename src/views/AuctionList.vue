@@ -7,6 +7,7 @@
         <thead>
           <tr>
             <th scope="col"></th>
+            <th scope="col">Name</th>
             <th scope="col">Date</th>
             <th scope="col">Auction Type</th>
             <th scope="col">Domain</th>
@@ -19,6 +20,7 @@
         <tbody>
           <tr v-for="(auction, index) in auctions" :key="auction.id">
             <td>{{ index + 1 }}</td>
+            <td>{{ auction.name || '-' }}</td>
             <td>{{ auction.createdAt | formatDate }}</td>
             <td>{{ auction.auctionType }}</td>
             <td>{{ auction.auction.domain.type }}</td>

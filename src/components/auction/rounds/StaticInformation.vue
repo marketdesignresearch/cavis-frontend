@@ -1,14 +1,27 @@
 <template>
   <div>
-    <div class="small">Type: <b>{{ auctionType }}</b></div>
-    <div class="small" v-if="paymentRule">Outcome Rule: <b>{{ paymentRule }}</b></div>
-    <div class="small" v-if="currentRoundType">Type of Round: <b>{{ currentRoundType }}</b></div>
+    <div class="small">
+      Type: <b>{{ auctionType }}</b>
+    </div>
+    <div class="small" v-if="paymentRule">
+      Outcome Rule: <b>{{ paymentRule }}</b>
+    </div>
+    <div class="small" v-if="currentRoundType">
+      Type of Round: <b>{{ currentRoundType }}</b>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiRound, ApiAuctionPaymentRule, ApiAuctionOutcomeRule } from '../../../store/modules/auction'
+import auction, {
+  ApiAuctionType,
+  ApiAuction,
+  ApiBid,
+  ApiRound,
+  ApiAuctionPaymentRule,
+  ApiAuctionOutcomeRule
+} from '../../../store/modules/auction'
 import selection from '../../../store/modules/selection'
 import RoundMixinVue from './RoundMixin.vue'
 
@@ -34,7 +47,7 @@ export default Vue.extend({
           return 'Second Price Auction'
         case ApiAuctionType.SIMULTANEOUS_FIRST_PRICE:
           return 'Simultaneous Multi-Item First Price Auction'
-        case ApiAuctionType.SIMULTANEOUS_FIRST_PRICE:
+        case ApiAuctionType.SIMULTANEOUS_SECOND_PRICE:
           return 'Simultaneous Multi-Item Second Price Auction'
         case ApiAuctionType.VCG:
           return 'VCG Auction'

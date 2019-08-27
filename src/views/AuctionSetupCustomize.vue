@@ -47,16 +47,19 @@ export default Vue.extend({
           goods: []
         },
         auctionType: model.auctionType,
-        maxBids: model.maxBids,
-        demandQueryTimeLimit: model.demandQueryTimeLimit
+        name: model.name,
+        auctionConfig: {
+          maxBids: model.maxBids,
+          demandQueryTimeLimit: model.demandQueryTimeLimit
+        }
       }
 
       if (model.auctionType === ApiAuctionType.CCA) {
-        auctionObj.ccaConfig = model.ccaConfig
+        auctionObj.auctionConfig.ccaConfig = model.ccaConfig
       }
 
       if (model.auctionType === ApiAuctionType.PVM) {
-        auctionObj.pvmConfig = model.pvmConfig
+        auctionObj.auctionConfig.pvmConfig = model.pvmConfig
       }
 
       switch (model.domainType) {

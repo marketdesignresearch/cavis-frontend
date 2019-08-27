@@ -68,23 +68,26 @@ export interface ApiAuctionCreateDTO {
     numberOfNationalBidders?: number
     numberOfRegionalBidders?: number
   }
-  maxBids?: number
-  demandQueryTimeLimit?: number
-  reservePrices?: Map<string, number>
-  useProposedReservePrices?: boolean
-  ccaConfig?: {
-    supplementaryBids: number
-    priceUpdate: number
-    initialPriceUpdateIfPriceEqualsZero: number
-    paymentRule: ApiAuctionPaymentRule
-    maxRounds: number
-  }
-  pvmConfig?: {
-    initialRoundBid: number
-    paymentRule: ApiAuctionPaymentRule
-    maxRounds: number
-  }
   auctionType: ApiAuctionType
+  name: string
+  auctionConfig: {
+    maxBids?: number
+    demandQueryTimeLimit?: number
+    reservePrices?: Map<string, number>
+    useProposedReservePrices?: boolean
+    ccaConfig?: {
+      supplementaryBids: number
+      priceUpdate: number
+      initialPriceUpdateIfPriceEqualsZero: number
+      paymentRule: ApiAuctionPaymentRule
+      maxRounds: number
+    }
+    pvmConfig?: {
+      initialRoundBid: number
+      paymentRule: ApiAuctionPaymentRule
+      maxRounds: number
+    }
+  }
 }
 
 export enum ApiAuctionOutcomeRule {
