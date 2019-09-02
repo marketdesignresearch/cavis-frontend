@@ -72,14 +72,12 @@ $body-bg: white;
   }
 }
 
-.table-bordered {
-  border: 0;
+.table-bordered th {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
 
-  tbody > tr {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  }
-
-  thead > tr {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-  }
+.table-bordered td {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
 }
