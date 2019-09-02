@@ -3,7 +3,7 @@
     <h1>Previous Auctions</h1>
 
     <div class="table-responsive">
-      <table class="table table-striped">
+      <table class="table table-bordered table-striped">
         <thead>
           <tr>
             <th scope="col"></th>
@@ -30,6 +30,7 @@
             <td
               class="text-right"
               v-intro="'To load the auction, you can simply click on the button. To delete the auction, press on the small arrow.'"
+              v-intro-step="2"
               v-intro-if="index === 0"
             >
               <b-dropdown right variant="primary" split text="Load" class="m-2" :split-to="{ name: 'auction', params: { id: auction.id } }">

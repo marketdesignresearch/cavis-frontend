@@ -29,7 +29,7 @@
           :title="round.roundNumber === rounds.length ? `${rounds.length} (Current Round)` : '' + round.roundNumber"
           :key="round.roundNumber"
         >
-          <table class="table table-bidder">
+          <table class="table table-bordered table-bidder">
             <thead>
               <tr>
                 <th scope="col">Bidder</th>

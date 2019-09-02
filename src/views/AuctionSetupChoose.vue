@@ -10,7 +10,7 @@
 
     <div class="row">
       <div class="col">
-        <div class="card-deck" v-intro="'Here, you can choose a starting point for the auction you are going to create.'">
+        <div class="card-deck" v-intro="'Here, you can choose a starting point for the auction you are going to create.'" v-intro-step="2">
           <div
             class="card"
             style="width: 18rem;"
