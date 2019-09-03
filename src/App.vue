@@ -34,6 +34,7 @@
                 class="nav-link btn btn-secondary text-white"
                 :class="{ 'mt-1': navCollapsed, 'ml-1': !navCollapsed }"
                 v-intro="'You can restart this tour anytime.'"
+                v-intro-step="99"
                 @click="showHelp"
                 >Help</a
               >
