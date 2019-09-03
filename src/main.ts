@@ -46,7 +46,9 @@ import {
   faTimes,
   faChevronDown,
   faChevronUp,
-  faBars
+  faBars,
+  faArchive,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -64,7 +66,9 @@ library.add(
   faEdit,
   faCheck,
   faTimes,
-  faBars
+  faBars,
+  faArchive,
+  faTrash
 )
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)

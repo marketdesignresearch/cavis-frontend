@@ -15,6 +15,7 @@
     "@sentry/browser": "^5.6.2",
     "@sentry/integrations": "^5.6.1",
     "axios": "^0.18.0",
+    "bignumber.js": "^9.0.0",
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.0-rc.27",
     "bootswatch": "^4.3.1",

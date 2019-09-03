@@ -72,6 +72,10 @@ $body-bg: white;
   }
 }
 
+.table-bordered {
+  border: none;
+}
+
 .table-bordered th {
   border: none;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);

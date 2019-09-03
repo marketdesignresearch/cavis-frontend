@@ -12,8 +12,8 @@
 
         <b-collapse id="nav-collapse" is-nav v-model="navCollapsed">
           <b-navbar-nav>
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'auction-list' }">Previous Auctions</router-link>
+            <li class="nav-item" v-intro="'Click here to get an overview over recent auctions.'" v-intro-step="1">
+              <router-link class="nav-link" :to="{ name: 'auction-list' }">Auctions</router-link>
             </li>
           </b-navbar-nav>
 
@@ -24,7 +24,7 @@
             <li class="nav-item">
               <a class="nav-link" href="/docs/#/faq" target="_blank">FAQ</a>
             </li>
-            <li class="nav-item" v-intro="'Click here to create a new auction.'">
+            <li class="nav-item" v-intro="'Click here to create a new auction.'" v-intro-step="2">
               <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">
                 Create new Auction
               </router-link>
@@ -34,6 +34,7 @@
                 class="nav-link btn btn-secondary text-white"
                 :class="{ 'mt-1': navCollapsed, 'ml-1': !navCollapsed }"
                 v-intro="'You can restart this tour anytime.'"
+                v-intro-step="99"
                 @click="showHelp"
                 >Help</a
               >
@@ -59,7 +60,7 @@ export default Vue.extend({
   },
   methods: {
     showHelp() {
-      const startAt = this.$router.currentRoute.name === 'home' ? 1 : 2 // start later if not on home
+      const startAt = this.$router.currentRoute.name === 'home' ? 1 : 3 // start later if not on home
       this.$intro().showHints()
       this.$intro()
         .setOptions({ showStepNumbers: false, skipLabel: 'End' })

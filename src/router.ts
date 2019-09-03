@@ -19,6 +19,11 @@ export default new Router({
       component: () => import(/* webpackChunkName: "auction-list" */ './views/AuctionList.vue')
     },
     {
+      path: '/auctions/archive',
+      name: 'auction-archive',
+      component: () => import(/* webpackChunkName: "auction-archive" */ './views/AuctionArchive.vue')
+    },
+    {
       path: '/auctions/result/:id',
       name: 'auction-result',
       component: () => import(/* webpackChunkName: "auction-result" */ './views/AuctionResult.vue')

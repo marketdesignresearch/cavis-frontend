@@ -11,7 +11,7 @@
             <div class="d-flex pt-4">
               <div
                 v-intro="'This, together with the right-hand side, visualizes the bidders that take part in the auction.'"
-                v-intro-step="2"
+                v-intro-step="3"
               >
                 <span
                   v-for="(bidderId, index) in leftSideBidders"
