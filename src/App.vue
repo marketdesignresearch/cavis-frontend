@@ -2,7 +2,7 @@
   <div id="app" class="d-flex flex-column">
     <b-navbar class="mb-4" toggleable="lg" type="light">
       <div class="container">
-        <router-link tag="a" class="navbar-brand" :to="{ name: 'auction-create' }">
+        <router-link tag="a" class="navbar-brand" :to="{ name: 'home' }">
           Home
         </router-link>
 
@@ -25,19 +25,20 @@
               <a class="nav-link" href="/docs/#/faq" target="_blank">FAQ</a>
             </li>
             <li class="nav-item" v-intro="'Click here to create a new auction.'" v-intro-step="2">
-              <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">
+              <router-link tag="button" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">
                 Create new Auction
               </router-link>
             </li>
             <li class="nav-item">
-              <a
-                class="nav-link btn btn-secondary text-white"
+              <button
+                class="nav-link btn btn-info text-white"
                 :class="{ 'mt-1': navCollapsed, 'ml-1': !navCollapsed }"
                 v-intro="'You can restart this tour anytime.'"
                 v-intro-step="99"
                 @click="showHelp"
-                >Help</a
               >
+                Help
+              </button>
             </li>
           </b-navbar-nav>
         </b-collapse>
@@ -77,10 +78,32 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+@import 'custom.scss';
+
+.navbar-collapse.collapse.show,
+.navbar-collapse.collapsing {
+  button {
+    @extend .btn-block;
+  }
+
+  li.nav-item {
+    a.nav-link {
+      padding-right: 0;
+      padding-left: 0;
+    }
+  }
+}
+
+li.nav-item {
+  a.nav-link {
+    padding-left: 1rem;
+    padding-right: 2rem;
+  }
+}
+
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
   min-height: 100vh;
 }
 
@@ -90,16 +113,5 @@ export default Vue.extend({
 
 .navbar-toggler {
   border: none;
-}
-
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
 }
 </style>

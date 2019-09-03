@@ -17,6 +17,14 @@ $grid-breakpoints: (
     xl: 1400px
 );
 
+$theme-colors: (
+  'primary': #2e688c,
+  'danger': #f25d50,
+  'warning': #f2b544,
+  'success': #11a536,
+  'info': #71bbd9
+);
+
 $container-max-widths: (
   sm: 540px,
   md: 720px,

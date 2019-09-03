@@ -74,6 +74,5 @@ export default Vue.extend({
 .bidsPlaced {
   border: 3px solid theme-color('success');
   padding-top: 21px;
-  // background-color: lighten(theme-color('success'), 25%);
 }
 </style>

@@ -1,11 +1,11 @@
 <template>
   <div class="container">
-    <h1>
+    <h2>
       Auctions
       <router-link tag="button" class="btn btn-secondary btn-sm float-right" :to="{ name: 'auction-archive' }">
         Archive <font-awesome-icon icon="archive" />
       </router-link>
-    </h1>
+    </h2>
     <hr />
 
     <div class="table-responsive">

@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h1>Archived Auctions</h1>
+    <h2>Archived Auctions</h2>
     <hr />
 
     <div class="table-responsive">

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="container">
-      <h1>Setup an Auction</h1>
+      <h2>Setup an Auction</h2>
 
       <hr />
 

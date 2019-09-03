@@ -2,7 +2,7 @@
   <div class="container content" v-if="result">
     <div class="row">
       <div class="col">
-        <h1>Result of Auction</h1>
+        <h2>Result of Auction</h2>
 
         <p>Total Payments: {{ result.payments.totalPayments | formatNumber }}</p>
 
