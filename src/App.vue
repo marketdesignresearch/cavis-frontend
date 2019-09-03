@@ -1,50 +1,48 @@
 <template>
   <div id="app" class="d-flex flex-column">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+    <b-navbar class="mb-4" toggleable="lg" type="light">
       <div class="container">
-        <router-link class="navbar-brand" :to="{ name: 'auction-create' }">Home</router-link>
+        <router-link tag="a" class="navbar-brand" :to="{ name: 'auction-create' }">
+          Home
+        </router-link>
 
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-toggle="collapse"
-          data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <b-navbar-toggle target="nav-collapse">
+          <font-awesome-icon fixed-width :icon="['fa', 'bars']" />
+        </b-navbar-toggle>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item" v-intro="'Click here to get an overview over past auctions.'">
-              <router-link tag="a" class="nav-link" :to="{ name: 'auction-list' }">Previous Auctions</router-link>
+        <b-collapse id="nav-collapse" is-nav v-model="navCollapsed">
+          <b-navbar-nav>
+            <li class="nav-item" v-intro="'Click here to get an overview over recent auctions.'" v-intro-step="1">
+              <router-link class="nav-link" :to="{ name: 'auction-list' }">Auctions</router-link>
             </li>
-          </ul>
-          <ul class="navbar-nav pr-3">
+          </b-navbar-nav>
+
+          <b-navbar-nav class="ml-auto">
             <li class="nav-item">
               <a class="nav-link" href="/docs/" target="_blank">Documentation</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/docs/#/faq" target="_blank">FAQ</a>
             </li>
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item" v-intro="'Click here to create a new auction.'">
+            <li class="nav-item" v-intro="'Click here to create a new auction.'" v-intro-step="2">
               <router-link tag="a" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">
                 Create new Auction
               </router-link>
             </li>
             <li class="nav-item">
-              <button class="nav-link btn ml-2 btn-secondary text-white" v-intro="'You can restart this tour anytime.'" @click="showHelp">
-                Help
-              </button>
+              <a
+                class="nav-link btn btn-secondary text-white"
+                :class="{ 'mt-1': navCollapsed, 'ml-1': !navCollapsed }"
+                v-intro="'You can restart this tour anytime.'"
+                v-intro-step="99"
+                @click="showHelp"
+                >Help</a
+              >
             </li>
-          </ul>
-        </div>
+          </b-navbar-nav>
+        </b-collapse>
       </div>
-    </nav>
+    </b-navbar>
 
     <router-view />
   </div>
@@ -53,12 +51,26 @@
 <script lang="ts">
 import Vue from 'vue'
 export default Vue.extend({
+  mounted() {
+    if (!this.$cookies.isKey('firstIntro')) {
+      // show introjs
+      this.showHelp()
+      this.$cookies.set('firstIntro', true)
+    }
+  },
   methods: {
     showHelp() {
+      const startAt = this.$router.currentRoute.name === 'home' ? 1 : 3 // start later if not on home
       this.$intro().showHints()
       this.$intro()
         .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+        .goToStepNumber(startAt)
         .start()
+    }
+  },
+  data: () => {
+    return {
+      navCollapsed: false
     }
   }
 })
@@ -74,6 +86,10 @@ export default Vue.extend({
 
 .content {
   flex: 1 0 auto;
+}
+
+.navbar-toggler {
+  border: none;
 }
 
 #nav {

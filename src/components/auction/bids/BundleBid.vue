@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column">
-    <form 
+    <form
       class="input-group btn-group"
       v-if="selectedGoods.length > 0 && (bidsLeft || (!bidsLeft && alreadyBid)) && bidsAllowed"
       @submit.enter.prevent="placeBid"
@@ -13,7 +13,10 @@
         <font-awesome-icon icon="times" />
       </button>
     </form>
-    <div v-if="selectedGoods.length > 0 && !bidsAllowed" class="alert alert-warning text-center">
+
+    <strategy-selector v-if="selectedGoods.length > 0 && bidsAllowed" class="pt-2" :auctionId="auctionId" />
+
+    <div v-if="selectedGoods.length > 0 && !bidsAllowed" class="alert pt-3 alert-warning text-center">
       Bids on this good are not allowed in this round.
     </div>
     <div v-if="!bidsLeft && !alreadyBid" class="alert alert-warning text-center">
@@ -24,7 +27,14 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder, ApiBundleEntry, ApiBundleEntryWrapper } from '../../../store/modules/auction'
+import auction, {
+  ApiAuctionType,
+  ApiAuction,
+  ApiBid,
+  ApiBidder,
+  ApiBundleEntry,
+  ApiBundleEntryWrapper
+} from '../../../store/modules/auction'
 import GoodBadgeComponent from '../GoodBadge.vue'
 import BidderService from '@/services/bidder'
 import GoodsService from '@/services/goods'
@@ -35,7 +45,8 @@ import hashBundle from '../../../services/bundleHash'
 export default Vue.extend({
   props: ['auctionId'],
   components: {
-    'good-badge': GoodBadgeComponent
+    'good-badge': GoodBadgeComponent,
+    'strategy-selector': () => import('./StrategySelector.vue')
   },
   data() {
     return {
@@ -88,6 +99,12 @@ export default Vue.extend({
 
       const restrictedBids = auction.auctionById()(this.$props.auctionId).auction.restrictedBids
       return !restrictedBids[bidderId] || restrictedBids[bidderId].some(value => value.hash === selectedBundle.hash)
+    },
+    selectedBidderStrategy(): string | undefined {
+      const bidderId = selection.selectedBidder()
+      if (bidderId) {
+        return auction.bidderById()(bidderId).strategy
+      }
     }
   },
   mounted() {
@@ -99,6 +116,9 @@ export default Vue.extend({
     },
     selectedBidder() {
       ;(this as any).determineBid()
+    },
+    selectedBidderStrategy() {
+      this.bid = null
     }
   },
   methods: {

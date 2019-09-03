@@ -15,6 +15,10 @@ if (process.env.VUE_APP_SENTRY_DSN) {
   })
 }
 
+// cookies
+import VueCookies from 'vue-cookies'
+Vue.use(VueCookies)
+
 // filters
 import './filters/numeral'
 import './filters/date'
@@ -41,7 +45,10 @@ import {
   faCheck,
   faTimes,
   faChevronDown,
-  faChevronUp
+  faChevronUp,
+  faBars,
+  faArchive,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -58,7 +65,10 @@ library.add(
   faSortDown,
   faEdit,
   faCheck,
-  faTimes
+  faTimes,
+  faBars,
+  faArchive,
+  faTrash
 )
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)

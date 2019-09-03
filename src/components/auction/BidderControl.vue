@@ -1,12 +1,8 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
-    <div class="small text-secondary font-weight-bold pl-2 pb-2">Current Strategy</div>
-
-    <b-form-select v-model="strategy.selected" @change="strategyChanged" :options="strategy.options"></b-form-select>
-
     <div>
       <div class="table-responsive">
-        <table class="table table-bidder table-hover">
+        <table class="table table-bidder table-bordered table-hover">
           <thead>
             <tr>
               <th>Currently Selected Bundle</th>
@@ -24,11 +20,11 @@
               <td v-if="pricedAuction">{{ priceForGood(selectedBundle) | formatNumber }}</td>
               <td v-if="pricedAuction">{{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
               <td>
-                 {{ bidForGood(selectedBundle) | formatNumber }}
+                {{ bidForGood(selectedBundle) | formatNumber }}
               </td>
               <td class="text-right">
                 <button v-if="bidForGood(selectedBundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(selectedBundle)">
-                  Remove Bid <font-awesome-icon icon="trash-alt" />
+                  <font-awesome-icon icon="times" /> Remove Bid
                 </button>
               </td>
             </tr>
@@ -69,7 +65,7 @@
               </td>
               <td class="text-right">
                 <button v-if="bundle.bid !== null" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">
-                  Remove Bid <font-awesome-icon icon="trash-alt" />
+                  <font-awesome-icon icon="times" /> Remove Bid
                 </button>
               </td>
             </tr>
@@ -107,21 +103,12 @@ export default Vue.extend({
     'sort-marker': SortMarker
   },
   props: ['auctionId'],
-  watch: {
-    selectedBidderStrategy: function(newStrategy) {
-      this.strategy.selected = newStrategy
-    }
-  },
   data() {
     return {
       selectedBundleHash: null,
       sort: {
         sortBy: 'value',
         sortASC: false
-      },
-      strategy: {
-        selected: ApiBidderStrategy.TRUTHFUL,
-        options: [{ value: ApiBidderStrategy.TRUTHFUL, text: 'Truthful' }, { value: ApiBidderStrategy.CUSTOM, text: 'Custom' }]
       }
     }
   },
@@ -130,12 +117,6 @@ export default Vue.extend({
       const bidderId = selection.selectedBidder()
       if (bidderId) {
         return auction.bidderById()(bidderId)
-      }
-    },
-    selectedBidderStrategy(): string | undefined {
-      const bidderId = selection.selectedBidder()
-      if (bidderId) {
-        return auction.bidderById()(bidderId).strategy
       }
     },
     selectedBundle(): ApiBundleEntryWrapper {
@@ -188,33 +169,6 @@ export default Vue.extend({
     }
   },
   methods: {
-    async strategyChanged(newStrategy: ApiBidderStrategy, oldStrategy: ApiBidderStrategy) {
-      if (!this.selectedBidder) {
-        return
-      }
-
-      try {
-        if (newStrategy === ApiBidderStrategy.TRUTHFUL && newStrategy !== oldStrategy) {
-          await this.$bvModal.msgBoxConfirm('All your bids will be overriden, are you sure?')
-          const bids: ApiBid[] = await auction.dispatchPropose({
-            auctionId: this.auctionId,
-            bidderIds: [this.selectedBidder.id!]
-          })
-
-          auction.commitRemoveBids({ bidderId: this.selectedBidder.id! })
-
-          bids.forEach(bid => {
-            auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
-          })
-
-          auction.commitChangeBidderStrategy({ bidderId: this.selectedBidder.id!, strategy: ApiBidderStrategy.TRUTHFUL })
-        } else {
-          auction.commitChangeBidderStrategy({ bidderId: this.selectedBidder.id!, strategy: ApiBidderStrategy.CUSTOM })
-        }
-      } catch (error) {
-        console.warn(error)
-      }
-    },
     sortBy(property: string) {
       this.sort.sortASC = !this.sort.sortASC
       this.sort.sortBy = property

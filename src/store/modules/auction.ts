@@ -368,7 +368,12 @@ async function createAuction(context: BareActionContext<AuctionState, RootState>
 }
 
 async function removeAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  const { data } = await api().delete(`/auctions/${payload.auctionId}`)
+  await api().delete(`/auctions/${payload.auctionId}`)
+  auction.commitRemoveAuction({ auctionId: payload.auctionId })
+}
+
+async function archiveAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
+  await api().post(`/auctions/${payload.auctionId}/archive`)
   auction.commitRemoveAuction({ auctionId: payload.auctionId })
 }
 
@@ -601,6 +606,7 @@ const auction = {
   dispatchGetAuctions: moduleBuilder.dispatch(getAuctions),
   dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
   dispatchRemoveAuction: moduleBuilder.dispatch(removeAuction),
+  dispatchArchiveAuction: moduleBuilder.dispatch(archiveAuction),
   dispatchPlaceBids: moduleBuilder.dispatch(placeBids),
   dispatchGetAuctionResult: moduleBuilder.dispatch(getResult),
   dispatchResetAuctionToRound: moduleBuilder.dispatch(resetAuctionToRound),

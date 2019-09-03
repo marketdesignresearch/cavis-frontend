@@ -1,11 +1,6 @@
 <template>
   <div class="container">
-    <h1>
-      Auctions
-      <router-link tag="button" class="btn btn-secondary btn-sm float-right" :to="{ name: 'auction-archive' }">
-        Archive <font-awesome-icon icon="archive" />
-      </router-link>
-    </h1>
+    <h1>Archived Auctions</h1>
     <hr />
 
     <div class="table-responsive">
@@ -17,9 +12,6 @@
             <th scope="col">Date</th>
             <th scope="col">Auction Type</th>
             <th scope="col">Domain</th>
-            <th scope="col"># Goods</th>
-            <th scope="col"># Bidders</th>
-            <th scope="col"># Played Rounds</th>
             <th scope="col"></th>
           </tr>
         </thead>
@@ -29,18 +21,22 @@
             <td>{{ auction.name || '-' }}</td>
             <td>{{ auction.createdAt | formatDate }}</td>
             <td>{{ auction.auctionType }}</td>
-            <td>{{ auction.auction.domain.type }}</td>
-            <td>{{ auction.auction.domain.goods.length }}</td>
-            <td>{{ auction.auction.domain.bidders.length }}</td>
-            <td>{{ auction.auction.rounds.length }}</td>
+            <td>{{ auction.domain }}</td>
             <td
               class="text-right"
               v-intro="'To load the auction, you can simply click on the button. To delete the auction, press on the small arrow.'"
               v-intro-step="3"
               v-intro-if="index === 0"
             >
-              <b-dropdown right variant="primary" split text="Load" class="m-2" :split-to="{ name: 'auction', params: { id: auction.id } }">
-                <b-dropdown-item @click="archive(auction.id)">Archive</b-dropdown-item>
+              <b-dropdown
+                right
+                variant="primary"
+                split
+                text="Load & Restore"
+                class="m-2"
+                :split-to="{ name: 'auction', params: { id: auction.uuid } }"
+              >
+                <b-dropdown-item @click="remove(auction.id)">Delete</b-dropdown-item>
               </b-dropdown>
             </td>
           </tr>
@@ -53,21 +49,26 @@
 <script lang="ts">
 import Vue from 'vue'
 import auction from '../store/modules/auction'
+import api from '../services/api'
 
 export default Vue.extend({
-  name: 'AuctionListView',
-  computed: {
-    auctions() {
-      return auction.auctions()
+  name: 'AuctionArchiveView',
+  data: () => {
+    return {
+      auctions: []
     }
   },
   methods: {
-    archive(auctionId: string) {
-      auction.dispatchArchiveAuction({ auctionId: auctionId })
+    async fetchAuctions() {
+      const { data } = await api().get(`/auctions/archived`)
+      this.auctions = data
+    },
+    async remove(auctionId: string) {
+      auction.dispatchRemoveAuction({ auctionId: auctionId })
     }
   },
   mounted() {
-    auction.dispatchGetAuctions()
+    this.fetchAuctions()
   }
 })
 </script>

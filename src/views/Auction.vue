@@ -9,7 +9,10 @@
         <div class="row">
           <div class="col">
             <div class="d-flex pt-4">
-              <div v-intro="'This, together with the righ-hand side, visualizes the bidders that take part in the auction.'">
+              <div
+                v-intro="'This, together with the right-hand side, visualizes the bidders that take part in the auction.'"
+                v-intro-step="3"
+              >
                 <span
                   v-for="(bidderId, index) in leftSideBidders"
                   :key="bidderId"
@@ -76,8 +79,14 @@
                       </div>
 
                       <div class="col d-flex align-items-center justify-content-start">
-                        <div><div class="small">Value:</div> {{ valueForGoods | formatNumber }}</div>
-                        <div class="pl-4" v-if="bidForGoods"><div class="small">Bid:</div> {{ bidForGoods | formatNumber }}</div>
+                        <div>
+                          <div class="small">Value:</div>
+                          {{ valueForGoods | formatNumber }}
+                        </div>
+                        <div class="pl-4" v-if="bidForGoods">
+                          <div class="small">Bid:</div>
+                          {{ bidForGoods | formatNumber }}
+                        </div>
                       </div>
                     </div>
                     <div class="row">

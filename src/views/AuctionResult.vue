@@ -7,7 +7,7 @@
         <p>Total Payments: {{ result.payments.totalPayments | formatNumber }}</p>
 
         <h2>Allocation</h2>
-        <table class="table table-striped">
+        <table class="table table-bordered table-bordered table-striped">
           <thead>
             <tr>
               <th scope="col">Bidder</th>
