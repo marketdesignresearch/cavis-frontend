@@ -25,6 +25,8 @@ $theme-colors: (
   'info': #71bbd9
 );
 
+$headings-color: theme-color('primary');
+
 $container-max-widths: (
   sm: 540px,
   md: 720px,
@@ -48,12 +50,11 @@ $body-bg: white;
 
   &.table thead th {
     color: lighten(black, 40%);
-    border: none;
     font-weight: bolder;
+    vertical-align: middle;
   }
 
   &.table tbody td {
-    border: none;
     vertical-align: middle;
   }
 }
@@ -91,5 +92,5 @@ $body-bg: white;
 
 .table-bordered td {
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }

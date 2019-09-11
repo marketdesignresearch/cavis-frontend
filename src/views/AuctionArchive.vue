@@ -34,7 +34,7 @@
                 split
                 text="Load & Restore"
                 class="m-2"
-                :split-to="{ name: 'auction', params: { id: auction.uuid } }"
+                :split-to="{ name: 'auction', params: { id: auction.id } }"
               >
                 <b-dropdown-item @click="remove(auction.id)">Delete</b-dropdown-item>
               </b-dropdown>

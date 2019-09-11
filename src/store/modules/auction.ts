@@ -5,6 +5,7 @@ import { RootState } from '..'
 import { normalize } from 'normalizr'
 import { auctionSchema } from './schemas'
 import selection from './selection'
+import BigNumber from 'bignumber.js'
 
 export interface AuctionState {
   bidders: {
@@ -181,7 +182,7 @@ export interface ApiBundleEntry {
 
 export interface ApiBid {
   id?: string
-  amount: number
+  amount: BigNumber
   value?: number
   bidderId?: string
   bundle: ApiBundleEntryWrapper
@@ -388,7 +389,7 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
 
   let bids: {
     [index: string]: {
-      amount: number
+      amount: BigNumber
       bundle: {
         [index: string]: number
       }
@@ -450,6 +451,7 @@ async function resetAuctionToRound(
   }
 
   bids.forEach((bid: ApiBid) => {
+    bid.amount = new BigNumber(bid.amount) // convert bid amount to bignumber
     auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
   })
 

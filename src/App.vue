@@ -19,15 +19,13 @@
 
           <b-navbar-nav class="ml-auto">
             <li class="nav-item">
-              <a class="nav-link" href="/docs/" target="_blank">Documentation</a>
+              <a class="nav-link" href="/docs/" target="_blank">Documentation <font-awesome-icon fixed-width icon="external-link-alt"/></a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/docs/#/faq" target="_blank">FAQ</a>
+              <router-link class="nav-link" :to="{ name: 'faq' }">FAQ</router-link>
             </li>
-            <li class="nav-item" v-intro="'Click here to create a new auction.'" v-intro-step="2">
-              <router-link tag="button" class="nav-link btn btn-primary text-white" :to="{ name: 'auction-create' }">
-                Create new Auction
-              </router-link>
+            <li class="nav-item">
+              <router-link class="nav-link" :to="{ name: 'about' }">About</router-link>
             </li>
             <li class="nav-item">
               <button
@@ -35,9 +33,9 @@
                 :class="{ 'mt-1': navCollapsed, 'ml-1': !navCollapsed }"
                 v-intro="'You can restart this tour anytime.'"
                 v-intro-step="99"
-                @click="showHelp"
+                @click="showTutorial"
               >
-                Help
+                Tutorial
               </button>
             </li>
           </b-navbar-nav>
@@ -55,12 +53,12 @@ export default Vue.extend({
   mounted() {
     if (!this.$cookies.isKey('firstIntro')) {
       // show introjs
-      this.showHelp()
+      this.showTutorial()
       this.$cookies.set('firstIntro', true)
     }
   },
   methods: {
-    showHelp() {
+    showTutorial() {
       const startAt = this.$router.currentRoute.name === 'home' ? 1 : 3 // start later if not on home
       this.$intro().showHints()
       this.$intro()

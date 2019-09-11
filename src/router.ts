@@ -42,6 +42,16 @@ export default new Router({
       path: '/auctions/:id',
       name: 'auction',
       component: () => import(/* webpackChunkName: "auction" */ './views/Auction.vue')
+    },
+    {
+      path: '/faq',
+      name: 'faq',
+      component: () => import(/* webpackChunkName: "faq" */ './views/Faq.vue')
+    },
+    {
+      path: '/about',
+      name: 'about',
+      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
     }
   ]
 })

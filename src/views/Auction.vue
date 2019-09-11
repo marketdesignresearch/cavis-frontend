@@ -4,7 +4,7 @@
       <Auctioneer v-if="activeAuction" :auction="activeAuction" />
     </div>
 
-    <div class="grow auction-view">
+    <div class="auction-view">
       <div class="container">
         <div class="row">
           <div class="col">
@@ -83,14 +83,10 @@
                           <div class="small">Value:</div>
                           {{ valueForGoods | formatNumber }}
                         </div>
-                        <div class="pl-4" v-if="bidForGoods">
-                          <div class="small">Bid:</div>
-                          {{ bidForGoods | formatNumber }}
-                        </div>
                       </div>
                     </div>
-                    <div class="row">
-                      <div class="col d-flex justify-content-center pt-2">
+                    <div class="row justify-content-center">
+                      <div class="col-8 d-flex justify-content-center pt-2">
                         <component :is="'component-bid-' + auctionType" :auctionId="auctionId" />
                       </div>
                     </div>
@@ -109,7 +105,7 @@
       </div>
     </div>
 
-    <div class="bg-light">
+    <div class="grow bg-light">
       <div
         class="container bottom-container"
         v-intro="
@@ -148,6 +144,7 @@ import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 import selection, { SelectionState } from '../store/modules/selection'
 import { mapGetters, mapState } from 'vuex'
 import BidderCircleVue from '@/components/auction/BidderCircle.vue'
+import BigNumber from 'bignumber.js'
 
 export default Vue.extend({
   components: {
@@ -221,7 +218,7 @@ export default Vue.extend({
 
       return 0
     },
-    bidForGoods(): number | null {
+    bidForGoods(): BigNumber | null {
       return GoodsService.bidForGood(selection.selectedBundle()!, selection.selectedBidder()!)
     },
     rounds(): number[] {
@@ -273,7 +270,6 @@ export default Vue.extend({
 .bottom-container {
   padding-top: 20px;
   padding-bottom: 15px;
-  min-height: 10vh;
 }
 
 .goods-container {
@@ -298,9 +294,7 @@ export default Vue.extend({
     width: 66.66%;
 
     position: relative;
-    height: 70px;
     bottom: -70px;
-
     border-radius: 35px;
     background: $light;
   }
@@ -314,7 +308,8 @@ export default Vue.extend({
 }
 
 .auction-view {
-  min-height: 60vh;
+  min-height: 40vh;
+  padding-bottom: 140px;
 }
 
 .grow {

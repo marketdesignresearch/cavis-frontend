@@ -49,7 +49,8 @@ import {
   faBars,
   faArchive,
   faTrash,
-  faInfoCircle
+  faInfoCircle,
+  faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
@@ -70,7 +71,8 @@ library.add(
   faBars,
   faArchive,
   faTrash,
-  faInfoCircle
+  faInfoCircle,
+  faExternalLinkAlt
 )
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)

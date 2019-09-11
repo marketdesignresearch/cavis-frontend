@@ -2,33 +2,7 @@
   <div class="bidder-control" v-if="selectedBidder">
     <div>
       <div class="table-responsive">
-        <table class="table table-bidder table-bordered table-hover">
-          <thead>
-            <tr>
-              <th>Currently Selected Bundle</th>
-              <th>Value <font-awesome-icon icon="coins" /></th>
-              <th v-if="pricedAuction">Price <font-awesome-icon icon="dollar-sign" /></th>
-              <th v-if="pricedAuction">Utility <font-awesome-icon icon="wrench" /></th>
-              <th class="w-25">Bid <font-awesome-icon icon="dollar-sign" /></th>
-              <th class="w-12-5"></th>
-            </tr>
-          </thead>
-          <tbody class="border-bottom pb-3">
-            <tr :class="{ active: selectedBundle.entries.length > 0 }">
-              <td><good-badge :ids="selectedBundle.entries" /></td>
-              <td>{{ valueForGood(selectedBundle) | formatNumber }}</td>
-              <td v-if="pricedAuction">{{ priceForGood(selectedBundle) | formatNumber }}</td>
-              <td v-if="pricedAuction">{{ (valueForGood(selectedBundle) - priceForGood(selectedBundle)) | formatNumber }}</td>
-              <td>
-                {{ bidForGood(selectedBundle) | formatNumber }}
-              </td>
-              <td class="text-right">
-                <button v-if="bidForGood(selectedBundle)" class="btn btn-outline-danger btn-sm" @click="removeBid(selectedBundle)">
-                  <font-awesome-icon icon="times" /> Remove Bid
-                </button>
-              </td>
-            </tr>
-          </tbody>
+        <table class="table table-bordered table-bidder table-hover">
           <thead>
             <tr>
               <th @click="sortBy('entriesString')" class="parentHover">
@@ -53,7 +27,7 @@
             <tr
               v-for="(bundle, index) in goodCombinations"
               :key="'set' + index"
-              :class="{ active: bundle.hash === selectedBundleHash, disabled: !isAllowed(bundle) }"
+              :class="{ active: bundle.hash === selectedBundle.hash, disabled: !isAllowed(bundle) }"
               @click="selectGoods(bundle)"
             >
               <td><good-badge :ids="bundle.entries" /></td>
@@ -94,6 +68,7 @@ import GoodBadgeComponent from './GoodBadge.vue'
 import selection from '../../store/modules/selection'
 import hashBundle from '../../services/bundleHash'
 import SortMarker from '../utils/sort-marker.vue'
+import BigNumber from 'bignumber.js'
 
 export default Vue.extend({
   name: 'BidderControl',
@@ -202,7 +177,7 @@ export default Vue.extend({
     priceForGood(bundle: ApiBundleEntryWrapper) {
       return GoodsService.priceForGood(this.$props.auctionId, bundle, selection.selectedBidder()!)
     },
-    bidForGood(bundle: ApiBundleEntryWrapper) {
+    bidForGood(bundle: ApiBundleEntryWrapper): BigNumber | null {
       return GoodsService.bidForGood(bundle, selection.selectedBidder()!)
     },
     removeBid(bundle: ApiBundleEntryWrapper) {

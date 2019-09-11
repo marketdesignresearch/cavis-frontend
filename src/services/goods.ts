@@ -1,5 +1,6 @@
 import auction, { ApiBid, ApiMechanismType, ApiBundleEntryWrapper, ApiBundleEntry } from '@/store/modules/auction'
 import hashBundle from './bundleHash'
+import BigNumber from 'bignumber.js'
 
 const powerSet = function(l: string[]): string[][] {
   // TODO: ensure l is actually array-like, and return null if not
@@ -87,7 +88,7 @@ export default {
     }
     return null
   },
-  bidForGood(goodIds: ApiBundleEntryWrapper, bidderId: string): number | null {
+  bidForGood(goodIds: ApiBundleEntryWrapper, bidderId: string): BigNumber | null {
     const bidder = auction.bidderById()(bidderId)
 
     if (bidder.bids) {

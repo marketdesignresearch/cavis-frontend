@@ -1,26 +1,32 @@
 <template>
   <div class="d-flex flex-column">
-    <form
-      class="input-group btn-group"
-      v-if="selectedGoods.length > 0 && (bidsLeft || (!bidsLeft && alreadyBid)) && bidsAllowed"
-      @submit.enter.prevent="placeBid"
-    >
-      <input v-model="bid" type="text" class="form-control w-75" placeholder="Your Bid" :disabled="bidEditable" />
-      <button @click="placeBid" class="btn btn-secondary btn-sm float-right" :class="{ 'btn-success': bidChanged }" :disabled="!bidChanged">
-        <font-awesome-icon icon="check" />
-      </button>
-      <button type="button" @click="removeBid(selectedBundle)" class="btn btn-danger btn-sm float-right" :disabled="!alreadyBid">
-        <font-awesome-icon icon="times" />
-      </button>
-    </form>
-
-    <strategy-selector v-if="selectedGoods.length > 0 && bidsAllowed" class="pt-2" :auctionId="auctionId" />
-
-    <div v-if="selectedGoods.length > 0 && !bidsAllowed" class="alert pt-3 alert-warning text-center">
-      Bids on this good are not allowed in this round.
+    <div v-if="selectedGoods.length > 0 && (bidsLeft || (!bidsLeft && alreadyBid)) && bidsAllowed">
+      <div class="text-left"><small>Bid:</small></div>
+      <form class="input-group btn-group" @submit.enter.prevent="placeBid">
+        <input v-model="bid" type="text" class="form-control w-75" placeholder="Your Bid" :disabled="bidEditable" />
+        <button
+          @click="placeBid"
+          class="btn btn-secondary btn-sm float-right text-white"
+          :class="{ 'btn-success': bidChanged, 'btn-warning': invalidInput(bid) }"
+          :disabled="!bidChanged || invalidInput(bid)"
+        >
+          <font-awesome-icon icon="check" />
+        </button>
+        <button type="button" @click="removeBid(selectedBundle)" class="btn btn-danger btn-sm float-right" :disabled="!alreadyBid">
+          <font-awesome-icon icon="times" />
+        </button>
+      </form>
     </div>
-    <div v-if="!bidsLeft && !alreadyBid" class="alert alert-warning text-center">
-      You have reached the maximum number of bids.
+
+    <div class="py-4">
+      <strategy-selector v-if="selectedGoods.length > 0 && bidsAllowed" class="pt-2 mb-2" :auctionId="auctionId" />
+
+      <div v-if="selectedGoods.length > 0 && !bidsAllowed" class="alert alert-warning text-center">
+        Bids on this good are not allowed in this round.
+      </div>
+      <div v-if="!bidsLeft && !alreadyBid" class="alert alert-warning text-center">
+        You have reached the maximum number of bids. If you want to add a bid, you need to remove one first.
+      </div>
     </div>
   </div>
 </template>
@@ -41,6 +47,7 @@ import GoodsService from '@/services/goods'
 import selection from '../../../store/modules/selection'
 import { mapGetters } from 'vuex'
 import hashBundle from '../../../services/bundleHash'
+import BigNumber from 'bignumber.js'
 
 export default Vue.extend({
   props: ['auctionId'],
@@ -61,6 +68,13 @@ export default Vue.extend({
     },
     bidChanged(): boolean {
       const currentBid = GoodsService.bidForGood(selection.selectedBundle()!, selection.selectedBidder()!)
+
+      console.log(currentBid, this.bid)
+
+      if (BigNumber.isBigNumber(currentBid) && this.bid) {
+        return !currentBid.isEqualTo(this.$data.bid)
+      }
+
       return this.bid !== currentBid
     },
     isAllowed(): boolean {
@@ -122,6 +136,9 @@ export default Vue.extend({
     }
   },
   methods: {
+    invalidInput(bid: string) {
+      return new BigNumber(bid).isNaN()
+    },
     async determineBid() {
       const bidderId = selection.selectedBidder()
       const selectedBundle = selection.selectedBundle()
@@ -153,7 +170,7 @@ export default Vue.extend({
       }
 
       const bid: ApiBid = {
-        amount: this.$data.bid,
+        amount: new BigNumber(this.$data.bid),
         bidderId: bidderId,
         bundle: {
           hash: hashBundle([]),
