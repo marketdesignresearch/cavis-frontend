@@ -127,9 +127,6 @@ export default Vue.extend({
     },
     selectedBidder() {
       ;(this as any).determineBid()
-    },
-    selectedBidderStrategy() {
-      this.bid = null
     }
   },
   methods: {
@@ -148,7 +145,7 @@ export default Vue.extend({
         const currentBid = GoodsService.bidForGood({ hash: hashBundle(bundle), entries: bundle }, selection.selectedBidder()!)
 
         if (currentBid) {
-          this.$data.bid = currentBid
+          this.$data.bid = currentBid.toString()
         } else {
           this.$data.bid = await BidderService.bidForBundle(bidderId, { hash: hashBundle(bundle), entries: bundle }, this.$props.auctionId)
         }
@@ -187,6 +184,7 @@ export default Vue.extend({
     },
     removeBid(bundle: ApiBundleEntryWrapper) {
       BidderService.removeBid(selection.selectedBidder()!, bundle)
+      ;(this as any).determineBid()
     }
   },
   name: 'BundleBid'
