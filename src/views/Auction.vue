@@ -123,11 +123,7 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import { AuctionGoodComponent, IAuctionGood } from '@/components/auction/Good.vue'
-import AuctionBidder from '@/components/auction/Bidder.vue'
-import AuctionSetup from '@/components/auction/Setup.vue'
-import Auctioneer from '@/components/auction/Auctioneer.vue'
-import BidderControl from '@/components/auction/BidderControl.vue'
+import { IAuctionGood } from '@/components/auction/Good.vue'
 import GoodsService from '@/services/goods'
 import auction, {
   ApiAuctionType,
@@ -143,18 +139,17 @@ import auction, {
 import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
 import selection, { SelectionState } from '../store/modules/selection'
 import { mapGetters, mapState } from 'vuex'
-import BidderCircleVue from '@/components/auction/BidderCircle.vue'
 import BigNumber from 'bignumber.js'
 
 export default Vue.extend({
   components: {
-    AuctionGood: AuctionGoodComponent,
-    AuctionBidder: AuctionBidder,
-    AuctionSetup: AuctionSetup,
-    Auctioneer: Auctioneer,
-    BidderControl: BidderControl,
-    'good-badge': GoodBadgeComponent,
-    'bidder-circle': BidderCircleVue,
+    AuctionGood: () => import('@/components/auction/Good.vue'),
+    AuctionBidder: () => import('@/components/auction/Bidder.vue'),
+    AuctionSetup: () => import('@/components/auction/Setup.vue'),
+    Auctioneer: () => import('@/components/auction/Auctioneer.vue'),
+    BidderControl: () => import('@/components/auction/BidderControl.vue'),
+    'good-badge': () => import('@/components/auction/GoodBadge.vue'),
+    'bidder-circle': () => import('@/components/auction/BidderCircle.vue'),
     'price-development-chart': () => import('@/components/auction/charts/PriceDevelopmentChart.vue'),
     'over-demand-chart': () => import('@/components/auction/charts/OverDemandChart.vue')
   },
@@ -163,10 +158,11 @@ export default Vue.extend({
       bidsPlaced: false
     }
   },
-  async mounted() {
+  async beforeMount() {
     // unselect everything
     selection.commitUnselectAll()
-
+  },
+  async mounted() {
     await auction.dispatchGetAuction({ auctionId: this.$route.params.id })
     const bids: ApiBid[] = await auction.dispatchPropose({
       auctionId: this.$route.params.id,

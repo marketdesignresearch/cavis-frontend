@@ -35,7 +35,7 @@ const AuctionGoodComponent = Vue.extend({
       }
     },
     bundleHash: async function(current, previous) {
-      const bidderId = selection.state().selectedBidder
+      const bidderId = selection.selectedBidder()
 
       if (bidderId) {
         this.updateProposedValue(bidderId)
@@ -71,9 +71,6 @@ const AuctionGoodComponent = Vue.extend({
   computed: {
     showProposedValue: function(): boolean {
       return selection.selectedGoods().indexOf(this.$props.goodId) === -1 && this.$data.proposedBundleValue !== null
-    },
-    selectedBidder: function(): string | null {
-      return selection.state().selectedBidder
     },
     bundleHash: function(): string {
       return Object.keys(selection.state().selectedGoods)

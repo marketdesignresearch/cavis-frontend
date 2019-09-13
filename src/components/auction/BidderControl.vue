@@ -63,19 +63,16 @@ import auction, {
 } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
-import BidderCircleVue from './BidderCircle.vue'
-import GoodBadgeComponent from './GoodBadge.vue'
 import selection from '../../store/modules/selection'
 import hashBundle from '../../services/bundleHash'
-import SortMarker from '../utils/sort-marker.vue'
 import BigNumber from 'bignumber.js'
 
 export default Vue.extend({
   name: 'BidderControl',
   components: {
-    'bidder-circle': BidderCircleVue,
-    'good-badge': GoodBadgeComponent,
-    'sort-marker': SortMarker
+    'bidder-circle': () => import('./BidderCircle.vue'),
+    'good-badge': () => import('./GoodBadge.vue'),
+    'sort-marker': () => import('../utils/sort-marker.vue')
   },
   props: ['auctionId'],
   data() {

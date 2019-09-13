@@ -22,7 +22,9 @@ import selection from '../../store/modules/selection'
 
 export default Vue.extend({
   name: 'AuctionBidder',
-  components: { 'bidder-circle': BidderCircleVue },
+  components: {
+    'bidder-circle': BidderCircleVue
+  },
   props: ['bidderId', 'auctionId'],
   methods: {
     bidsPlaced(bidder: ApiBidder) {
@@ -58,7 +60,8 @@ export default Vue.extend({
   padding-bottom: 70px;
   border-radius: 10px;
 
-  &.selected, &:hover {
+  &.selected,
+  &:hover {
     //background-color: white;
   }
 }

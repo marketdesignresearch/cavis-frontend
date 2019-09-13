@@ -1,7 +1,7 @@
 <template>
   <div class="text-left text-bold">
     <small>Strategy:</small>
-    <b-form-select v-model="strategy.selected" @change="strategyChanged" :options="strategy.options"></b-form-select>
+    <b-form-select :value="selectedBidderStrategy" @change="strategyChanged" :options="strategy.options"></b-form-select>
   </div>
 </template>
 
@@ -16,7 +16,6 @@ export default Vue.extend({
   data() {
     return {
       strategy: {
-        selected: ApiBidderStrategy.TRUTHFUL,
         options: [{ value: ApiBidderStrategy.TRUTHFUL, text: 'Truthful' }, { value: ApiBidderStrategy.CUSTOM, text: 'Custom' }]
       }
     }
@@ -30,11 +29,6 @@ export default Vue.extend({
       if (bidderId) {
         return auction.bidderById()(bidderId).strategy
       }
-    }
-  },
-  watch: {
-    selectedBidderStrategy: function(newStrategy) {
-      this.strategy.selected = newStrategy
     }
   },
   methods: {

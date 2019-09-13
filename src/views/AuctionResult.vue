@@ -57,14 +57,12 @@
 <script lang="ts">
 import Vue from 'vue'
 import auction, { ApiAuctionType, ApiAuction, ApiAuctionAllocation, AuctionState } from '../store/modules/auction'
-import GoodBadgeComponent from '@/components/auction/GoodBadge.vue'
-import BidderCircleVue from '@/components/auction/BidderCircle.vue'
 
 export default Vue.extend({
   name: 'AuctionResultView',
   components: {
-    'good-badge': GoodBadgeComponent,
-    'bidder-circle': BidderCircleVue
+    'good-badge': () => import('@/components/auction/GoodBadge.vue'),
+    'bidder-circle': () => import('@/components/auction/BidderCircle.vue')
   },
   methods: {
     getBidder(id: string) {

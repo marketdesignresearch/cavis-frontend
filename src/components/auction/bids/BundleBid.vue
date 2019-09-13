@@ -2,7 +2,7 @@
   <div class="d-flex flex-column">
     <div v-if="selectedGoods.length > 0 && (bidsLeft || (!bidsLeft && alreadyBid)) && bidsAllowed">
       <div class="text-left"><small>Bid:</small></div>
-      <form class="input-group btn-group" @submit.enter.prevent="placeBid">
+      <form class="input-group btn-group" @submit.enter.prevent>
         <input v-model="bid" type="text" class="form-control w-75" placeholder="Your Bid" :disabled="bidEditable" />
         <button
           @click="placeBid"
@@ -41,7 +41,6 @@ import auction, {
   ApiBundleEntry,
   ApiBundleEntryWrapper
 } from '../../../store/modules/auction'
-import GoodBadgeComponent from '../GoodBadge.vue'
 import BidderService from '@/services/bidder'
 import GoodsService from '@/services/goods'
 import selection from '../../../store/modules/selection'
@@ -52,7 +51,7 @@ import BigNumber from 'bignumber.js'
 export default Vue.extend({
   props: ['auctionId'],
   components: {
-    'good-badge': GoodBadgeComponent,
+    'good-badge': () => import('../GoodBadge.vue'),
     'strategy-selector': () => import('./StrategySelector.vue')
   },
   data() {
@@ -68,8 +67,6 @@ export default Vue.extend({
     },
     bidChanged(): boolean {
       const currentBid = GoodsService.bidForGood(selection.selectedBundle()!, selection.selectedBidder()!)
-
-      console.log(currentBid, this.bid)
 
       if (BigNumber.isBigNumber(currentBid) && this.bid) {
         return !currentBid.isEqualTo(this.$data.bid)

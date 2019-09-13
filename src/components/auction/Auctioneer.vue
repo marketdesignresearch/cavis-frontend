@@ -99,7 +99,6 @@ import auction, {
 } from '../../store/modules/auction'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
-import GoodBadgeComponent from './GoodBadge.vue'
 import hashBundle from '../../services/bundleHash'
 import api from '../../services/api'
 
@@ -107,7 +106,7 @@ export default Vue.extend({
   name: 'AuctionAuctioneer',
   props: ['auction'],
   components: {
-    'good-badge': GoodBadgeComponent,
+    'good-badge': () => import('./GoodBadge.vue'),
     'auction-static-information': () => import('./rounds/StaticInformation.vue')
   },
   watch: {
