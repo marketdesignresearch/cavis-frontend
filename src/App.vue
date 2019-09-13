@@ -53,7 +53,7 @@ export default Vue.extend({
   mounted() {
     if (!this.$cookies.isKey('firstIntro')) {
       // show introjs
-      this.showTutorial()
+      setTimeout(this.showTutorial, 3000)
       this.$cookies.set('firstIntro', true)
     }
   },
