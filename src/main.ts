@@ -75,6 +75,11 @@ library.add(
   faExternalLinkAlt
 )
 
+// vue-multiselect
+import Multiselect from 'vue-multiselect'
+Vue.component('multiselect', Multiselect)
+import 'vue-multiselect/dist/vue-multiselect.min.css'
+
 Vue.component('font-awesome-icon', FontAwesomeIcon)
 
 // Intro.js

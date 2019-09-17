@@ -198,7 +198,7 @@ export default Vue.extend({
     },
     results() {
       this.allocate()
-      this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
+      this.$router.push({ name: 'auction-result', query: { auctions: [this.$props.auction.id] } })
     },
     valueForGood(bidder: ApiBidder, goods: ApiBundleEntryWrapper) {
       if (this.bundleValues[bidder.id!]) {

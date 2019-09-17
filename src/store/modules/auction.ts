@@ -74,6 +74,7 @@ export interface ApiAuctionCreateDTO {
   }
   auctionType: ApiAuctionType
   name: string
+  tags: string[]
   auctionConfig: {
     maxBids?: number
     demandQueryTimeLimit?: number
@@ -101,6 +102,8 @@ export enum ApiAuctionOutcomeRule {
 
 export interface ApiAuction {
   id?: string
+  name: string
+  tags: string[]
   auction: {
     mechanismType: ApiMechanismType
     currentRoundType?: string
@@ -356,12 +359,6 @@ async function getAuction(context: BareActionContext<AuctionState, RootState>, p
   return data
 }
 
-async function getAuctions(context: BareActionContext<AuctionState, RootState>): Promise<ApiAuction[]> {
-  const { data } = await api().get('/auctions/')
-  data.forEach((auctionInstance: any) => auction.commitAppendAuction({ auction: auctionInstance }))
-  return data
-}
-
 async function createAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionCreateDTO: ApiAuctionCreateDTO }) {
   const { data } = await api().post('/auctions/', payload.auctionCreateDTO)
   auction.commitAppendAuction({ auction: data })
@@ -605,7 +602,6 @@ const auction = {
 
   // actions
   dispatchGetAuction: moduleBuilder.dispatch(getAuction),
-  dispatchGetAuctions: moduleBuilder.dispatch(getAuctions),
   dispatchCreateAuction: moduleBuilder.dispatch(createAuction),
   dispatchRemoveAuction: moduleBuilder.dispatch(removeAuction),
   dispatchArchiveAuction: moduleBuilder.dispatch(archiveAuction),

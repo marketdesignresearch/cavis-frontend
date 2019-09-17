@@ -147,6 +147,22 @@ export default Vue.extend({
               inputType: 'text',
               label: 'Name (optional)',
               model: 'name'
+            },
+            {
+              type: 'vueMultiSelect',
+              inputType: 'text',
+              label: 'Tags (optional)',
+              values: [],
+              selectOptions: {
+                taggable: true,
+                multiple: true,
+                onNewTag: function(newTag: string, _id: string, options: string[], value: string[]) {
+                  options.push(newTag)
+                  value.push(newTag)
+                }
+              },
+              default: [],
+              model: 'tags'
             }
           ]
         },
@@ -381,10 +397,24 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
+              label: 'Number of bids reserved for user',
+              model: 'manualBids',
+              default: 5,
+              validator: [VueFormGenerator.validators.required]
+            },
+            {
+              type: 'input',
+              inputType: 'number',
               label: 'Timelimit for Demand Queries (in seconds)',
               model: 'demandQueryTimeLimit',
               default: 5,
               validator: [VueFormGenerator.validators.required]
+            },
+            {
+              type: 'input',
+              inputType: 'number',
+              label: 'Seed',
+              model: 'seed'
             }
           ]
         }

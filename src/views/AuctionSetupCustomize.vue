@@ -48,6 +48,7 @@ export default Vue.extend({
         },
         auctionType: model.auctionType,
         name: model.name,
+        tags: model.tags,
         auctionConfig: {
           maxBids: model.maxBids,
           demandQueryTimeLimit: model.demandQueryTimeLimit

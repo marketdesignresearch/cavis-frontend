@@ -60,7 +60,7 @@ export default Vue.extend({
   },
   methods: {
     showAuctionResults() {
-      this.$router.push({ name: 'auction-result', params: { id: this.$props.auction.id } })
+      this.$router.push({ name: 'auction-result', query: { auctions: [this.$props.auction.id] } })
     },
     async resetRound(round: number) {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: round })
