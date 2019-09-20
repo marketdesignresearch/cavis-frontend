@@ -52,6 +52,16 @@ export default new Router({
       path: '/about',
       name: 'about',
       component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+    },
+    {
+      path: '/auth/login',
+      name: 'auth-login',
+      component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
+    },
+    {
+      path: '/oidc-callback', // Needs to match redirectUri (redirect_uri if you use snake case) in you oidcSettings
+      name: 'oidcCallback',
+      component: () => import(/* webpackChunkName: "oidc-callback" */ '@/components/auth/oidc-callback.vue')
     }
   ]
 })

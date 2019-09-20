@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="container">
-      <div class="jumbotron">
+    <div class="jumbotron">
+      <div class="container">
         <h1 class="display-4">Combinatorial Auction Visualizer</h1>
         <p class="lead">
           An online, interactive platform for combinatorial auctions.
@@ -12,9 +12,9 @@
           advantages and disadvantages in an interactive way.
         </p>
       </div>
-
-      <auction-create class="pb-4" />
     </div>
+
+    <auction-create class="pb-4" />
   </div>
 </template>
 

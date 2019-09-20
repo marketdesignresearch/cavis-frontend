@@ -124,9 +124,11 @@ export interface ApiAuction {
       [x: string]: number
     }
     allowedNumberOfBids: number
+    manualBids: number
     rounds: ApiRound[]
     outcomeRule: ApiAuctionOutcomeRule
   }
+  seed: number
   auctionType: ApiAuctionType
   result?: ApiAuctionAllocation
 }

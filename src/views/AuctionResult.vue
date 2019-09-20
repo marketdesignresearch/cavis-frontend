@@ -7,22 +7,21 @@
       <div class="row">
         <div class="col-2"></div>
         <div class="col" v-for="(auction, index) in auctions" :key="auction.id">
-          <div class="col font-weight-bold py-2 text-center">
-            Auction<br />
-            <span class="badge badge-primary">{{ auction.name || auction.id }}</span
-            ><br />
-            Efficiency: {{ results[index].revenue }}<br />
-            Social Welfare: {{ results[index].socialWelfare }}
+          <div class="col header py-2 text-center">
+            Auction: {{ auction.name || auction.id }}<br />
+            <a @click="calculateEfficiency()" class="badge badge-pill badge-success mr-1 text-white" v-if="!efficiency(index)"
+              >Calculate Efficiency</a
+            >
+            <span class="badge badge-pill badge-success mr-1" v-if="efficiency(index)">Efficiency: {{ efficiency(index) }}%</span>
+            <span class="badge badge-pill badge-secondary mr-1">Social Welfare: {{ results[index].socialWelfare }}</span>
+            <span class="badge badge-pill badge-secondary">Revenue: {{ results[index].revenue }}</span>
           </div>
-          <div class="row py-3 border-top border-bottom font-weight-bold">
+          <div class="row py-1 border-left border-right border-top border-bottom bg-primary text-white font-weight-bold">
             <div class="col">
               Efficient Allocation
             </div>
             <div class="col">
               Allocation
-            </div>
-            <div class="col">
-              Value
             </div>
             <div class="col">
               Payment
@@ -36,20 +35,22 @@
 
       <div v-if="results.length > 0">
         <div class="row" v-for="(value, key) in results[0].allocation" :key="key">
-          <div class="col-2">
-            <bidder-circle class="pb-2" :bidder="getBidder(key)" />
+          <div class="col-2 border-bottom">
+            <bidder-circle class="my-3" :bidder="getBidder(key)" />
           </div>
-          <div class="col border-left" v-for="(result, index) in results" :key="'result-' + index">
+          <div class="col border-bottom border-right border-left" v-for="(result, index) in results" :key="'result-' + index">
             <div class="row my-3">
               <div class="col">
-                <button class="btn btn-sm btn-primary" @click="fetchEfficientAllocation(auctions[index].id)">Calculate</button>
+                <div v-if="auctions[index].auction.domain.efficientAllocationCalculated">
+                  <good-badge :ids="auctions[index].auction.domain.efficientAllocation[key].bundle.entries"></good-badge><br />
+                  <span class="badge badge-primary"
+                    >Value: {{ auctions[index].auction.domain.efficientAllocation[key].trueValue | formatNumber }}</span
+                  >
+                </div>
               </div>
               <div class="col">
-                <good-badge :ids="value.bundle.entries"></good-badge>
-              </div>
-              <div class="col">
-                {{ value.value | formatNumber }}<br />
-                (Truthful: {{ value.trueValue | formatNumber }})
+                <good-badge :ids="value.bundle.entries"></good-badge><br />
+                <span class="badge badge-primary">Value: {{ value.trueValue | formatNumber }}</span>
               </div>
               <div class="col">
                 {{ result.payments[key] | formatNumber }}
@@ -79,7 +80,13 @@ export default Vue.extend({
     getBidder(id: string) {
       return auction.bidderById()(id)
     },
-    fetchEfficientAllocation(auctionId: string) {}
+    calculateEfficiency(auctionId: string) {},
+    efficiency(index: number) {
+      if (this.$data.auctions[index].auction.domain.efficientAllocationCalculated) {
+        return (this.$data.results[index].socialWelfare / this.$data.auctions[index].auction.domain.efficientSocialWelfare) * 100
+      }
+      return null
+    }
   },
   data() {
     return {
@@ -104,6 +111,10 @@ export default Vue.extend({
 
 .results-table {
   font-size: 0.8rem;
+
+  .header {
+    font-size: 1.2rem;
+  }
 }
 
 .no-gutters {

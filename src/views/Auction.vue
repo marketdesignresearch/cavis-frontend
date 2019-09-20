@@ -34,6 +34,8 @@
                 >
                   <div class="goods-title"><span>Goods</span></div>
 
+                  <pvm-inferred-values class="pvm-box" v-if="isPVM && auctioneerVisible" :auctionId="auctionId" />
+
                   <span v-for="goodId in goods" :key="goodId" @click="selectGood(goodId)">
                     <AuctionGood class="align-self-center d-inline-flex" :goodId="goodId" :auctionId="auctionId" />
                   </span>
@@ -151,7 +153,8 @@ export default Vue.extend({
     'good-badge': () => import('@/components/auction/GoodBadge.vue'),
     'bidder-circle': () => import('@/components/auction/BidderCircle.vue'),
     'price-development-chart': () => import('@/components/auction/charts/PriceDevelopmentChart.vue'),
-    'over-demand-chart': () => import('@/components/auction/charts/OverDemandChart.vue')
+    'over-demand-chart': () => import('@/components/auction/charts/OverDemandChart.vue'),
+    'pvm-inferred-values': () => import('@/components/auction/bids/PVMInferredValues.vue')
   },
   data() {
     return {
@@ -186,6 +189,7 @@ export default Vue.extend({
   },
   computed: {
     ...mapGetters('selection', ['selectedGoods']),
+    ...mapGetters('gui', ['auctioneerVisible']),
     ...mapState('selection', {
       selectedBidder(state: SelectionState) {
         if (state.selectedBidder) {
@@ -226,7 +230,11 @@ export default Vue.extend({
     },
     isCCA(): boolean {
       const currentAuction = auction.auctionById()(this.$route.params.id)
-      return currentAuction.auctionType.startsWith('CCA')
+      return currentAuction ? currentAuction.auctionType.startsWith('CCA') : false
+    },
+    isPVM(): boolean {
+      const currentAuction = auction.auctionById()(this.$route.params.id)
+      return currentAuction ? currentAuction.auctionType.startsWith('PVM') : false
     },
     auctionType(): string {
       const currentAuction = auction.auctionById()(this.$route.params.id)
@@ -266,6 +274,12 @@ export default Vue.extend({
 .bottom-container {
   padding-top: 20px;
   padding-bottom: 15px;
+}
+
+.pvm-box {
+  position: relative;
+  top: -15px;
+  right: 0px;
 }
 
 .goods-container {

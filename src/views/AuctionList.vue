@@ -25,7 +25,9 @@
         </thead>
         <tbody>
           <tr v-for="(auction, index) in auctions" :key="auction.id">
-            <td>{{ index + 1 }}</td>
+            <td>
+              {{ index + 1 }}
+            </td>
             <td>
               <click-to-edit :value="auction.name" @input="updateAuctionName($event, auction.id)" />
               <br /><span class="small">Seed: {{ auction.seed }}</span>
@@ -60,7 +62,7 @@
             >
               <b-dropdown right variant="primary" split text="Load" class="m-2" :split-to="{ name: 'auction', params: { id: auction.id } }">
                 <b-dropdown-item @click="archive(auction.id)">Archive</b-dropdown-item>
-                <b-dropdown-item @click="recreate(auction.id)">Re-create</b-dropdown-item>
+                <b-dropdown-item @click="recreate(auction.id)">Duplicate</b-dropdown-item>
                 <b-dropdown-item @click="edit(auction.id)">Edit</b-dropdown-item>
               </b-dropdown>
             </td>
@@ -76,6 +78,7 @@ import Vue from 'vue'
 import auction, { ApiAuction } from '../store/modules/auction'
 import api from '@/services/api'
 import ClickToEdit from '@/components/utils/click-to-edit.vue'
+import { configToModelJSON } from '@/services/auctionModel'
 
 export default Vue.extend({
   name: 'AuctionListView',
@@ -98,7 +101,7 @@ export default Vue.extend({
   methods: {
     async recreate(auctionId: string) {
       const { data: auction } = await api().get(`/auctions/${auctionId}`)
-      console.log('not implemented yet')
+      this.$router.push({ name: 'auction-customize', query: { auctionConfig: configToModelJSON(auction) } })
     },
     archive(auctionId: string) {
       auction.dispatchArchiveAuction({ auctionId: auctionId })
@@ -131,10 +134,29 @@ export default Vue.extend({
 </script>
 
 <style lang="scss">
+@import '../custom.scss';
+
 .inline-multiselect {
   .multiselect__tags {
     border: none;
     background: transparent;
+  }
+
+  .multiselect__tag-icon:focus,
+  .multiselect__tag-icon:hover {
+    background: darken(theme-color('primary'), 10%);
+  }
+
+  .multiselect__tag {
+    background: theme-color('primary');
+  }
+
+  .multiselect__option--highlight {
+    background: theme-color('primary');
+
+    &::after {
+      background: theme-color('primary');
+    }
   }
 
   input {

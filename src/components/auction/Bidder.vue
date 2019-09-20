@@ -7,7 +7,7 @@
           :title="bidder.description"
           :bidder="bidder"
           showStrategy="true"
-          :class="{ selected: isSelected, bidsPlaced: bidsPlaced(bidder) }"
+          :class="{ unselected: unSelected, selected: isSelected, bidsPlaced: bidsPlaced(bidder) }"
         />
       </div>
     </div>
@@ -41,6 +41,9 @@ export default Vue.extend({
     isSelected: function() {
       return selection.selectedBidder() === this.$props.bidderId
     },
+    unSelected: function() {
+      return selection.selectedBidder() && selection.selectedBidder() !== this.$props.bidderId
+    },
     bidComponent: function() {
       const mechanismType = auction.auctionById()(this.$props.auctionId).auction.mechanismType
       return 'component-bid-' + mechanismType
@@ -60,9 +63,12 @@ export default Vue.extend({
   padding-bottom: 70px;
   border-radius: 10px;
 
-  &.selected,
-  &:hover {
-    //background-color: white;
+  .unselected {
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
   }
 }
 

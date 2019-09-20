@@ -14,18 +14,6 @@
           <div
             class="card"
             style="width: 18rem;"
-            @click="configureAndCreate('custom')"
-            v-intro="'With this option, you can customize your auction from scratch.'"
-          >
-            <img src="../assets/custom.jpg" class="card-img-top" />
-            <div class="card-body">
-              <h5 class="card-title">Custom</h5>
-              <p class="card-text">Configure an auction from scratch, selecting the mechanism, domain and additional parameters.</p>
-            </div>
-          </div>
-          <div
-            class="card"
-            style="width: 18rem;"
             @click="configureAndCreate('new-zealand-1990')"
             v-intro="
               'This option brings you directly into an auction configuration that represents the New Zealand auction of 1990, which was a simultaneous second-price auction on multiple goods.'
@@ -65,6 +53,18 @@
             <div class="card-body">
               <h5 class="card-title">Swiss December 2000 UMTS</h5>
               <p class="card-text">A real-world example showing "bidder meltdown".</p>
+            </div>
+          </div>
+          <div
+            class="card"
+            style="width: 18rem;"
+            @click="configureAndCreate('custom')"
+            v-intro="'With this option, you can customize your auction from scratch.'"
+          >
+            <img src="../assets/custom.jpg" class="card-img-top" />
+            <div class="card-body">
+              <h5 class="card-title">Custom</h5>
+              <p class="card-text">Configure an auction from scratch, selecting the mechanism, domain and additional parameters.</p>
             </div>
           </div>
         </div>

@@ -16,8 +16,8 @@
       </b-collapse>
     </div>
 
-    <div class="text-right">
-      <button class="btn btn-success ml-1" @click.prevent="submit">Create</button>
+    <div class="text-right py-2">
+      <button class="btn btn-lg btn-success ml-1" @click.prevent="submit">Create</button>
     </div>
   </form>
 </template>
@@ -66,6 +66,8 @@ export default Vue.extend({
     showSchema(schemaName: string): boolean {
       if (!this.model) return false
       switch (schemaName) {
+        case 'strategySchema':
+          return false
         case 'llgDomainSchema':
           return (this.model as any).domainType.indexOf('llg') !== -1
         case 'defaultDomainSchema':
@@ -391,7 +393,7 @@ export default Vue.extend({
               inputType: 'number',
               label: 'Maximum number of bids per bidder & round',
               model: 'maxBids',
-              default: 10,
+              default: 20,
               validator: [VueFormGenerator.validators.required]
             },
             {

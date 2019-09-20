@@ -33,8 +33,21 @@ export default Vue.extend({
   },
   computed: {
     modelValue(): any {
-      const value = this.historicDomains.find((obj: any) => obj.id === this.$route.query.domain)
-      return value ? value.value : {}
+      // check if a domain is supplied, if yes apply
+      if (this.$route.query.domain) {
+        const value = this.historicDomains.find((obj: any) => obj.id === this.$route.query.domain)
+
+        if (value) {
+          return value.value
+        }
+      }
+
+      // if a config has been supplied, apply it
+      if (typeof this.$route.query.auctionConfig === 'string') {
+        return JSON.parse(this.$route.query.auctionConfig)
+      }
+
+      return {}
     }
   },
   methods: {

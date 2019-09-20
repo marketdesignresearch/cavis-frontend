@@ -1,8 +1,6 @@
 <template>
   <div class="flex-column">
     <div class="good" :class="{ selected: isSelected, disabled: !isAllowed }">
-      <div class="card-edge-top">{{ good.name }}</div>
-      <div class="card-edge-bottom">{{ good.name }}</div>
       <div class="name">{{ good.name }}</div>
       <span class="badge badge-success badge-pill badge-price" v-if="priceForGood">
         {{ priceForGood | formatNumber }} <font-awesome-icon icon="dollar-sign" />
@@ -115,24 +113,6 @@ export { AuctionGoodComponent }
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-
-  .card-edge-top {
-    position: absolute;
-    top: 5px;
-    left: 8px;
-    font-size: 10px;
-    opacity: 0.5;
-  }
-
-  .card-edge-bottom {
-    display: none;
-    position: absolute;
-    bottom: 5px;
-    right: 8px;
-    font-size: 10px;
-    transform: rotate(180deg);
-    opacity: 0.5;
-  }
 
   .name {
     position: absolute;

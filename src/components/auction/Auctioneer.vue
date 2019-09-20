@@ -23,24 +23,26 @@
 
     <b-collapse id="collapse-auctioneer" v-model="isAuctioneerVisible" class="mt-2 text-left">
       <h4>Rounds</h4>
+
       <b-tabs content-class="mt-3" v-model="selectedRound">
         <b-tab
           v-for="round in rounds"
+          style="position: relative"
           :title="round.roundNumber === rounds.length ? `${rounds.length} (Current Round)` : '' + round.roundNumber"
           :key="round.roundNumber"
         >
+          <div class="right py-3">
+            <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">
+              Reset to Round #{{ round.roundNumber }}
+            </button>
+            <button v-if="rounds.length > 1" @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
+            <button v-if="isMultiPhase" @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
+          </div>
+
           <table class="table table-bordered table-bidder">
             <thead>
               <tr>
-                <th scope="col">Bidder</th>
-                <th scope="col" v-if="goodCombinations.length <= 4">
-                  <div>Values</div>
-                  <div class="d-flex d-flex-column">
-                    <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
-                      <good-badge :ids="goodSet" />
-                    </div>
-                  </div>
-                </th>
+                <th class="w-25" scope="col">Bidder</th>
                 <th scope="col">Bids</th>
                 <th scope="col" v-if="isMultiRound">Interim Allocation</th>
                 <th scope="col" v-if="isMultiRound">Payment</th>
@@ -48,17 +50,14 @@
             </thead>
             <tbody>
               <tr v-for="bidder of bidders" :key="bidder.id">
-                <td>{{ bidder.shortDescription }}</td>
-                <td v-if="goodCombinations.length <= 4">
-                  <div class="d-flex d-flex-column">
-                    <div class="flex-grow-1 flex-basis-0" v-for="(goodSet, index) in goodCombinations" :key="'set' + index">
-                      {{ valueForGood(bidder, goodSet) | formatNumber }}
-                    </div>
-                  </div>
-                </td>
+                <td class="w-25">Bidder {{ bidder.name }}</td>
                 <td>
-                  <div v-for="bid in bidsByBidder(bidder, round)" :key="bid.id">
-                    {{ bid.amount | formatNumber }} for <good-badge :ids="bid.bundle.entries.map(obj => obj.good)" />
+                  <div class="row">
+                    <div class="col" v-for="(bids, index) in bidsByBidderChunked(bidder, round)" :key="'chunked-' + index">
+                      <div v-for="bid in bids" :key="bid.id">
+                        {{ bid.amount | formatNumber }} for <good-badge :ids="bid.bundle.entries.map(obj => obj.good)" />
+                      </div>
+                    </div>
                   </div>
                 </td>
                 <td v-if="isMultiRound">
@@ -68,14 +67,6 @@
               </tr>
             </tbody>
           </table>
-
-          <div class="text-right py-3">
-            <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">
-              Reset to Round #{{ round.roundNumber }}
-            </button>
-            <button v-if="rounds.length > 1" @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
-            <button v-if="isMultiPhase" @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
-          </div>
         </b-tab>
       </b-tabs>
     </b-collapse>
@@ -97,6 +88,7 @@ import auction, {
   ApiBundleEntryWrapper,
   ApiBundleValue
 } from '../../store/modules/auction'
+import gui from '../../store/modules/gui'
 import BidderService from '../../services/bidder'
 import GoodsService from '../../services/goods'
 import hashBundle from '../../services/bundleHash'
@@ -125,19 +117,25 @@ export default Vue.extend({
   data: () => {
     const data: {
       selectedRound: number | null
-      isAuctioneerVisible: boolean
       bundleValues: {
         [x: string]: ApiBundleValue[]
       }
     } = {
       selectedRound: null,
-      isAuctioneerVisible: false,
       bundleValues: {}
     }
 
     return data
   },
   computed: {
+    isAuctioneerVisible: {
+      get(): boolean {
+        return gui.auctioneerVisible()
+      },
+      set(value: boolean) {
+        gui.commitAuctioneerVisibility({ visible: value })
+      }
+    },
     roundType(): string {
       return 'component-round-' + this.$props.auction.auctionType
     },
@@ -208,9 +206,14 @@ export default Vue.extend({
 
       return '-'
     },
-    bidsByBidder(bidder: ApiBidder, round: ApiRound) {
+    bidsByBidderChunked(bidder: ApiBidder, round: ApiRound, chunkSize = 4) {
       if (round.bids) {
-        return round.bids.filter(bid => bid.bidderId === bidder.id)
+        const filtered = round.bids.filter(bid => bid.bidderId === bidder.id)
+        return filtered
+          .map((element, index) => {
+            return index % chunkSize === 0 ? filtered.slice(index, index + chunkSize) : null
+          })
+          .filter(e => e !== null)
       }
       return []
     },
@@ -281,5 +284,11 @@ export default Vue.extend({
 
 .flex-basis-0 {
   flex-basis: 0;
+}
+
+.right {
+  position: absolute;
+  right: 0;
+  top: -70px;
 }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="hover">
     <input
+      class="form-control"
       type="text"
       v-if="edit"
       :value="valueLocal"

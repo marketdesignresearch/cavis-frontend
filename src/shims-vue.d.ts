@@ -5,3 +5,4 @@ declare module '*.vue' {
 
 declare module 'vue-form-generator'
 declare module 'color-scheme'
+declare module 'vuex-oidc'

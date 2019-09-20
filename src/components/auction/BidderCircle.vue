@@ -2,10 +2,11 @@
   <div :style="{ 'background-image': backgroundImage }" class="bidder text-center">
     <div class="badges justify-content-center">
       <div>
-        <span class="badge badge-secondary">{{ bidder.name.length > 3 ? bidder.name : bidder.shortDescription }}</span>
+        <span class="badge badge-secondary">Bidder {{ bidder.name }}</span>
       </div>
       <div>
         <span class="badge badge-primary" v-if="showStrategy">{{ strategy }}</span>
+        <span class="badge badge-primary mx-1">{{ bidder.shortDescription }}</span>
       </div>
     </div>
   </div>

@@ -12,10 +12,16 @@ export default () => {
   })
 
   // before a request is made start the nprogress
-  api.interceptors.request.use(config => {
-    NProgress.start()
-    return config
-  })
+  api.interceptors.request.use(
+    config => {
+      NProgress.start()
+      return config
+    },
+    error => {
+      console.warn(error)
+      NProgress.done()
+    }
+  )
 
   // before a response is returned stop nprogress
   api.interceptors.response.use(response => {
