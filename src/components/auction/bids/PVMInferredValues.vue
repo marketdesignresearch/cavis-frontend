@@ -20,18 +20,25 @@ import Vue from 'vue'
 import selection from '@/store/modules/selection'
 import auction from '@/store/modules/auction'
 import api from '../../../services/api'
+import { mapGetters } from 'vuex'
 
 export default Vue.extend({
   props: ['auctionId'],
   watch: {
     selectedGoods() {
-      //;(this as any).determinePredicted()
+      ;(this as any).determinePredicted()
     },
     selectedBidder() {
-      //;(this as any).determinePredicted()
+      ;(this as any).determinePredicted()
+    }
+  },
+  data() {
+    return {
+      proposedBundleValue: null
     }
   },
   computed: {
+    ...mapGetters('selection', ['selectedGoods', 'selectedBidder']),
     reportedValue(): number | string {
       const selectedBundle = selection.selectedBundle().hash
       const selectedBidder = selection.selectedBidder()
@@ -52,7 +59,7 @@ export default Vue.extend({
       return reportedValue
     },
     predictedValue(): number | string {
-      return '-'
+      return this.$data.proposedBundleValue ? this.$data.proposedBundleValue : '-'
     }
   },
   methods: {
@@ -65,15 +72,13 @@ export default Vue.extend({
         bundle[key] = 1
       })
 
-      bundle[this.$props.goodId] = 1
-
       const valueQuery = {
-        bidders: [selectedBidder],
-        bundles: [bundle]
+        bidder: selectedBidder,
+        bundle: bundle
       }
 
-      const { data: valueQueryResult } = await api().post(`/auctions/${this.$props.auctionId}/valuequery`, valueQuery)
-      this.$data.proposedBundleValue = valueQueryResult[0].value
+      const { data: valueQueryResult } = await api().post(`/auctions/${this.$props.auctionId}/inferredvaluequery`, valueQuery)
+      this.$data.proposedBundleValue = (valueQueryResult.inferredValues as number[]).pop()
     }
   }
 })
