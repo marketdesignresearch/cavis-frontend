@@ -1,7 +1,15 @@
 <template>
   <div class="container content">
-    <h2>Results</h2>
-    <hr />
+    <h2>
+      Results
+      <router-link
+        v-if="auctions.length === 1"
+        tag="button"
+        class="btn btn-success btn-sm pull-right"
+        :to="{ name: 'auction', params: { id: auctions[0].id } }"
+        >Back to Auction</router-link
+      >
+    </h2>
 
     <div class="results-table" v-if="results.length > 0 && auctions.length > 0">
       <div class="row">

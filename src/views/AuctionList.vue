@@ -9,14 +9,27 @@
     <hr />
 
     <div class="table-responsive">
-      <table class="table table-bordered table-striped">
+      <table class="table table-bordered table-striped table-bidder">
         <thead>
           <tr>
-            <th scope="col"></th>
-            <th scope="col">Name</th>
-            <th scope="col">Date</th>
-            <th scope="col">Auction Type</th>
-            <th scope="col">Domain</th>
+            <th scope="col" @click="sortBy('number')" class="parentHover">
+              # <sort-marker :sortable="sort" :property="'number'"></sort-marker>
+            </th>
+            <th scope="col" @click="sortBy('name')" class="parentHover">
+              Name <sort-marker :sortable="sort" :property="'name'"></sort-marker>
+            </th>
+            <th scope="col" @click="sortBy('createdAt')" class="parentHover">
+              Date <sort-marker :sortable="sort" :property="'createdAt'"></sort-marker>
+            </th>
+            <th scope="col" @click="sortBy('auctionType')" class="parentHover">
+              Auction Type <sort-marker :sortable="sort" :property="'auctionType'"></sort-marker>
+            </th>
+            <th scope="col" @click="sortBy('domain')" class="parentHover">
+              Domain <sort-marker :sortable="sort" :property="'domain'"></sort-marker>
+            </th>
+            <th scope="col" @click="sortBy('seed')" class="parentHover">
+              Seed <sort-marker :sortable="sort" :property="'seed'"></sort-marker>
+            </th>
             <th scope="col"># Goods and Bidders</th>
             <th scope="col"># Played Rounds</th>
             <th scope="col">Tags</th>
@@ -24,17 +37,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(auction, index) in auctions" :key="auction.id">
+          <tr v-for="(auction, index) in sortedAuctions" :key="auction.id">
             <td>
-              {{ index + 1 }}
+              {{ auction.number }}
             </td>
             <td>
               <click-to-edit :value="auction.name" @input="updateAuctionName($event, auction.id)" />
-              <br /><span class="small">Seed: {{ auction.seed }}</span>
             </td>
             <td>{{ auction.createdAt | formatDate }}</td>
             <td>{{ auction.auctionType }}</td>
             <td>{{ auction.domain }}</td>
+            <td>{{ auction.seed }}</td>
             <td>
               Goods: {{ auction.numberOfGoods }}<br />
               Bidders: {{ auction.numberOfBidders }}
@@ -60,7 +73,15 @@
               v-intro-step="3"
               v-intro-if="index === 0"
             >
-              <b-dropdown right variant="primary" split text="Load" class="m-2" :split-to="{ name: 'auction', params: { id: auction.id } }">
+              <b-dropdown
+                right
+                variant="primary"
+                size="sm"
+                split
+                text="Load"
+                class="m-2"
+                :split-to="{ name: 'auction', params: { id: auction.id } }"
+              >
                 <b-dropdown-item @click="archive(auction.id)">Archive</b-dropdown-item>
                 <b-dropdown-item @click="recreate(auction.id)">Duplicate</b-dropdown-item>
                 <b-dropdown-item @click="edit(auction.id)">Edit</b-dropdown-item>
@@ -77,18 +98,22 @@
 import Vue from 'vue'
 import auction, { ApiAuction } from '../store/modules/auction'
 import api from '@/services/api'
-import ClickToEdit from '@/components/utils/click-to-edit.vue'
 import { configToModelJSON } from '@/services/auctionModel'
 
 export default Vue.extend({
   name: 'AuctionListView',
   components: {
-    'click-to-edit': ClickToEdit
+    'click-to-edit': () => import('@/components/utils/click-to-edit.vue'),
+    'sort-marker': () => import('@/components/utils/sort-marker.vue')
   },
   data: () => {
     return {
       auctions: [],
-      tagOptions: []
+      tagOptions: [],
+      sort: {
+        sortBy: 'createdAt',
+        sortASC: false
+      }
     }
   },
   computed: {
@@ -96,15 +121,35 @@ export default Vue.extend({
       return [].concat.apply([], this.$data.auctions.map((auction: ApiAuction) => auction.tags)).filter((item, index, array) => {
         return array.indexOf(item) === index
       })
+    },
+    sortedAuctions() {
+      const sortedArray = this.$data.auctions
+        .map((auction: any, index: number) => {
+          auction.number = index
+          return auction
+        })
+        .sort((a: ApiAuction, b: ApiAuction) => {
+          if (!this.sort.sortASC) {
+            return (a as any)[this.sort.sortBy] >= (b as any)[this.sort.sortBy] ? -1 : 1
+          }
+          return (a as any)[this.sort.sortBy] < (b as any)[this.sort.sortBy] ? -1 : 1
+        })
+
+      return sortedArray
     }
   },
   methods: {
+    sortBy(property: string) {
+      this.sort.sortASC = !this.sort.sortASC
+      this.sort.sortBy = property
+    },
     async recreate(auctionId: string) {
       const { data: auction } = await api().get(`/auctions/${auctionId}`)
       this.$router.push({ name: 'auction-customize', query: { auctionConfig: configToModelJSON(auction) } })
     },
     archive(auctionId: string) {
       auction.dispatchArchiveAuction({ auctionId: auctionId })
+      this.$data.auctions.splice(this.$data.auctions.findIndex((auction: ApiAuction) => auction.id === auctionId), 1)
     },
     updateAuctionName(newName: string, id: string) {
       api().patch(`/auctions/${id}`, { name: newName })

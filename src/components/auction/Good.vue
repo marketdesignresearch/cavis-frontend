@@ -5,7 +5,9 @@
       <span class="badge badge-success badge-pill badge-price" v-if="priceForGood">
         {{ priceForGood | formatNumber }} <font-awesome-icon icon="dollar-sign" />
       </span>
-      <div class="proposedValue" v-if="showProposedValue">{{ proposedBundleValue | formatNumber }}</div>
+      <div class="proposedValue" v-if="showProposedValue">
+        {{ proposedBundleValue > 0 ? '+' : '' }}{{ proposedBundleValue | formatNumber }}
+      </div>
     </div>
   </div>
 </template>
@@ -55,15 +57,17 @@ const AuctionGoodComponent = Vue.extend({
         bundle[key] = 1
       })
 
+      const originalBundle = Object.assign({}, bundle)
+
       bundle[this.$props.goodId] = 1
 
       const valueQuery = {
         bidders: [bidderId],
-        bundles: [bundle]
+        bundles: [bundle, originalBundle]
       }
 
       const { data: valueQueryResult } = await api().post(`/auctions/${this.$props.auctionId}/valuequery`, valueQuery)
-      this.$data.proposedBundleValue = valueQueryResult[bidderId][0].value
+      this.$data.proposedBundleValue = valueQueryResult[bidderId][0].value - valueQueryResult[bidderId][1].value
     }
   },
   computed: {

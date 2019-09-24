@@ -2,7 +2,7 @@
   <div>
     <div class="pvm d-inline-block">
       <div class="pvm-title">
-        <span>PVM</span>
+        <span>Auctioneer's Knowledge / Belief</span>
       </div>
       <div class="row">
         <div class="col">Reported Value:</div>
@@ -101,7 +101,10 @@ export default Vue.extend({
 }
 
 .pvm {
-  position: relative;
+  position: absolute;
+  right: -75px;
+  top: -50px;
+
   font-size: 0.8rem;
   background: #563d7c;
   color: $light;
