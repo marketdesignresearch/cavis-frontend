@@ -75,23 +75,27 @@ export interface ApiAuctionCreateDTO {
   auctionType: ApiAuctionType
   name: string
   tags: string[]
-  auctionConfig: {
-    maxBids?: number
-    demandQueryTimeLimit?: number
-    reservePrices?: Map<string, number>
-    useProposedReservePrices?: boolean
-    ccaConfig?: {
-      supplementaryBids: number
-      priceUpdate: number
-      initialPriceUpdateIfPriceEqualsZero: number
-      paymentRule: ApiAuctionPaymentRule
-      maxRounds: number
-    }
-    pvmConfig?: {
-      initialRoundBid: number
-      paymentRule: ApiAuctionPaymentRule
-      maxRounds: number
-    }
+  private: boolean
+  auctionConfig: ApiAuctionConfig
+}
+
+export interface ApiAuctionConfig {
+  maxBids?: number
+  manualBids?: number
+  demandQueryTimeLimit?: number
+  reservePrices?: Map<string, number>
+  useProposedReservePrices?: boolean
+  ccaConfig?: {
+    supplementaryBids: number
+    priceUpdate: number
+    initialPriceUpdateIfPriceEqualsZero: number
+    paymentRule: ApiAuctionPaymentRule
+    maxRounds: number
+  }
+  pvmConfig?: {
+    initialRoundBid: number
+    paymentRule: ApiAuctionPaymentRule
+    maxRounds: number
   }
 }
 
@@ -104,6 +108,7 @@ export interface ApiAuction {
   id?: string
   name: string
   tags: string[]
+  auctionConfig: ApiAuctionConfig
   auction: {
     mechanismType: ApiMechanismType
     currentRoundType?: string
@@ -356,29 +361,29 @@ function addResult(state: AuctionState, payload: { auctionId: string; result: Ap
 
 // actions
 async function getAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }): Promise<ApiAuction> {
-  const { data } = await api().get(`/auctions/${payload.auctionId}`)
+  const { data } = await api.get(`/auctions/${payload.auctionId}`)
   auction.commitAppendAuction({ auction: data })
   return data
 }
 
 async function createAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionCreateDTO: ApiAuctionCreateDTO }) {
-  const { data } = await api().post('/auctions/', payload.auctionCreateDTO)
+  const { data } = await api.post('/auctions/', payload.auctionCreateDTO)
   auction.commitAppendAuction({ auction: data })
   return data
 }
 
 async function removeAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  await api().delete(`/auctions/${payload.auctionId}`)
+  await api.delete(`/auctions/${payload.auctionId}`)
   auction.commitRemoveAuction({ auctionId: payload.auctionId })
 }
 
 async function archiveAuction(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  await api().post(`/auctions/${payload.auctionId}/archive`)
+  await api.post(`/auctions/${payload.auctionId}/archive`)
   auction.commitRemoveAuction({ auctionId: payload.auctionId })
 }
 
 async function getRoundResult(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string; round: number }) {
-  const { data } = await api().get(`/auctions/${payload.auctionId}/rounds/${payload.round}/result`)
+  const { data } = await api.get(`/auctions/${payload.auctionId}/rounds/${payload.round}/result`)
   auction.commitRoundResult({ auctionId: payload.auctionId, round: payload.round, result: data })
 }
 
@@ -414,8 +419,8 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
   })
 
   // place bids and close round
-  await api().post(`/auctions/${payload.auctionId}/bids`, bids)
-  const { data: auctionData } = await api().post(`/auctions/${payload.auctionId}/close-round`, bids)
+  await api.post(`/auctions/${payload.auctionId}/bids`, bids)
+  const { data: auctionData } = await api.post(`/auctions/${payload.auctionId}/close-round`, bids)
 
   // update auctions after placing bids
   auction.commitAppendAuction({ auction: auctionData })
@@ -429,7 +434,7 @@ async function placeBids(context: BareActionContext<AuctionState, RootState>, pa
 }
 
 async function getResult(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  const { data } = await api().get(`/auctions/${payload.auctionId}/result`)
+  const { data } = await api.get(`/auctions/${payload.auctionId}/result`)
   auction.commitResult({ auctionId: payload.auctionId, result: data })
   return data
 }
@@ -438,7 +443,7 @@ async function resetAuctionToRound(
   context: BareActionContext<AuctionState, RootState>,
   payload: { auctionId: string; round: number; standardBids?: boolean }
 ) {
-  let { data: bids } = await api().put(`/auctions/${payload.auctionId}/reset`, { round: payload.round })
+  let { data: bids } = await api.put(`/auctions/${payload.auctionId}/reset`, { round: payload.round })
 
   // update auction
   await auction.dispatchGetAuction({ auctionId: payload.auctionId })
@@ -459,7 +464,7 @@ async function resetAuctionToRound(
 }
 
 async function advanceRound(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  const { data } = await api().post(`/auctions/${payload.auctionId}/advance-round`)
+  const { data } = await api.post(`/auctions/${payload.auctionId}/advance-round`)
   auction.commitAppendAuction({ auction: data })
   if (!data.finished) {
     const bids: ApiBid[] = await auction.dispatchPropose({
@@ -474,7 +479,7 @@ async function advanceRound(context: BareActionContext<AuctionState, RootState>,
 }
 
 async function advancePhase(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  const { data } = await api().post(`/auctions/${payload.auctionId}/advance-phase`)
+  const { data } = await api.post(`/auctions/${payload.auctionId}/advance-phase`)
   auction.commitAppendAuction({ auction: data })
   if (!data.finished) {
     const bids: ApiBid[] = await auction.dispatchPropose({
@@ -489,7 +494,7 @@ async function advancePhase(context: BareActionContext<AuctionState, RootState>,
 }
 
 async function finish(context: BareActionContext<AuctionState, RootState>, payload: { auctionId: string }) {
-  const { data } = await api().post(`/auctions/${payload.auctionId}/finish`)
+  const { data } = await api.post(`/auctions/${payload.auctionId}/finish`)
   auction.commitAppendAuction({ auction: data })
 }
 
@@ -497,7 +502,7 @@ async function propose(
   context: BareActionContext<AuctionState, RootState>,
   payload: { auctionId: string; bidderIds: string[] }
 ): Promise<ApiBid[]> {
-  const { data } = await api().post(`/auctions/${payload.auctionId}/propose`, payload.bidderIds)
+  const { data } = await api.post(`/auctions/${payload.auctionId}/propose`, payload.bidderIds)
   data.forEach((bid: ApiBid) => {
     if (bid.value) {
       const bundleValue: ApiBundleValue = {
@@ -537,7 +542,7 @@ async function valueQuery(
     bundles: bundles
   }
 
-  const { data: valueQueryResult } = await api().post(`/auctions/${payload.auctionId}/valuequery`, valueQuery)
+  const { data: valueQueryResult } = await api.post(`/auctions/${payload.auctionId}/valuequery`, valueQuery)
 
   Object.keys(valueQueryResult).forEach(bidderId => {
     valueQueryResult[bidderId].forEach((value: ApiBundleValue) => {

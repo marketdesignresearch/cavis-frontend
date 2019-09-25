@@ -100,20 +100,20 @@ export default Vue.extend({
     }
   },
   methods: {
+    async fetchAuctions(): Promise<void> {
+      const { data } = await api.get(`/auctions/archived`)
+      this.auctions = data
+    },
+    async remove(auctionId: string): Promise<void> {
+      auction.dispatchRemoveAuction({ auctionId: auctionId })
+    },
     sortBy(property: string) {
       this.sort.sortASC = !this.sort.sortASC
       this.sort.sortBy = property
-    },
-    async fetchAuctions() {
-      const { data } = await api().get(`/auctions/archived`)
-      this.auctions = data
-    },
-    async remove(auctionId: string) {
-      auction.dispatchRemoveAuction({ auctionId: auctionId })
     }
   },
   mounted() {
-    this.fetchAuctions()
+    ;(this as any).fetchAuctions()
   }
 })
 </script>

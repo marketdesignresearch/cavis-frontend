@@ -77,7 +77,7 @@ export default Vue.extend({
         bundle: bundle
       }
 
-      const { data: valueQueryResult } = await api().post(`/auctions/${this.$props.auctionId}/inferredvaluequery`, valueQuery)
+      const { data: valueQueryResult } = await api.post(`/auctions/${this.$props.auctionId}/inferredvaluequery`, valueQuery)
       this.$data.proposedBundleValue = (valueQueryResult.inferredValues as number[]).pop()
     }
   }

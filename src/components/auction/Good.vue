@@ -66,7 +66,7 @@ const AuctionGoodComponent = Vue.extend({
         bundles: [bundle, originalBundle]
       }
 
-      const { data: valueQueryResult } = await api().post(`/auctions/${this.$props.auctionId}/valuequery`, valueQuery)
+      const { data: valueQueryResult } = await api.post(`/auctions/${this.$props.auctionId}/valuequery`, valueQuery)
       this.$data.proposedBundleValue = valueQueryResult[bidderId][0].value - valueQueryResult[bidderId][1].value
     }
   },

@@ -144,7 +144,7 @@ export default Vue.extend({
       this.sort.sortBy = property
     },
     async recreate(auctionId: string) {
-      const { data: auction } = await api().get(`/auctions/${auctionId}`)
+      const { data: auction } = await api.get(`/auctions/${auctionId}`)
       this.$router.push({ name: 'auction-customize', query: { auctionConfig: configToModelJSON(auction) } })
     },
     archive(auctionId: string) {
@@ -152,14 +152,14 @@ export default Vue.extend({
       this.$data.auctions.splice(this.$data.auctions.findIndex((auction: ApiAuction) => auction.id === auctionId), 1)
     },
     updateAuctionName(newName: string, id: string) {
-      api().patch(`/auctions/${id}`, { name: newName })
+      api.patch(`/auctions/${id}`, { name: newName })
     },
     addTag(newTag: string, id: string) {
       const auction = this.$data.auctions.find((auction: ApiAuction) => auction.id === id)
 
       if (auction) {
         auction.tags.push(newTag)
-        api().patch(`/auctions/${id}`, { tags: auction.tags })
+        api.patch(`/auctions/${id}`, { tags: auction.tags })
       }
     },
     removeTag(removedTag: string, id: string) {
@@ -167,12 +167,12 @@ export default Vue.extend({
 
       if (auction) {
         auction.tags.splice(auction.tags.indexOf(removedTag))
-        api().patch(`/auctions/${id}`, { tags: auction.tags })
+        api.patch(`/auctions/${id}`, { tags: auction.tags })
       }
     }
   },
   async mounted() {
-    const { data } = await api().get('/auctions/')
+    const { data } = await api.get('/auctions/')
     this.$data.auctions = data
   }
 })

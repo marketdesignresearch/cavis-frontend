@@ -28,7 +28,7 @@ export default Vue.extend({
   },
   computed: {
     apiUrl(): string | undefined {
-      return api().defaults.baseURL
+      return api.defaults.baseURL
     }
   },
   name: 'home'

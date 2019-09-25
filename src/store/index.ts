@@ -10,6 +10,10 @@ import './modules/auction'
 import './modules/selection'
 import './modules/gui'
 
+import auth from '@/services/auth'
+import api from '@/services/api'
+import { Route } from 'vue-router'
+
 export interface RootState {
   auction: AuctionState
   selection: SelectionState
@@ -17,7 +21,6 @@ export interface RootState {
 }
 
 Vue.use(Vuex)
-const store: Store<RootState> = getStoreBuilder<RootState>().vuexStore()
 
 // oidc
 export const oidcSettings = {
@@ -29,16 +32,28 @@ export const oidcSettings = {
   automaticSilentRenew: true
 }
 
+const store: Store<RootState> = getStoreBuilder<RootState>().vuexStore()
+
 store.registerModule(
   'oidcStore',
-  vuexOidcCreateStoreModule(oidcSettings, null, {
-    userLoaded: (user: any) => console.log('OIDC user is loaded:', user),
-    userUnloaded: () => console.log('OIDC user is unloaded'),
-    accessTokenExpiring: () => console.log('Access token will expire'),
-    accessTokenExpired: () => console.log('Access token did expire'),
-    silentRenewError: () => console.log('OIDC user is unloaded'),
-    userSignedOut: () => console.log('OIDC user is signed out')
-  })
+  vuexOidcCreateStoreModule(
+    oidcSettings,
+    {
+      isPublicRoute: (route: Route) => true // all routes are public by default
+    },
+    {
+      userLoaded: (user: any) => {
+        console.log('OIDC user loaded')
+        auth.init(api, user)
+      },
+      userUnloaded: () => console.log('OIDC user is unloaded'),
+      accessTokenExpiring: () => console.log('Access token will expire'),
+      accessTokenExpired: () => console.log('Access token did expire'),
+      silentRenewError: () => console.log('OIDC user is unloaded'),
+      userSignedOut: () => console.log('OIDC user is signed out'),
+      oidcError: (payload: any) => console.log(`An error occured at ${payload.context}:`, payload.error)
+    }
+  )
 )
 
 export default store // <-- "store" to provide to root Vue

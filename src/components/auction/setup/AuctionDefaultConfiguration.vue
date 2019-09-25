@@ -25,7 +25,8 @@
 <script lang="ts">
 import Vue from 'vue'
 import VueFormGenerator from 'vue-form-generator'
-import { ApiBidderStrategy, ApiAuctionType, ApiAuctionPaymentRule } from '../../../store/modules/auction'
+import { ApiBidderStrategy, ApiAuctionType, ApiAuctionPaymentRule } from '@/store/modules/auction'
+import store from '@/store'
 
 const helpIconGenerator = (link: string) => {
   return `<a href="${link}" target="_blank">
@@ -165,6 +166,15 @@ export default Vue.extend({
               },
               default: [],
               model: 'tags'
+            },
+            {
+              visible: () => {
+                return store.getters.oidcIsAuthenticated
+              },
+              type: 'checkbox',
+              label: 'Private (only accessible if logged-in)',
+              model: 'private',
+              default: false
             }
           ]
         },

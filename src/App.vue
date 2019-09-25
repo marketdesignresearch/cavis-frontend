@@ -12,32 +12,47 @@
 
         <b-collapse id="nav-collapse" is-nav v-model="navCollapsed">
           <b-navbar-nav>
-            <li class="nav-item" v-intro="'Click here to get an overview over recent auctions.'" v-intro-step="1">
-              <router-link class="nav-link" :to="{ name: 'auction-list' }">Auctions</router-link>
-            </li>
+            <b-nav-item :to="{ name: 'auction-list' }" v-intro="'Click here to get an overview over recent auctions.'" v-intro-step="1">
+              Auctions
+            </b-nav-item>
+
+            <b-nav-item href="/docs/" target="_blank">
+              Documentation <font-awesome-icon fixed-width icon="external-link-alt" />
+            </b-nav-item>
+
+            <b-nav-item :to="{ name: 'faq' }">
+              FAQ
+            </b-nav-item>
+
+            <b-nav-item :to="{ name: 'about' }">
+              About
+            </b-nav-item>
+
+            <b-button
+              variant="info"
+              class="text-white"
+              v-intro="'You can restart this tour anytime.'"
+              v-intro-step="99"
+              @click="showTutorial"
+            >
+              Tutorial
+            </b-button>
           </b-navbar-nav>
 
           <b-navbar-nav class="ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="/docs/" target="_blank">Documentation <font-awesome-icon fixed-width icon="external-link-alt"/></a>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'faq' }">FAQ</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" :to="{ name: 'about' }">About</router-link>
-            </li>
-            <li class="nav-item">
-              <button
-                class="nav-link btn btn-info text-white"
-                :class="{ 'mt-1': navCollapsed, 'ml-1': !navCollapsed }"
-                v-intro="'You can restart this tour anytime.'"
-                v-intro-step="99"
-                @click="showTutorial"
-              >
-                Tutorial
-              </button>
-            </li>
+            <b-nav-item v-if="!oidcIsAuthenticated" :to="{ name: 'auth-login' }">Login</b-nav-item>
+
+            <img v-if="oidcIsAuthenticated" :src="oidcUser.picture" class="img-fluid user-avatar" />
+            <b-nav-item-dropdown
+              v-if="oidcIsAuthenticated"
+              id="dropdown-settings"
+              right
+              :text="oidcUser.name"
+              variant="link"
+              :menu-class="'text-primary'"
+            >
+              <b-dropdown-item @click="signOutOidc">Logout</b-dropdown-item>
+            </b-nav-item-dropdown>
           </b-navbar-nav>
         </b-collapse>
       </div>
@@ -49,7 +64,13 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import store from '@/store'
+import { mapGetters, mapActions } from 'vuex'
+
 export default Vue.extend({
+  computed: {
+    ...mapGetters(['oidcIsAuthenticated', 'oidcUser'])
+  },
   mounted() {
     if (!this.$cookies.isKey('firstIntro')) {
       // show introjs
@@ -58,6 +79,7 @@ export default Vue.extend({
     }
   },
   methods: {
+    ...mapActions(['signOutOidc']),
     showTutorial() {
       const startAt = this.$router.currentRoute.name === 'home' ? 1 : 3 // start later if not on home
       this.$intro().showHints()
@@ -77,6 +99,13 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 @import 'custom.scss';
+
+.user-avatar {
+  margin-top: 5px;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+}
 
 .navbar-collapse.collapse.show,
 .navbar-collapse.collapsing {

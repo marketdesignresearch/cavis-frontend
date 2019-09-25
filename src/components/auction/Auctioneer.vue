@@ -251,7 +251,7 @@ export default Vue.extend({
         bundles: bundles
       }
 
-      const { data: valueQueryResult } = await api().post(`/auctions/${auctionId}/valuequery`, valueQuery)
+      const { data: valueQueryResult } = await api.post(`/auctions/${auctionId}/valuequery`, valueQuery)
 
       Object.keys(valueQueryResult).forEach(bidderId => {
         this.bundleValues[bidderId] = valueQueryResult[bidderId]

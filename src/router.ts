@@ -1,17 +1,26 @@
 import Vue from 'vue'
-import Router from 'vue-router'
-import Home from './views/Home.vue'
+import Router, { Route } from 'vue-router'
+import { Store } from 'vuex'
+import store, { RootState } from './store'
 
 Vue.use(Router)
 
-export default new Router({
+const oidcMiddleware: any = (store: Store<RootState>) => {
+  return (to: Route, _from: Route, next: Function) => {
+    store.dispatch('oidcCheckAccess', to).then((hasAccess: boolean) => {
+      next()
+    })
+  }
+}
+
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: () => import(/* webpackChunkName: "home" */ './views/Home.vue')
     },
     {
       path: '/auctions',
@@ -65,3 +74,7 @@ export default new Router({
     }
   ]
 })
+
+router.beforeEach(oidcMiddleware(store))
+
+export default router

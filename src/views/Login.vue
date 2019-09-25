@@ -1,8 +1,6 @@
 <template>
   <div class="container">
-    State: {{ oidcIsAuthenticated }} User: {{ oidcUser }}
-    <button @click="signOutOidc">Sign out</button>
-    <button @click="authenticateOidc">Sign In</button>
+    <b-button variant="primary" @click="authenticateOidc">Sign In with Google</b-button>
   </div>
 </template>
 

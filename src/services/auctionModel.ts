@@ -7,9 +7,11 @@ const configToModelJSON = function(auction: ApiAuction): string {
     tags: auction.tags,
     numberOfGoods: auction.auction.domain.goods.length,
     numberOfBidders: auction.auction.domain.bidders.length,
-    maxBids: auction.auction.allowedNumberOfBids,
-    manualBids: auction.auction.manualBids,
-    seed: auction.seed
+    seed: auction.seed,
+    maxBids: auction.auctionConfig.maxBids,
+    manualBids: auction.auctionConfig.manualBids,
+    ccaConfig: auction.auctionConfig.ccaConfig,
+    pvmConfig: auction.auctionConfig.pvmConfig
   })
 }
 
