@@ -31,6 +31,7 @@ const AuctionGoodComponent = Vue.extend({
   watch: {
     selectedBidder: async function(current, previous) {
       if (current) {
+        console.log(current)
         this.updateProposedValue(current)
       }
     },

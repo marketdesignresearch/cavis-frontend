@@ -26,7 +26,8 @@ Vue.use(Vuex)
 export const oidcSettings = {
   authority: 'https://accounts.google.com/',
   clientId: '331980528223-vd457jtapti5bhsi39ht9ivvmggbhceu.apps.googleusercontent.com',
-  redirectUri: 'http://localhost:1234/oidc-callback',
+  redirectUri: `${window.location.toString()}oidc-callback`,
+  post_logout_redirect_uri: window.location.toString(),
   responseType: 'id_token token',
   scope: 'openid',
   automaticSilentRenew: true
@@ -39,7 +40,8 @@ store.registerModule(
   vuexOidcCreateStoreModule(
     oidcSettings,
     {
-      isPublicRoute: (route: Route) => true // all routes are public by default
+      isPublicRoute: (route: Route) => true, // all routes are public by default
+      dispatchEventsOnWindow: true
     },
     {
       userLoaded: (user: any) => {

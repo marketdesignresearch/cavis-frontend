@@ -42,14 +42,19 @@
       </div>
 
       <div v-if="results.length > 0">
-        <div class="row" v-for="(value, key) in results[0].allocation" :key="key">
+        <div class="row" v-for="key in bidderIds" :key="key">
           <div class="col-2 border-bottom">
+            {{ key }}
             <bidder-circle class="my-3" :bidder="getBidder(key)" />
           </div>
           <div class="col border-bottom border-right border-left" v-for="(result, index) in results" :key="'result-' + index">
             <div class="row my-3">
               <div class="col">
-                <div v-if="auctions[index].auction.domain.efficientAllocationCalculated">
+                <div
+                  v-if="
+                    auctions[index].auction.domain.efficientAllocationCalculated && auctions[index].auction.domain.efficientAllocation[key]
+                  "
+                >
                   <good-badge :ids="auctions[index].auction.domain.efficientAllocation[key].bundle.entries"></good-badge><br />
                   <span class="badge badge-primary"
                     >Value: {{ auctions[index].auction.domain.efficientAllocation[key].trueValue | formatNumber }}</span
@@ -76,13 +81,18 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, { ApiAuctionType, ApiAuction, ApiAuctionAllocation, AuctionState } from '../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiAuctionAllocation, AuctionState, ApiBidder } from '../store/modules/auction'
 
 export default Vue.extend({
   name: 'AuctionResultView',
   components: {
     'good-badge': () => import('@/components/auction/GoodBadge.vue'),
     'bidder-circle': () => import('@/components/auction/BidderCircle.vue')
+  },
+  computed: {
+    bidderIds(): string[] {
+      return (this.$data.auctions[0] as ApiAuction).auction.domain.bidders
+    }
   },
   methods: {
     getBidder(id: string) {

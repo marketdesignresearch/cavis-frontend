@@ -15,34 +15,24 @@
             <b-nav-item :to="{ name: 'auction-list' }" v-intro="'Click here to get an overview over recent auctions.'" v-intro-step="1">
               Auctions
             </b-nav-item>
+          </b-navbar-nav>
 
-            <b-nav-item href="/docs/" target="_blank">
-              Documentation <font-awesome-icon fixed-width icon="external-link-alt" />
-            </b-nav-item>
-
+          <b-navbar-nav class="ml-auto">
             <b-nav-item :to="{ name: 'faq' }">
               FAQ
             </b-nav-item>
 
-            <b-nav-item :to="{ name: 'about' }">
+            <b-nav-item :to="{ name: 'about' }" class="border-right pr-2">
               About
             </b-nav-item>
 
-            <b-button
-              variant="info"
-              class="text-white"
-              v-intro="'You can restart this tour anytime.'"
-              v-intro-step="99"
-              @click="showTutorial"
-            >
-              Tutorial
-            </b-button>
-          </b-navbar-nav>
+            <b-nav-item href="/docs/" target="_blank" class="border-right px-2">
+              Documentation <font-awesome-icon fixed-width icon="external-link-alt" />
+            </b-nav-item>
 
-          <b-navbar-nav class="ml-auto">
-            <b-nav-item v-if="!oidcIsAuthenticated" :to="{ name: 'auth-login' }">Login</b-nav-item>
+            <b-nav-item class="pl-2" v-if="!oidcIsAuthenticated" :to="{ name: 'auth-login' }">Login</b-nav-item>
 
-            <img v-if="oidcIsAuthenticated" :src="oidcUser.picture" class="img-fluid user-avatar" />
+            <img v-if="oidcIsAuthenticated" :src="oidcUser.picture" class="img-fluid user-avatar ml-3" />
             <b-nav-item-dropdown
               v-if="oidcIsAuthenticated"
               id="dropdown-settings"
@@ -72,11 +62,16 @@ export default Vue.extend({
     ...mapGetters(['oidcIsAuthenticated', 'oidcUser'])
   },
   mounted() {
+    window.addEventListener('vuexoidc:userUnloaded', this.userUnloaded)
+
     if (!this.$cookies.isKey('firstIntro')) {
       // show introjs
       setTimeout(this.showTutorial, 3000)
       this.$cookies.set('firstIntro', true)
     }
+  },
+  destroyed() {
+    window.removeEventListener('vuexoidc:userUnloaded', this.userUnloaded)
   },
   methods: {
     ...mapActions(['signOutOidc']),
@@ -87,6 +82,9 @@ export default Vue.extend({
         .setOptions({ showStepNumbers: false, skipLabel: 'End' })
         .goToStepNumber(startAt)
         .start()
+    },
+    userUnloaded() {
+      this.$router.push({ name: 'home' })
     }
   },
   data: () => {
