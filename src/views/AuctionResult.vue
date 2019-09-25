@@ -134,7 +134,7 @@ export default Vue.extend({
       }
       return null
     },
-    async fetchAuctions() {
+    async fetchResults() {
       const auctionIds = Array.isArray(this.$route.query.auctions) ? this.$route.query.auctions : [this.$route.query.auctions]
       this.$data.auctions = await Promise.all(auctionIds.map(auctionId => auction.dispatchGetAuction({ auctionId: auctionId! })))
       this.$data.results = await Promise.all(auctionIds.map(auctionId => auction.dispatchGetAuctionResult({ auctionId: auctionId! })))
@@ -147,7 +147,7 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    await this.fetchAuctions()
+    await this.fetchResults()
     if (!this.$cookies.isKey('auctionResultIntro')) {
       setTimeout(
         () =>

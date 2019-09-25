@@ -51,8 +51,9 @@
                     <AuctionGood
                       v-intro="
                         'Each good is selectable. This is a central part of the user\'s interaction with the tool: Much of the other interactions depend on the bundle that is selected on the table.<br><br>\
-                        For example, when also selecting a bidder, you will see this bidder\'s valuation for the selected bundle, and will be able to enter a bid for it. For complex value functions of a bidder, \
-                        this kind of interaction is a convenient way to explore a bidder\'s value function.'
+                        For example, when also selecting a bidder, you will see this bidder\'s valuation for the selected bundle, and will be able to enter a bid for it. Inside an unselected good, you will in this case also see \
+                        the marginal value of this bidder for adding this good to the selection.<br>\
+                        For complex value functions of a bidder, this kind of interaction is a convenient way to explore a bidder\'s value function.'
                       "
                       v-intro-if="index === 0"
                       class="align-self-center d-inline-flex"
