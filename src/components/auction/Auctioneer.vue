@@ -1,12 +1,17 @@
 <template>
   <div v-if="auction">
     <div class="row">
-      <div class="col">
+      <div class="col" v-intro="'Here, you can see some general information about the auction (like its type).'">
         <p class="my-4">
           <auction-static-information :auction="auction" />
         </p>
       </div>
-      <div class="col text-center">
+      <div
+        class="col text-center"
+        v-intro="
+          'This is where the auctioneer sits. By clicking on the button, you can display a panel with all the information that the auctioneer has (which is mostly information that is not publicly available to all bidders), like submitted bids from all bidders in each round, etc.'
+        "
+      >
         <img src="../../assets/auctioneer2.png" class="logo mt-3" v-b-toggle.collapse-auctioneer />
         <p>
           <b-button v-b-toggle.collapse-auctioneer size="sm" class="mt-3">
@@ -14,7 +19,12 @@
           </b-button>
         </p>
       </div>
-      <div class="col text-right">
+      <div
+        class="col text-right"
+        v-intro="
+          'You can advance the auction with the actions provided in this area. In a single-round auction, this means you can close the auction and get the outcome; In a multi-round auction, you are able to advance a round (and when all the rounds are played, close the auction).'
+        "
+      >
         <p class="my-4">
           <component :is="roundType" :auction="auction" />
         </p>

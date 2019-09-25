@@ -1,12 +1,18 @@
 <template>
   <div>
     <div class="container">
-      <h2>Setup an Auction</h2>
+      <h2>Set up an Auction</h2>
 
       <hr />
 
       <div class="row">
-        <div class="col">
+        <div
+          class="col"
+          v-intro="
+            'This is the configuration screen for an auction. If you have selected a historic auction example, the form is pre-filled to match the setting of this auction.\
+            You can configure various aspects of an auction. To get more information on the individual options, hover over the icon next to its label. Clicking on it will bring you to the corresponding paragraph in the documentation.'
+          "
+        >
           <AuctionSetup @createAuction="createAuction" :modelValue="modelValue" />
         </div>
       </div>
@@ -30,6 +36,20 @@ export default Vue.extend({
   name: 'AuctionSetupView',
   components: {
     AuctionSetup: () => import('@/components/auction/setup/AuctionDefaultConfiguration.vue')
+  },
+  mounted() {
+    if (!this.$cookies.isKey('setupIntro')) {
+      // show introjs
+      setTimeout(
+        () =>
+          this.$intro()
+            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+            .start(),
+        1000
+      )
+
+      this.$cookies.set('setupIntro', true)
+    }
   },
   computed: {
     modelValue(): any {

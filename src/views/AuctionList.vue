@@ -2,13 +2,21 @@
   <div class="container">
     <h2>
       Auctions
-      <router-link tag="button" class="btn btn-secondary btn-sm float-right" :to="{ name: 'auction-archive' }">
+      <router-link
+        tag="button"
+        class="btn btn-secondary btn-sm float-right"
+        :to="{ name: 'auction-archive' }"
+        v-intro="
+          'This will bring you to the non-active, archived auctions. Note that currently, auctions in a SATS domain are not stored, thus not recoverable once you\'re archiving them!'
+        "
+        v-intro-step="80"
+      >
         Archive <font-awesome-icon icon="archive" />
       </router-link>
     </h2>
     <hr />
 
-    <div class="table-responsive">
+    <div class="table-responsive" v-intro="'Here you have an overview over the currently active auctions.'">
       <table class="table table-bordered table-striped table-bidder">
         <thead>
           <tr>
@@ -42,7 +50,13 @@
               {{ auction.number }}
             </td>
             <td>
-              <click-to-edit :value="auction.name" @input="updateAuctionName($event, auction.id)" />
+              <click-to-edit
+                :value="auction.name"
+                @input="updateAuctionName($event, auction.id)"
+                v-intro="'You can change the name of an auction directly by clicking on it'"
+                v-intro-if="index === 0"
+              />
+              <br /><span class="small">Seed: {{ auction.seed }}</span>
             </td>
             <td>{{ auction.createdAt | formatDate }}</td>
             <td>{{ auction.auctionType }}</td>
@@ -65,22 +79,25 @@
                 @tag="addTag"
                 @select="addTag"
                 @remove="removeTag"
+                v-intro="'You can also add custom tags to an auction to distinguish them.'"
+                v-intro-if="index === 0"
               />
             </td>
-            <td
-              class="text-right"
-              v-intro="'To load the auction, you can simply click on the button. To delete the auction, press on the small arrow.'"
-              v-intro-step="3"
-              v-intro-if="index === 0"
-            >
+            <td class="text-right">
               <b-dropdown
                 right
-                variant="primary"
                 size="sm"
+                variant="primary"
                 split
                 text="Load"
                 class="m-2"
                 :split-to="{ name: 'auction', params: { id: auction.id } }"
+                v-intro="
+                  'To load the auction, you can simply click on the button. Clicking on the arrow gives you the option to archive or duplicate an auction.<br><br>\
+              Archiving will remove the auction from the server. If it\'s not a SATS-domain auction, you can later recover it from the archive.<br><br>\
+              Duplicating will take you to the setup screen with pre-filled settings to start an auction in the exact same domain.'
+                "
+                v-intro-if="index === 0"
               >
                 <b-dropdown-item @click="archive(auction.id)">Archive</b-dropdown-item>
                 <b-dropdown-item @click="recreate(auction.id)">Duplicate</b-dropdown-item>
@@ -174,6 +191,16 @@ export default Vue.extend({
   async mounted() {
     const { data } = await api.get('/auctions/')
     this.$data.auctions = data
+    if (!this.$cookies.isKey('auctionListIntro')) {
+      setTimeout(
+        () =>
+          this.$intro()
+            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+            .start(),
+        1000
+      )
+      this.$cookies.set('auctionListIntro', true)
+    }
   }
 })
 </script>

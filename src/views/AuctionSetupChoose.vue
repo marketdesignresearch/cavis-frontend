@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <h2>Setup an Auction</h2>
+    <h2>Set up an Auction</h2>
     <hr />
 
     <p>
@@ -10,56 +10,49 @@
 
     <div class="row">
       <div class="col">
-        <div class="card-deck" v-intro="'Here, you can choose a starting point for the auction you are going to create.'" v-intro-step="3">
-          <div
-            class="card"
-            style="width: 18rem;"
-            @click="configureAndCreate('new-zealand-1990')"
-            v-intro="
-              'This option brings you directly into an auction configuration that represents the New Zealand auction of 1990, which was a simultaneous second-price auction on multiple goods.'
-            "
-          >
+        <div
+          class="card-deck"
+          v-intro="
+            'To get started, you can choose a starting point for the auction you are going to create.<br>\
+              With the first three options, you can jump directly in a configuration of historic auction examples, who all in some way had a flaw.'
+          "
+          v-intro-position="'top'"
+        >
+          <div class="card" @click="configureAndCreate('new-zealand-1990')">
             <img src="../assets/new-zealand.jpg" class="card-img-top" />
             <div class="card-body">
               <h5 class="card-title">New Zealand 1990</h5>
               <p class="card-text">
-                A real-world example of a simultaneous second-price auction, showcasing the difficulties of this approach.
+                A configuration based on a spectrum auction that took place in New Zealand in 1990, which pointed out a potential problem
+                with a simultaneous second-price auction.
               </p>
             </div>
           </div>
-          <div
-            class="card"
-            style="width: 18rem;"
-            @click="configureAndCreate('swiss-march-2000')"
-            v-intro="
-              'Similarly, this provides an auction configuration that represents the Swiss auction of March 2000, which was a sequential second-price auction on multiple goods.'
-            "
-          >
+          <div class="card" @click="configureAndCreate('swiss-march-2000')">
             <img src="../assets/ch-march.jpg" class="card-img-top" />
             <div class="card-body">
               <h5 class="card-title">Swiss March 2000</h5>
               <p class="card-text">
-                A real-world example of a sequential second-price auction, showcasing the difficulties of this approach.
+                A configuration based on a spectrum auction (called "Swiss Wireless Local Loop (WLL)") that took place in Switzerland in
+                March 2000, which pointed out a potential problem with a sequential second-price auction.
+              </p>
+            </div>
+          </div>
+          <div class="card" @click="configureAndCreate('swiss-december-2000')">
+            <img src="../assets/ch-december.jpg" class="card-img-top" />
+            <div class="card-body">
+              <h5 class="card-title">Swiss December 2000</h5>
+              <p class="card-text">
+                A configuration based on a spectrum auction (called "Swiss Wireless Local Loop (WLL)") that took place in Switzerland in
+                March 2000, which pointed out a potential problem with a sequential second-price auction.
               </p>
             </div>
           </div>
           <div
             class="card"
-            style="width: 18rem;"
-            @click="configureAndCreate('swiss-december-2000')"
-            v-intro="'Lastly, this provides an auction configuration that represents the Swiss auction of December 2000.'"
-          >
-            <img src="../assets/ch-december.jpg" class="card-img-top" />
-            <div class="card-body">
-              <h5 class="card-title">Swiss December 2000 UMTS</h5>
-              <p class="card-text">A real-world example showing "bidder meltdown".</p>
-            </div>
-          </div>
-          <div
-            class="card"
-            style="width: 18rem;"
             @click="configureAndCreate('custom')"
             v-intro="'With this option, you can customize your auction from scratch.'"
+            v-intro-position="'top'"
           >
             <img src="../assets/custom.jpg" class="card-img-top" />
             <div class="card-body">

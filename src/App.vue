@@ -17,7 +17,12 @@
             </b-nav-item>
           </b-navbar-nav>
 
-          <b-navbar-nav class="ml-auto">
+          <b-navbar-nav class="ml-auto"
+            v-intro="
+              'Here, you can access the documentation (including background information, explanations, etc.), the FAQ, or learn more about the people behind this tool.'
+            "
+            v-intro-step="98"
+            >
             <b-nav-item :to="{ name: 'faq' }">
               FAQ
             </b-nav-item>
@@ -76,11 +81,8 @@ export default Vue.extend({
   methods: {
     ...mapActions(['signOutOidc']),
     showTutorial() {
-      const startAt = this.$router.currentRoute.name === 'home' ? 1 : 3 // start later if not on home
-      this.$intro().showHints()
       this.$intro()
         .setOptions({ showStepNumbers: false, skipLabel: 'End' })
-        .goToStepNumber(startAt)
         .start()
     },
     userUnloaded() {

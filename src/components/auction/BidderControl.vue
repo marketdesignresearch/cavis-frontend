@@ -1,23 +1,38 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
-    <div>
+    <div
+      v-intro="
+        'The main purpose of this table is to give, for a specific bidder, an overview over<br>\
+        (a) The current bids, and<br>\
+        (b) The values for the so-far selected bundles.<br><br>\
+        It has an entry for each bundle that has been selected (or bid on) before, and is sortable by all the columns. Thus, it is a tabular form of the so-far explored value function. \
+        The big advantage of this representation is that it is useful in all domains, no matter how large it gets, by relying on the interactive design of CAVis.'
+      "
+      v-intro-position="'top'"
+    >
       <div class="table-responsive">
         <table class="table table-bordered table-bidder table-hover">
           <thead>
             <tr>
-              <th @click="sortBy('entriesString')" class="parentHover">
+              <th @click="sortBy('entriesString')" class="parentHover" v-intro="'You can sort by bundle size, ...'">
                 Bundle <sort-marker :sortable="sort" :property="'entriesString'"></sort-marker>
               </th>
-              <th @click="sortBy('value')" class="parentHover">
+              <th @click="sortBy('value')" class="parentHover" v-intro="'... the bidder\'s value, ...'">
                 Value <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'value'"></sort-marker>
               </th>
-              <th @click="sortBy('price')" class="parentHover" v-if="pricedAuction">
+              <th @click="sortBy('price')" class="parentHover" v-if="pricedAuction" v-intro="'... the bundle\'s price, ...'">
                 Price <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'price'"></sort-marker>
               </th>
-              <th @click="sortBy('utility')" class="parentHover" v-if="pricedAuction">
+              <th @click="sortBy('utility')" class="parentHover" v-if="pricedAuction" v-intro="'... the bidder\'s utility, ...'">
                 Utility <font-awesome-icon icon="wrench" /> <sort-marker :sortable="sort" :property="'utility'"></sort-marker>
               </th>
-              <th @click="sortBy('bid')" class="parentHover w-25">
+              <th
+                @click="sortBy('bid')"
+                class="parentHover w-25"
+                v-intro="
+                  '... or the current bid on this bundle. Sorting that way will show you all the currently entered bids on top. You can also remove a bid directly in the table (this will keep the entry in the table, only removing the bundle\'s bid).'
+                "
+              >
                 Bid <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'bid'"></sort-marker>
               </th>
               <th class="w-12-5"></th>
