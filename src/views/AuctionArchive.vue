@@ -37,13 +37,7 @@
             <td>{{ auction.createdAt | formatDate }}</td>
             <td>{{ auction.auctionType }}</td>
             <td>{{ auction.domain }}</td>
-            <td>{{ auction.seed }}</td>
-            <td
-              class="text-right"
-              v-intro="'To load the auction, you can simply click on the button. To delete the auction, press on the small arrow.'"
-              v-intro-step="3"
-              v-intro-if="index === 0"
-            >
+            <td class="text-right">
               <b-dropdown
                 right
                 variant="primary"
@@ -52,6 +46,10 @@
                 text="Load & Restore"
                 class="m-2"
                 :split-to="{ name: 'auction', params: { id: auction.id } }"
+                v-intro="
+                  'To load the auction, you can simply click on the button. To definitely delete the auction, press on the small arrow and select the option.'
+                "
+                v-intro-if="index === 0"
               >
                 <b-dropdown-item @click="remove(auction.id)">Delete</b-dropdown-item>
               </b-dropdown>
@@ -112,8 +110,18 @@ export default Vue.extend({
       this.sort.sortBy = property
     }
   },
-  mounted() {
-    ;(this as any).fetchAuctions()
+  async mounted() {
+    (this as any).fetchAuctions()
+    if (!this.$cookies.isKey('auctionArchiveIntro')) {
+      setTimeout(
+        () =>
+          this.$intro()
+            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+            .start(),
+        1000
+      )
+      this.$cookies.set('auctionArchiveIntro', true)
+    }
   }
 })
 </script>

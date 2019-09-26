@@ -1,5 +1,10 @@
 <template>
-  <div class="grow">
+  <div
+    class="grow"
+    v-intro="
+      'Great! You have entered the auction room. Imagine this view as the room with a big table, where the auctioneer sits on top and the bidders sit around this table. The goods to be auctioned off are placed on the table.'
+    "
+  >
     <div class="container">
       <Auctioneer v-if="activeAuction" :auction="activeAuction" />
     </div>
@@ -9,20 +14,17 @@
         <div class="row">
           <div class="col">
             <div class="d-flex pt-4">
-              <div
-                v-intro="'This, together with the right-hand side, visualizes the bidders that take part in the auction.'"
-                v-intro-step="3"
-              >
-                <span
-                  v-for="(bidderId, index) in leftSideBidders"
-                  :key="bidderId"
-                  @click="selectBidder(bidderId)"
-                  v-intro="
-                    'You can hover over the bidder to get more information, and click to interact (e.g., to bid for goods). Each round, it is calculated what the best bids would be given the bidder\'s strategy. Once this calculation has completed, a green circle appears around the bidder.'
-                  "
-                  v-intro-if="index === 0"
-                >
-                  <AuctionBidder class="align-self-start" :auctionId="auctionId" :bidderId="bidderId" />
+              <div v-intro="'This, together with the right-hand side, visualizes the bidders that take part in the auction.'">
+                <span v-for="(bidderId, index) in leftSideBidders" :key="bidderId" @click="selectBidder(bidderId)">
+                  <AuctionBidder
+                    class="align-self-start"
+                    :auctionId="auctionId"
+                    :bidderId="bidderId"
+                    v-intro="
+                      'You can hover over the bidder to get more information, and click to interact (e.g., to bid for goods). Each round, it is calculated what the best bids would be given the bidder\'s strategy. Once this calculation has completed, a green circle appears around the bidder.'
+                    "
+                    v-intro-if="index === 0"
+                  />
                 </span>
               </div>
 
@@ -30,20 +32,39 @@
                 <div
                   class="goods-container justify-content-center"
                   :class="{ selected: selectedBidder }"
-                  v-intro="'Here, you can see the goods that are auctioned off.'"
+                  v-intro="'This represents the table on which the goods are placed that are auctioned off.'"
                 >
-                  <div class="goods-title"><span>Goods</span></div>
+                  <div class="goods-title">
+                    <span>Goods</span>
+                  </div>
 
-                  <pvm-inferred-values class="pvm-box" v-if="isPVM && auctioneerVisible" :auctionId="auctionId" />
+                  <pvm-inferred-values
+                    class="pvm-box"
+                    v-intro="
+                      'In PVM, you can see additional information about the selection, namely what value a bidder reported for the selected bundle and what the auctioneer\'s learning algorithm would infer as the selected bidder\'s value for the selected bundle.'
+                    "
+                    v-if="isPVM && auctioneerVisible"
+                    :auctionId="auctionId"
+                  />
 
-                  <span v-for="goodId in goods" :key="goodId" @click="selectGood(goodId)">
-                    <AuctionGood class="align-self-center d-inline-flex" :goodId="goodId" :auctionId="auctionId" />
+                  <span v-for="(goodId, index) in goods" :key="goodId" @click="selectGood(goodId)">
+                    <AuctionGood
+                      v-intro="
+                        'Each good is selectable. This is a central part of the user\'s interaction with the tool: Much of the other interactions depend on the bundle that is selected on the table.<br><br>\
+                        For example, when also selecting a bidder, you will see this bidder\'s valuation for the selected bundle, and will be able to enter a bid for it. Inside an unselected good, you will in this case also see \
+                        the marginal value of this bidder for adding this good to the selection.<br>\
+                        For complex value functions of a bidder, this kind of interaction is a convenient way to explore a bidder\'s value function.'
+                      "
+                      v-intro-if="index === 0"
+                      class="align-self-center d-inline-flex"
+                      :goodId="goodId"
+                      :auctionId="auctionId"
+                    />
                   </span>
 
                   <b-modal id="modal-price-development" title="Price Development">
                     <price-development-chart :rounds="apiRounds" :goodIds="selectedGoods" />
                   </b-modal>
-
                   <b-modal id="modal-over-demand" title="Over-Demand">
                     <over-demand-chart :rounds="apiRounds" :goodIds="selectedGoods" />
                   </b-modal>
@@ -70,7 +91,13 @@
                     </span>
                   </div>
 
-                  <div class="goods-bidder" v-if="selectedBidder">
+                  <div
+                    class="goods-bidder"
+                    v-if="selectedBidder"
+                    v-intro="
+                      'Here, you see the selected bidder\'s value for the selected bundle. It is also where you can enter/change a bid for the selected bundle.'
+                    "
+                  >
                     <div class="row">
                       <div class="col d-flex align-items-center">
                         <bidder-circle :bidder="selectedBidder" class="float-right selected" />
@@ -111,7 +138,7 @@
       <div
         class="container bottom-container"
         v-intro="
-          'If a bidder is selected, you can get more details about this bidder in this panel. This is also where you can manipulate the bids.'
+          'This area becomes particularly interesting when a bidder is selected (if you do not have a bidder selected currently, we suggest to restart the tutorial later with a bidder selected to get more information about this part of the tool).'
         "
       >
         <div class="text-center" v-if="!selectedBidder">
@@ -175,6 +202,13 @@ export default Vue.extend({
     bids.forEach(bid => {
       auction.commitUpdateBidder({ bidderId: bid.bidderId!, bid: bid })
     })
+    if (!this.$cookies.isKey('auctionIntro')) {
+      // show introjs
+      this.$intro()
+        .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+        .start()
+      this.$cookies.set('auctionIntro', true)
+    }
   },
   methods: {
     selectGood(goodId: string) {

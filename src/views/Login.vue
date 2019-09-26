@@ -1,6 +1,16 @@
 <template>
   <div class="container">
-    <b-button variant="primary" @click="authenticateOidc">Sign In with Google</b-button>
+    <h2>
+      Sign In
+    </h2>
+    <hr />
+    <p>
+      If you'd like to keep your auctions <italic>private</italic>, you can sign in using your Google account so we are able to keep track
+      of your auctions. We do not store any sensible information of you, only a small identifier (a random number) provided by Google.
+    </p>
+    <p class="text-center pt-3">
+      <b-button size="lg" variant="outline-success" @click="authenticateOidc">Sign In with Google</b-button>
+    </p>
   </div>
 </template>
 

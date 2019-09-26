@@ -11,7 +11,11 @@
       >
     </h2>
 
-    <div class="results-table" v-if="results.length > 0 && auctions.length > 0">
+    <div
+      class="results-table"
+      v-if="results.length > 0 && auctions.length > 0"
+      v-intro="'This is an overview over the outcome of the auction.'"
+    >
       <div class="row">
         <div class="col-2"></div>
         <div class="col" v-for="(auction, index) in auctions" :key="auction.id">
@@ -20,21 +24,46 @@
             <a @click="calculateEfficiency()" class="badge badge-pill badge-success mr-1 text-white" v-if="!efficiency(index)"
               >Calculate Efficiency</a
             >
-            <span class="badge badge-pill badge-success mr-1" v-if="efficiency(index)">Efficiency: {{ efficiency(index) }}%</span>
-            <span class="badge badge-pill badge-secondary mr-1">Social Welfare: {{ results[index].socialWelfare }}</span>
-            <span class="badge badge-pill badge-secondary">Revenue: {{ results[index].revenue }}</span>
+            <span
+              class="badge badge-pill badge-success mr-1"
+              v-if="efficiency(index)"
+              v-intro="'The efficiency compares the auction\'s resulting social welfare with the efficient social welfare.'"
+              v-intro-if="index === 0"
+            >
+              Efficiency: {{ efficiency(index) }}%
+            </span>
+            <span
+              class="badge badge-pill badge-secondary mr-1"
+              v-intro="'The social welfare is the sum over the winner\'s values for their allocations.'"
+              v-intro-if="index === 0"
+            >
+              Social Welfare: {{ results[index].socialWelfare }}
+            </span>
+            <span class="badge badge-pill badge-secondary" v-intro="'The revenue is simply the sum of all the payments.'">
+              Revenue: {{ results[index].revenue }}
+            </span>
           </div>
           <div class="row py-1 border-left border-right border-top border-bottom bg-primary text-white font-weight-bold">
-            <div class="col">
+            <div
+              class="col"
+              v-intro="
+                'If all true information about the bidder\'s valuation would be known to the auctioneer, this would be the efficient allocation.'
+              "
+              v-intro-if="index === 0"
+            >
               Efficient Allocation
             </div>
-            <div class="col">
+            <div class="col" v-intro="'This shows the actual allocation per winner of this auction run.'" v-intro-if="index === 0">
               Allocation
             </div>
-            <div class="col">
+            <div class="col" v-intro="'This is what this bidder has to pay for the bundle.'" v-intro-if="index === 0">
               Payment
             </div>
-            <div class="col">
+            <div
+              class="col"
+              v-intro="'Finally, this is the utility of this bidder for this outcome (assuming quasi-linear utility).'"
+              v-intro-if="index === 0"
+            >
               Utility
             </div>
           </div>
@@ -104,6 +133,11 @@ export default Vue.extend({
         return (this.$data.results[index].socialWelfare / this.$data.auctions[index].auction.domain.efficientSocialWelfare) * 100
       }
       return null
+    },
+    async fetchResults() {
+      const auctionIds = Array.isArray(this.$route.query.auctions) ? this.$route.query.auctions : [this.$route.query.auctions]
+      this.$data.auctions = await Promise.all(auctionIds.map(auctionId => auction.dispatchGetAuction({ auctionId: auctionId! })))
+      this.$data.results = await Promise.all(auctionIds.map(auctionId => auction.dispatchGetAuctionResult({ auctionId: auctionId! })))
     }
   },
   data() {
@@ -113,9 +147,17 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    const auctionIds = Array.isArray(this.$route.query.auctions) ? this.$route.query.auctions : [this.$route.query.auctions]
-    this.$data.auctions = await Promise.all(auctionIds.map(auctionId => auction.dispatchGetAuction({ auctionId: auctionId! })))
-    this.$data.results = await Promise.all(auctionIds.map(auctionId => auction.dispatchGetAuctionResult({ auctionId: auctionId! })))
+    await this.fetchResults()
+    if (!this.$cookies.isKey('auctionResultIntro')) {
+      setTimeout(
+        () =>
+          this.$intro()
+            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+            .start(),
+        1000
+      )
+      this.$cookies.set('auctionResultIntro', true)
+    }
   }
 })
 </script>
