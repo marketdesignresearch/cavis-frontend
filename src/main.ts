@@ -52,6 +52,7 @@ import {
   faInfoCircle,
   faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons'
+import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 library.add(
@@ -72,7 +73,8 @@ library.add(
   faArchive,
   faTrash,
   faInfoCircle,
-  faExternalLinkAlt
+  faExternalLinkAlt,
+  faGoogle
 )
 
 // vue-multiselect

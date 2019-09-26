@@ -19,6 +19,7 @@ import GoodsService from '@/services/goods'
 import selection from '../../store/modules/selection'
 import api from '../../services/api'
 import hashBundle from '../../services/bundleHash'
+import { mapGetters } from 'vuex'
 
 export interface IAuctionGood {
   name: string
@@ -31,8 +32,9 @@ const AuctionGoodComponent = Vue.extend({
   watch: {
     selectedBidder: async function(current, previous) {
       if (current) {
-        console.log(current)
         this.updateProposedValue(current)
+      } else {
+        this.$data.proposedBundleValue = null
       }
     },
     bundleHash: async function(current, previous) {
@@ -72,6 +74,7 @@ const AuctionGoodComponent = Vue.extend({
     }
   },
   computed: {
+    ...mapGetters('selection', ['selectedBidder']),
     showProposedValue: function(): boolean {
       return selection.selectedGoods().indexOf(this.$props.goodId) === -1 && this.$data.proposedBundleValue !== null
     },
