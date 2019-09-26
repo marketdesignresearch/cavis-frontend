@@ -17,12 +17,13 @@
             </b-nav-item>
           </b-navbar-nav>
 
-          <b-navbar-nav class="ml-auto"
+          <b-navbar-nav
+            class="ml-auto"
             v-intro="
               'Here, you can access the documentation (including background information, explanations, etc.), the FAQ, or learn more about the people behind this tool.'
             "
             v-intro-step="98"
-            >
+          >
             <b-nav-item :to="{ name: 'faq' }">
               FAQ
             </b-nav-item>
@@ -35,7 +36,7 @@
               Documentation <font-awesome-icon fixed-width icon="external-link-alt" />
             </b-nav-item>
 
-            <b-nav-item class="pl-2" v-if="!oidcIsAuthenticated" :to="{ name: 'auth-login' }">Login</b-nav-item>
+            <b-nav-item class="pl-2" v-if="!oidcIsAuthenticated" :to="{ name: 'auth-login' }">Sign In</b-nav-item>
 
             <img v-if="oidcIsAuthenticated" :src="oidcUser.picture" class="img-fluid user-avatar ml-3" />
             <b-nav-item-dropdown
@@ -46,12 +47,24 @@
               variant="link"
               :menu-class="'text-primary'"
             >
-              <b-dropdown-item @click="signOutOidc">Logout</b-dropdown-item>
+              <b-dropdown-item @click="signOutOidc">Sign out</b-dropdown-item>
             </b-nav-item-dropdown>
           </b-navbar-nav>
         </b-collapse>
       </div>
     </b-navbar>
+
+    <button
+      class="btn btn-info text-white btn-tutorial"
+      v-intro="
+        'You can activate the tutorial anytime with this button; it will be explaining the component you see on your screen at that moment.'
+      "
+      v-intro-step="99"
+      v-intro-position="'left'"
+      @click="showTutorial"
+    >
+      Tutorial
+    </button>
 
     <router-view />
   </div>
@@ -99,6 +112,12 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 @import 'custom.scss';
+
+.btn-tutorial {
+  position: fixed;
+  right: 15px;
+  bottom: 15px;
+}
 
 .user-avatar {
   margin-top: 5px;
