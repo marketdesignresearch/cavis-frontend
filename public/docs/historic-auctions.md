@@ -10,9 +10,9 @@ However, here, it was chosen to let bidders place a bid on each individual item.
 
 As a result of this choice, the outcome of the New Zealand spectrum auction of 1990 had some problematic features:
 
-- Bidders paid prices far below their bids. One extreme case is that a bidder who bid NZ$100,000 only paid the second-highest bid of NZ$6 for a license.
+- Bidders paid prices far below their bids. One extreme case is that a bidder who bid NZ\$100,000 only paid the second-highest bid of NZ\$6 for a license.
 
-- The revenue ended up being much less than the New Zealand government expected (NZ$36 million vs. NZ$240 million)
+- The revenue ended up being much less than the New Zealand government expected (NZ\$36 million vs. NZ\$240 million)
 
 ---
 
