@@ -45,7 +45,9 @@
           <div class="auction d-flex flex-column flex-grow-1" v-for="(auction, index) in auctions" :key="auction.id">
             <div class="header d-flex flex-column justify-content-end">
               <div class="auction-results text-center">
-                Auction: {{ auction.name || auction.id }}<br />
+                {{ auction.name || auction.id }}<br />
+
+                <auction-static-information :auction="auction" :roundTypeShown="false" />
 
                 <a @click="calculateEfficiency(auction.id)" class="badge badge-pill badge-success mr-1 text-white" v-if="!efficiency(index)"
                   >Calculate Efficiency</a
@@ -144,7 +146,7 @@ export default Vue.extend({
   name: 'AuctionResultView',
   components: {
     'good-badge': () => import('@/components/auction/GoodBadge.vue'),
-    'bidder-circle': () => import('@/components/auction/BidderCircle.vue')
+    'auction-static-information': () => import('@/components/auction/rounds/StaticInformation.vue')
   },
   computed: {
     auctionIds(): string[] {
@@ -233,13 +235,13 @@ export default Vue.extend({
 @import '../custom.scss';
 
 .header-cell {
-  padding: 1rem;
+  padding: 0.5rem;
   @extend .border-bottom;
 }
 
 .content-cell {
-  padding: 1rem;
-  min-height: 110px;
+  padding: 0.5rem;
+  min-height: 130px;
   @extend .border-bottom;
 }
 
@@ -274,7 +276,7 @@ export default Vue.extend({
 }
 
 .auction {
-  min-width: 400px;
+  min-width: 500px;
 }
 
 .auctions > .auction:nth-child(even) {
@@ -286,7 +288,7 @@ export default Vue.extend({
 }
 
 .header {
-  height: 120px;
+  height: 180px;
   border-bottom: 1px solid darken($light, 20%);
 }
 

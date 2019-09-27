@@ -3,11 +3,11 @@
     <div class="small">
       Type: <b>{{ auctionType }}</b>
     </div>
-    <div class="small" v-if="paymentRule">
+    <div class="small">
       Outcome Rule: <b>{{ paymentRule }}</b>
     </div>
-    <div class="small" v-if="currentRoundType">
-      Type of Round: <b>{{ currentRoundType }}</b>
+    <div class="small" v-if="roundTypeShown">
+      Type of Round: <b>{{ currentRoundType ? currentRoundType : 'Single-Round Auction' }}</b>
     </div>
   </div>
 </template>
@@ -26,7 +26,13 @@ import selection from '../../../store/modules/selection'
 import RoundMixinVue from './RoundMixin.vue'
 
 export default Vue.extend({
-  props: ['auction'],
+  props: {
+    auction: Object,
+    roundTypeShown: {
+      type: Boolean,
+      default: true
+    }
+  },
   mixins: [RoundMixinVue],
   computed: {
     paymentRule() {
@@ -36,7 +42,7 @@ export default Vue.extend({
         case ApiAuctionOutcomeRule.CCG:
           return 'CCG'
         default:
-          return undefined
+          return ''
       }
     },
     auctionType() {
