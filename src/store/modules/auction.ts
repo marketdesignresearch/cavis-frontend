@@ -74,6 +74,7 @@ export interface ApiAuctionCreateDTO {
   }
   auctionType: ApiAuctionType
   name: string
+  seed: string
   tags: string[]
   private: boolean
   auctionConfig: ApiAuctionConfig
@@ -114,6 +115,11 @@ export interface ApiAuction {
     currentRoundType?: string
     finished: boolean
     domain: {
+      efficientAllocationCalculated: boolean
+      efficientAllocation: {
+        [x: string]: ApiBundleEntryWrapper
+      }
+      efficientSocialWelfare: number
       bidders: string[]
       goods: string[]
     }
@@ -134,6 +140,7 @@ export interface ApiAuction {
     outcomeRule: ApiAuctionOutcomeRule
   }
   seed: number
+  private: boolean
   auctionType: ApiAuctionType
   result?: ApiAuctionAllocation
 }

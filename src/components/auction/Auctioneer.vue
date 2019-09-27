@@ -1,11 +1,7 @@
 <template>
   <div v-if="auction">
     <div class="row">
-      <div class="col" v-intro="'Here, you can see some general information about the auction (like its type).'">
-        <p class="my-4">
-          <auction-static-information :auction="auction" />
-        </p>
-      </div>
+      <div class="col"></div>
       <div
         class="col text-center"
         v-intro="
@@ -26,7 +22,9 @@
         "
       >
         <p class="my-4">
+          <!--
           <component :is="roundType" :auction="auction" />
+          -->
         </p>
       </div>
     </div>

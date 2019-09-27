@@ -13,6 +13,9 @@
       >
         Archive <font-awesome-icon icon="archive" />
       </router-link>
+      <button class="btn btn-primary btn-sm float-right mr-1" :disabled="selectedAuctions.length === 0" @click="compare(selectedAuctions)">
+        {{ selectedAuctions.length === 0 ? 'Select auctions to compare' : `Compare ${selectedAuctions.length} auctions` }}
+      </button>
     </h2>
     <hr />
 
@@ -22,6 +25,9 @@
           <tr>
             <th scope="col" @click="sortBy('number')" class="parentHover">
               # <sort-marker :sortable="sort" :property="'number'"></sort-marker>
+            </th>
+            <th scope="col" @click="sortBy('private')" class="parentHover" v-if="oidcIsAuthenticated">
+              Private <sort-marker :sortable="sort" :property="'private'"></sort-marker>
             </th>
             <th scope="col" @click="sortBy('name')" class="parentHover">
               Name <sort-marker :sortable="sort" :property="'name'"></sort-marker>
@@ -47,7 +53,10 @@
         <tbody>
           <tr v-for="(auction, index) in sortedAuctions" :key="auction.id">
             <td>
-              {{ auction.number }}
+              <b-form-checkbox v-model="selectedAuctions" :key="auction.id" :value="auction.id" />
+            </td>
+            <td v-if="oidcIsAuthenticated">
+              <b-form-checkbox v-model="auction.private" @change="togglePrivate(auction)" />
             </td>
             <td>
               <click-to-edit
@@ -56,7 +65,6 @@
                 v-intro="'You can change the name of an auction directly by clicking on it'"
                 v-intro-if="index === 0"
               />
-              <br /><span class="small">Seed: {{ auction.seed }}</span>
             </td>
             <td>{{ auction.createdAt | formatDate }}</td>
             <td>{{ auction.auctionType }}</td>
@@ -116,6 +124,7 @@ import Vue from 'vue'
 import auction, { ApiAuction } from '../store/modules/auction'
 import api from '@/services/api'
 import { configToModelJSON } from '@/services/auctionModel'
+import { mapGetters } from 'vuex'
 
 export default Vue.extend({
   name: 'AuctionListView',
@@ -125,8 +134,9 @@ export default Vue.extend({
   },
   data: () => {
     return {
-      auctions: [],
+      auctions: [] as ApiAuction[],
       tagOptions: [],
+      selectedAuctions: [] as string[],
       sort: {
         sortBy: 'createdAt',
         sortASC: false
@@ -134,6 +144,7 @@ export default Vue.extend({
     }
   },
   computed: {
+    ...mapGetters(['oidcIsAuthenticated']),
     allTags() {
       return [].concat.apply([], this.$data.auctions.map((auction: ApiAuction) => auction.tags)).filter((item, index, array) => {
         return array.indexOf(item) === index
@@ -156,6 +167,10 @@ export default Vue.extend({
     }
   },
   methods: {
+    togglePrivate(auction: ApiAuction) {
+      auction.private = !auction.private
+      api.patch(`/auctions/${auction.id}`, { private: auction.private })
+    },
     sortBy(property: string) {
       this.sort.sortASC = !this.sort.sortASC
       this.sort.sortBy = property
@@ -163,6 +178,29 @@ export default Vue.extend({
     async recreate(auctionId: string) {
       const { data: auction } = await api.get(`/auctions/${auctionId}`)
       this.$router.push({ name: 'auction-customize', query: { auctionConfig: configToModelJSON(auction) } })
+    },
+    async compare(selectedAuctions: string[]) {
+      const comparedAuctions = this.auctions.filter(auction => selectedAuctions.indexOf(auction.id!) !== -1)
+      const baseSeed = comparedAuctions[0].seed
+
+      let seedsMatch = true
+
+      comparedAuctions.forEach(auction => {
+        if (auction.seed !== baseSeed) {
+          seedsMatch = false
+        }
+      })
+
+      if (!seedsMatch) {
+        this.$bvModal.msgBoxOk(
+          'Your selected auctions have non-matching seeds, therefore non-matching bidders. You cannot compare these.',
+          {
+            title: 'Warning'
+          }
+        )
+      } else {
+        this.$router.push({ name: 'auction-result', query: { auctions: selectedAuctions } })
+      }
     },
     archive(auctionId: string) {
       auction.dispatchArchiveAuction({ auctionId: auctionId })

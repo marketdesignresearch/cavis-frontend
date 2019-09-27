@@ -168,8 +168,8 @@ export default Vue.extend({
               model: 'tags'
             },
             {
-              visible: () => {
-                return store.getters.oidcIsAuthenticated
+              disabled: () => {
+                return !store.getters.oidcIsAuthenticated
               },
               type: 'checkbox',
               label: 'Private (only accessible if logged-in)',

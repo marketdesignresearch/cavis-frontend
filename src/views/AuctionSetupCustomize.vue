@@ -83,6 +83,7 @@ export default Vue.extend({
         name: model.name,
         tags: model.tags,
         private: model.private,
+        seed: model.seed,
         auctionConfig: {
           maxBids: model.maxBids,
           demandQueryTimeLimit: model.demandQueryTimeLimit

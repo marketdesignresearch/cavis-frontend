@@ -22,7 +22,7 @@
       <strategy-selector v-if="selectedGoods.length > 0 && bidsAllowed" class="pt-2 mb-2" :auctionId="auctionId" />
 
       <div v-if="selectedGoods.length > 0 && !bidsAllowed" class="alert alert-warning text-center">
-        Bids on this good are not allowed in this round.
+        Bids on this bundle are not allowed in this round.
       </div>
       <div v-if="!bidsLeft && !alreadyBid" class="alert alert-warning text-center">
         You have reached the maximum number of bids. If you want to add a bid, you need to remove one first.

@@ -22,12 +22,14 @@ export interface RootState {
 
 Vue.use(Vuex)
 
+const url = `${window.location.protocol}//${window.location.host}/`
+
 // oidc
 export const oidcSettings = {
   authority: 'https://accounts.google.com/',
   clientId: '331980528223-vd457jtapti5bhsi39ht9ivvmggbhceu.apps.googleusercontent.com',
-  redirectUri: `${window.location.toString()}oidc-callback`,
-  post_logout_redirect_uri: window.location.toString(),
+  redirectUri: `${url}oidc-callback`,
+  post_logout_redirect_uri: url,
   responseType: 'id_token token',
   scope: 'openid',
   automaticSilentRenew: true

@@ -103,15 +103,14 @@
                         <bidder-circle :bidder="selectedBidder" class="float-right selected" />
                       </div>
 
-                      <div class="col d-flex align-items-center justify-content-start">
+                      <div class="col d-flex flex-column justify-content-center">
+                        <div class="small"><b>Selected Bundle:</b></div>
                         <good-badge :ids="selectedGoods" />
                       </div>
 
-                      <div class="col d-flex align-items-center justify-content-start">
-                        <div>
-                          <div class="small">Value:</div>
-                          {{ valueForGoods | formatNumber }}
-                        </div>
+                      <div class="col d-flex flex-column justify-content-center">
+                        <div class="small"><b>Value:</b></div>
+                        {{ valueForGoods | formatNumber }}
                       </div>
                     </div>
                     <div class="row justify-content-center">
@@ -134,7 +133,7 @@
       </div>
     </div>
 
-    <div class="grow bg-light">
+    <div class="grow bg-light auction-status-padding">
       <div
         class="container bottom-container"
         v-intro="
@@ -147,6 +146,8 @@
         <BidderControl :auctionId="auctionId" />
       </div>
     </div>
+
+    <AuctionStatusBar :auctionId="auctionId" />
   </div>
 </template>
 
@@ -177,6 +178,7 @@ export default Vue.extend({
     AuctionSetup: () => import('@/components/auction/Setup.vue'),
     Auctioneer: () => import('@/components/auction/Auctioneer.vue'),
     BidderControl: () => import('@/components/auction/BidderControl.vue'),
+    AuctionStatusBar: () => import('@/components/auction/AuctionStatusBar.vue'),
     'good-badge': () => import('@/components/auction/GoodBadge.vue'),
     'bidder-circle': () => import('@/components/auction/BidderCircle.vue'),
     'price-development-chart': () => import('@/components/auction/charts/PriceDevelopmentChart.vue'),
@@ -304,6 +306,10 @@ export default Vue.extend({
 
 <style scoped lang="scss">
 @import '../custom.scss';
+
+.auction-status-padding {
+  padding-bottom: 140px;
+}
 
 .bottom-container {
   padding-top: 20px;

@@ -55,7 +55,7 @@
     </b-navbar>
 
     <button
-      class="btn btn-info text-white btn-tutorial"
+      class="btn btn-outline-primary btn-tutorial"
       v-intro="
         'You can activate the tutorial anytime with this button; it will be explaining the component you see on your screen at that moment.'
       "
@@ -114,9 +114,11 @@ export default Vue.extend({
 @import 'custom.scss';
 
 .btn-tutorial {
+  z-index: 100;
   position: fixed;
-  right: 15px;
-  bottom: 15px;
+  right: 30px;
+  bottom: 30px;
+  background-color: white;
 }
 
 .user-avatar {

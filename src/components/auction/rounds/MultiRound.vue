@@ -1,7 +1,8 @@
 <template>
   <div class="small">
     <div v-if="rounds.length > 0">
-      Round:
+      Current Round: <b>{{ rounds[rounds.length - 1].roundNumber + 1 }}</b>
+      <!--
       <nav class="d-inline-flex">
         <span class="round" :class="{ active: rounds.length === 0 }">
           <a href="#" v-if="rounds.length > 0" @click="resetRound(0)">1</a>
@@ -17,6 +18,7 @@
           </span>
         </span>
       </nav>
+      -->
     </div>
 
     <button class="btn mt-2 btn-success btn-sm" @click="nextRound()" v-if="!finished">Next Round</button>
