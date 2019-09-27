@@ -117,7 +117,7 @@ export interface ApiAuction {
     domain: {
       efficientAllocationCalculated: boolean
       efficientAllocation: {
-        [x: string]: ApiBundleEntryWrapper
+        [x: string]: ApiEfficientBundleValue
       }
       efficientSocialWelfare: number
       bidders: string[]
@@ -187,6 +187,10 @@ export interface ApiBundleValue {
   bundle: ApiBundleEntryWrapper
 }
 
+export interface ApiEfficientBundleValue extends ApiBundleValue {
+  trueValue: number
+}
+
 export interface ApiBundleEntryWrapper {
   hash: string
   entries: ApiBundleEntry[]
@@ -206,6 +210,11 @@ export interface ApiBid {
 }
 
 export interface ApiAuctionAllocation {
+  socialWelfare: number
+  revenue: number
+  winnerUtilities: {
+    [x: string]: number
+  }
   allocation: {
     [x: string]: {
       value: number

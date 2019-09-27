@@ -3,7 +3,7 @@
     <h2>
       Results
       <router-link
-        v-if="auctions.length === 1"
+        v-if="auctions.length > 0"
         tag="button"
         class="btn btn-success btn-sm pull-right"
         :to="{ name: 'auction', params: { id: auctions[0].id } }"
@@ -30,8 +30,8 @@
               Efficient Allocation
             </div>
           </div>
-          <div v-if="efficientAuction">
-            <div class="flex-grow-1 text-right content-cell" v-for="bidderId in efficientAuction.auction.domain.bidders" :key="bidderId">
+          <div class="flex-grow-1 text-right content-cell" v-for="bidderId in efficientAuction.auction.domain.bidders" :key="bidderId">
+            <div v-if="efficientAllocationOf(bidderId, efficientAuction)">
               <good-badge :ids="efficientAllocationOf(bidderId, efficientAuction).bundle.entries"></good-badge><br />
               <span class="badge badge-primary"
                 >Value: {{ efficientAllocationOf(bidderId, efficientAuction).trueValue | formatNumber }}</span
@@ -47,7 +47,7 @@
               <div class="auction-results text-center">
                 Auction: {{ auction.name || auction.id }}<br />
 
-                <a @click="calculateEfficiency()" class="badge badge-pill badge-success mr-1 text-white" v-if="!efficiency(index)"
+                <a @click="calculateEfficiency(auction.id)" class="badge badge-pill badge-success mr-1 text-white" v-if="!efficiency(index)"
                   >Calculate Efficiency</a
                 >
                 <span
@@ -135,7 +135,8 @@ import auction, {
   ApiAuctionAllocation,
   AuctionState,
   ApiBidder,
-  ApiBundleEntryWrapper
+  ApiBundleEntryWrapper,
+  ApiEfficientBundleValue
 } from '../store/modules/auction'
 import api from '../services/api'
 
@@ -146,6 +147,17 @@ export default Vue.extend({
     'bidder-circle': () => import('@/components/auction/BidderCircle.vue')
   },
   computed: {
+    auctionIds(): string[] {
+      return Array.isArray(this.$route.query.auctions) ? (this.$route.query.auctions as string[]) : [this.$route.query.auctions]
+    },
+    auctions(): ApiAuction[] {
+      return this.auctionIds.map(auctionId => auction.auctionById()(auctionId!))
+    },
+    results(): ApiAuctionAllocation[] {
+      return this.auctionIds
+        .map(auctionId => auction.auctionResultById()(auctionId!))
+        .filter(obj => obj !== null && obj !== undefined) as ApiAuctionAllocation[]
+    },
     efficientAuction(): ApiAuction | null {
       let mostEfficientAuction: ApiAuction | null = null
 
@@ -184,30 +196,21 @@ export default Vue.extend({
       // update auctions
       this.fetchResults()
     },
-    efficientAllocationOf(bidderId: string, auction: ApiAuction): ApiBundleEntryWrapper | null {
-      console.log(bidderId, auction)
-      return auction.auction.domain.efficientAllocation[bidderId]
+    efficientAllocationOf(bidderId: string, auction: ApiAuction): ApiEfficientBundleValue | null {
+      if (!auction.auction.domain.efficientAllocationCalculated) {
+        return null
+      }
+      return auction.auction.domain.efficientAllocation[bidderId] ? auction.auction.domain.efficientAllocation[bidderId] : null
     },
     efficiency(index: number) {
-      if (this.$data.auctions[index].auction.domain.efficientAllocationCalculated) {
-        return (this.$data.results[index].socialWelfare / this.$data.auctions[index].auction.domain.efficientSocialWelfare) * 100
+      if (this.auctions[index].auction.domain.efficientAllocationCalculated) {
+        return (this.results[index].socialWelfare / this.auctions[index].auction.domain.efficientSocialWelfare) * 100
       }
       return null
     },
     async fetchResults() {
-      const auctionIds = Array.isArray(this.$route.query.auctions) ? this.$route.query.auctions : [this.$route.query.auctions]
-
-      await Promise.all(auctionIds.map(auctionId => auction.dispatchGetAuction({ auctionId: auctionId! })))
-      await Promise.all(auctionIds.map(auctionId => auction.dispatchGetAuctionResult({ auctionId: auctionId! })))
-
-      this.$data.auctions = auctionIds.map(auctionId => auction.auctionById()(auctionId!))
-      this.$data.results = auctionIds.map(auctionId => auction.auctionResultById()(auctionId!))
-    }
-  },
-  data() {
-    return {
-      auctions: [] as ApiAuction[],
-      results: []
+      await Promise.all(this.auctionIds.map(auctionId => auction.dispatchGetAuction({ auctionId: auctionId! })))
+      await Promise.all(this.auctionIds.map(auctionId => auction.dispatchGetAuctionResult({ auctionId: auctionId! })))
     }
   },
   async mounted() {
