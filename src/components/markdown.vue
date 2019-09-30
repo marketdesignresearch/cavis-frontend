@@ -17,7 +17,9 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    const { data: faqMarkdown } = await axiosClient.get(`/docs/${this.$props.file}`)
+    const { data: faqMarkdown } = await axiosClient.get(
+      `https://raw.githubusercontent.com/marketdesignresearch/cavis-docs/master/${this.$props.file}`
+    )
     this.$data.content = faqMarkdown
   },
   computed: {
