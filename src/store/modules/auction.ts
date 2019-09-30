@@ -147,6 +147,7 @@ export interface ApiAuction {
 
 export interface ApiDomainConfig {
   name: string
+  type: string
   bidders?: {
     name: string
     min: number
