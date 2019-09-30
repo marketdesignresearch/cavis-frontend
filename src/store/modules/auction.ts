@@ -109,6 +109,7 @@ export interface ApiAuction {
   name: string
   tags: string[]
   auctionConfig: ApiAuctionConfig
+  domainConfig: ApiDomainConfig
   auction: {
     mechanismType: ApiMechanismType
     currentRoundType?: string
@@ -142,6 +143,26 @@ export interface ApiAuction {
   private: boolean
   auctionType: ApiAuctionType
   result?: ApiAuctionAllocation
+}
+
+export interface ApiDomainConfig {
+  name: string
+  bidders?: {
+    name: string
+    min: number
+    max: number
+  }[]
+  goods?: {
+    name: string
+    id: string
+    quantity: number
+  }[]
+  synergy?: number
+  interestingCase?: boolean
+  maxLocalValue?: number
+  numberOfNationalBidders?: number
+  numberOfRegionalBidders?: number
+  numberOfLocalBidders?: number
 }
 
 export interface ApiRound {
