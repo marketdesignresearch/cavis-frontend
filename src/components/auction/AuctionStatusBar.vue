@@ -1,10 +1,8 @@
 <template>
   <div class="status-bar-container" v-if="auction">
     <div class="status-bar shadow-lg d-flex">
-      <auction-static-information
-        :auction="auction"
-        v-intro="'Here, you can see some general information about the auction (like its type).'"
-      />
+      <!-- v-intro="'Here, you can see some general information about the auction (like its type).'" -->
+      <auction-static-information :auction="auction" />
       <div class="text-center flex-grow-1">
         <!-- given no round type, its a standard bidding round -->
         <div v-if="!auction.auction.currentRoundType">
@@ -25,6 +23,7 @@
         </div>
       </div>
 
+      <!-- v-intro="'You can advance the auction with the actions provided in this area. In a single-round auction, this means you can close the auction and get the outcome; In a multi-round auction, you are able to advance a round (and when all the rounds are played, close the auction).'" -->
       <component :is="roundType" :auction="auction" />
     </div>
   </div>

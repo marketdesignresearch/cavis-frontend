@@ -9,21 +9,34 @@
         The big advantage of this representation is that it is useful in all domains, no matter how large it gets, by relying on the interactive design of CAVis.'
       "
       v-intro-position="'top'"
+      v-intro-step="81"
     >
       <div class="table-responsive">
         <table class="table table-bordered table-bidder table-hover">
           <thead>
             <tr>
-              <th @click="sortBy('entriesString')" class="parentHover" v-intro="'You can sort by bundle size, ...'">
+              <th @click="sortBy('entriesString')" class="parentHover" v-intro="'You can sort by bundle size, ...'" v-intro-step="82">
                 Bundle <sort-marker :sortable="sort" :property="'entriesString'"></sort-marker>
               </th>
-              <th @click="sortBy('value')" class="parentHover" v-intro="'... the bidder\'s value, ...'">
+              <th @click="sortBy('value')" class="parentHover" v-intro="'... the bidder\'s value, ...'" v-intro-step="83">
                 Value <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'value'"></sort-marker>
               </th>
-              <th @click="sortBy('price')" class="parentHover" v-if="pricedAuction" v-intro="'... the bundle\'s price, ...'">
+              <th
+                @click="sortBy('price')"
+                class="parentHover"
+                v-if="pricedAuction"
+                v-intro="'... the bundle\'s price, ...'"
+                v-intro-step="84"
+              >
                 Price <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'price'"></sort-marker>
               </th>
-              <th @click="sortBy('utility')" class="parentHover" v-if="pricedAuction" v-intro="'... the bidder\'s utility, ...'">
+              <th
+                @click="sortBy('utility')"
+                class="parentHover"
+                v-if="pricedAuction"
+                v-intro="'... the bidder\'s utility, ...'"
+                v-intro-step="85"
+              >
                 Utility <font-awesome-icon icon="wrench" /> <sort-marker :sortable="sort" :property="'utility'"></sort-marker>
               </th>
               <th
@@ -32,6 +45,7 @@
                 v-intro="
                   '... or the current bid on this bundle. Sorting that way will show you all the currently entered bids on top. You can also remove a bid directly in the table (this will keep the entry in the table, only removing the bundle\'s bid).'
                 "
+                v-intro-step="86"
               >
                 Bid <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'bid'"></sort-marker>
               </th>

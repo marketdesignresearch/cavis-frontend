@@ -4,6 +4,7 @@
     v-intro="
       'Great! You have entered the auction room. Imagine this view as the room with a big table, where the auctioneer sits on top and the bidders sit around this table. The goods to be auctioned off are placed on the table.'
     "
+    v-intro-step="70"
   >
     <div class="bg-light">
       <div class="container py-3">
@@ -16,7 +17,10 @@
         <div class="row">
           <div class="col">
             <div class="d-flex pt-4">
-              <div v-intro="'This, together with the right-hand side, visualizes the bidders that take part in the auction.'">
+              <div
+                v-intro="'This, together with the right-hand side, visualizes the bidders that take part in the auction.'"
+                v-intro-step="72"
+              >
                 <span v-for="(bidderId, index) in leftSideBidders" :key="bidderId" @click="selectBidder(bidderId)">
                   <AuctionBidder
                     class="align-self-start"
@@ -25,6 +29,7 @@
                     v-intro="
                       'You can hover over the bidder to get more information, and click to interact (e.g., to bid for goods). Each round, it is calculated what the best bids would be given the bidder\'s strategy. Once this calculation has completed, a green circle appears around the bidder.'
                     "
+                    v-intro-step="73"
                     v-intro-if="index === 0"
                   />
                 </span>
@@ -35,6 +40,7 @@
                   class="goods-container justify-content-center"
                   :class="{ selected: selectedBidder }"
                   v-intro="'This represents the table on which the goods are placed that are auctioned off.'"
+                  v-intro-step="74"
                 >
                   <div class="goods-title">
                     <span>Goods</span>
@@ -45,6 +51,7 @@
                     v-intro="
                       'In PVM, you can see additional information about the selection, namely what value a bidder reported for the selected bundle and what the auctioneer\'s learning algorithm would infer as the selected bidder\'s value for the selected bundle.'
                     "
+                    v-intro-step="75"
                     v-if="isPVM && auctioneerVisible"
                     :auctionId="auctionId"
                   />
@@ -57,6 +64,7 @@
                         the marginal value of this bidder for adding this good to the selection.<br>\
                         For complex value functions of a bidder, this kind of interaction is a convenient way to explore a bidder\'s value function.'
                       "
+                      v-intro-step="77"
                       v-intro-if="index === 0"
                       class="align-self-center d-inline-flex"
                       :goodId="goodId"
@@ -79,6 +87,7 @@
                         class="btn btn-outline-success btn-sm mx-1"
                         v-b-modal.modal-price-development
                         v-intro="'This brings you to the publicly available information about past prices of the selected goods.'"
+                        v-intro-step="78"
                       >
                         Price Development
                       </button>
@@ -87,6 +96,7 @@
                         class="btn btn-outline-success btn-sm mx-1"
                         v-b-modal.modal-over-demand
                         v-intro="'Similarly, here you find the public information about past over-demand of the selected goods.'"
+                        v-intro-step="79"
                       >
                         Over-Demand History
                       </button>
@@ -99,6 +109,7 @@
                     v-intro="
                       'Here, you see the selected bidder\'s value for the selected bundle. It is also where you can enter/change a bid for the selected bundle.'
                     "
+                    v-intro-step="76"
                   >
                     <div class="row">
                       <div class="col d-flex align-items-center">
@@ -145,6 +156,7 @@
         v-intro="
           'This area becomes particularly interesting when a bidder is selected (if you do not have a bidder selected currently, we suggest to restart the tutorial later with a bidder selected to get more information about this part of the tool).'
         "
+        v-intro-step="80"
       >
         <div class="text-center" v-if="!selectedBidder">
           <h4 class="text-muted">select bidder to view details</h4>
@@ -212,9 +224,13 @@ export default Vue.extend({
     })
     if (!this.$cookies.isKey('auctionIntro')) {
       // show introjs
-      this.$intro()
-        .setOptions({ showStepNumbers: false, skipLabel: 'End' })
-        .start()
+      window.addEventListener('load', () => {
+        // run after everything is in-place
+        this.$intro()
+          .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+          .start()
+        this.$cookies.set('homeIntro', true)
+      })
       this.$cookies.set('auctionIntro', true)
     }
   },

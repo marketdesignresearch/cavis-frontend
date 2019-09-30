@@ -2,7 +2,13 @@
   <div id="app" class="d-flex flex-column">
     <b-navbar class="mb-4" toggleable="lg" type="light">
       <div class="container">
-        <router-link tag="a" class="navbar-brand" :to="{ name: 'home' }">
+        <router-link
+          tag="a"
+          class="navbar-brand"
+          :to="{ name: 'home' }"
+          v-intro="'Click here get to the home screen anytime to start a new auction.'"
+          v-intro-step="96"
+        >
           Home
         </router-link>
 
@@ -12,7 +18,7 @@
 
         <b-collapse id="nav-collapse" is-nav v-model="navCollapsed">
           <b-navbar-nav>
-            <b-nav-item :to="{ name: 'auction-list' }" v-intro="'Click here to get an overview over recent auctions.'" v-intro-step="1">
+            <b-nav-item :to="{ name: 'auction-list' }" v-intro="'Click here to get an overview over recent auctions.'" v-intro-step="97">
               Auctions
             </b-nav-item>
           </b-navbar-nav>
@@ -100,12 +106,6 @@ export default Vue.extend({
   },
   mounted() {
     window.addEventListener('vuexoidc:userUnloaded', this.userUnloaded)
-
-    if (!this.$cookies.isKey('firstIntro')) {
-      // show introjs
-      setTimeout(this.showTutorial, 3000)
-      this.$cookies.set('firstIntro', true)
-    }
   },
   destroyed() {
     window.removeEventListener('vuexoidc:userUnloaded', this.userUnloaded)
