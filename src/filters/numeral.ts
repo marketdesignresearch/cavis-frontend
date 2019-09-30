@@ -4,8 +4,7 @@ import BigNumber from 'bignumber.js'
 const numberFormat = {
   decimalSeparator: '.',
   groupSeparator: ',',
-  groupSize: 3,
-  secondaryGroupSize: 2
+  groupSize: 3
 }
 
 Vue.filter('formatNumber', function(value: any): string {

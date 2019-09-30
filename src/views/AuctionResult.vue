@@ -1,5 +1,10 @@
 <template>
-  <div class="container content">
+  <div
+    class="container content"
+    v-intro="
+      'This is the result screen. It shows a summary and some numbers for the finished auction. If you have selected multiple comparable auctions from the auction list, you will see them all in comparison in the following table.'
+    "
+  >
     <h2>
       Results
       <router-link
@@ -7,6 +12,7 @@
         tag="button"
         class="btn btn-success btn-sm pull-right"
         :to="{ name: 'auction', params: { id: auctions[0].id } }"
+        v-intro="'You can go back to the auction screen by clicking here.'"
         >Back to Auction</router-link
       >
     </h2>
@@ -26,15 +32,20 @@
       <div class="d-flex flex-grow-1 efficient">
         <div class="efficient-allocations d-flex flex-column flex-grow-1">
           <div class="header d-flex flex-column text-right justify-content-end">
-            <div class="small font-weight-bold header-cell">
+            <div
+              class="small font-weight-bold header-cell"
+              v-intro="
+                'As a reference, the efficient allocation shows what the allocation would be given the complete information about each bidder\'s value function.'
+              "
+            >
               Efficient Allocation
             </div>
           </div>
           <div class="flex-grow-1 text-right content-cell" v-for="bidderId in efficientAuction.auction.domain.bidders" :key="bidderId">
             <div v-if="efficientAllocationOf(bidderId, efficientAuction)">
               <good-badge :ids="efficientAllocationOf(bidderId, efficientAuction).bundle.entries"></good-badge><br />
-              <span class="badge badge-primary"
-                >Value: {{ efficientAllocationOf(bidderId, efficientAuction).trueValue | formatNumber }}</span
+              <span class="badge badge-primary">
+                Value: {{ efficientAllocationOf(bidderId, efficientAuction).trueValue | formatNumber }}</span
               >
             </div>
           </div>
@@ -67,10 +78,20 @@
                 >
                   Social Welfare: {{ results[index].socialWelfare | formatNumber }}
                 </span>
-                <span class="badge badge-pill badge-secondary mr-1" v-intro="'The revenue is simply the sum of all the payments.'">
+                <span
+                  class="badge badge-pill badge-secondary mr-1"
+                  v-intro="'The revenue is simply the sum of all the payments.'"
+                  v-intro-if="index === 0"
+                >
                   Revenue: {{ results[index].revenue | formatNumber }}
                 </span>
-                <span class="badge badge-pill badge-secondary mr-1" v-intro="'The revenue is simply the sum of all the payments.'">
+                <span
+                  class="badge badge-pill badge-secondary mr-1"
+                  v-intro="
+                    'At a glance, you\'re also shown how many rounds were run. For some auction formats, you\'ll also see information about the number of value/demand queries.'
+                  "
+                  v-intro-if="index === 0"
+                >
                   # of Rounds: {{ auction.auction.rounds.length }}
                 </span>
                 <span class="badge badge-pill text-white bg-pvm mr-1" v-if="isPVM(auction)">
@@ -83,7 +104,7 @@
               <div class="bidder-header d-flex">
                 <div
                   class="flex-fill-same text-right border-right header-cell small font-weight-bold"
-                  v-intro="'This shows the actual allocation per winner of this auction run.'"
+                  v-intro="'This shows the actual allocation per bidder.'"
                   v-intro-if="index === 0"
                 >
                   Allocation
@@ -181,7 +202,11 @@ export default Vue.extend({
   },
   methods: {
     ccaDemandQueries(auction: ApiAuction): number {
-      return auction.auction.rounds.length + (auction.auctionConfig!.ccaConfig!.supplementaryBids > 0 ? 1 : 0) + 1
+      return (
+        auction.auction.rounds.length +
+        (auction.auctionConfig!.ccaConfig!.supplementaryBids > 0 ? auction.auctionConfig!.ccaConfig!.supplementaryBids : 0) +
+        1
+      )
     },
     isCCA(auction: ApiAuction): boolean {
       return auction.auctionType.startsWith('CCA')

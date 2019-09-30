@@ -9,12 +9,18 @@
         v-intro="
           'This will bring you to the non-active, archived auctions. Note that currently, auctions in a SATS domain are not stored, thus not recoverable once you\'re archiving them!'
         "
-        v-intro-step="80"
       >
         Archive <font-awesome-icon icon="archive" />
       </router-link>
-      <button class="btn btn-primary btn-sm float-right mr-1" :disabled="selectedAuctions.length === 0" @click="compare(selectedAuctions)">
-        {{ selectedAuctions.length === 0 ? 'Select auctions to compare' : `Compare ${selectedAuctions.length} auctions` }}
+      <button
+        class="btn btn-primary btn-sm float-right mr-1"
+        :disabled="selectedAuctions.length < 2"
+        @click="compare(selectedAuctions)"
+        v-intro="
+          'After selecting at least two comparable auctions (with the same domain settings incl. the seed), you can click here to compare the results of these auctions.'
+        "
+      >
+        {{ selectedAuctions.length < 2 ? 'Select auctions to compare' : `Compare ${selectedAuctions.length} auctions` }}
       </button>
     </h2>
     <hr />
