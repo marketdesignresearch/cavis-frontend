@@ -122,7 +122,7 @@ export default Vue.extend({
                 { name: 'Simultaneous Second Price Auction', id: ApiAuctionType.SIMULTANEOUS_SECOND_PRICE },
                 { name: 'VCG Auction', id: ApiAuctionType.VCG },
                 { name: 'Combinatorial Clock Auction (CCA)', id: ApiAuctionType.CCA },
-                { name: 'PVM Auction', id: ApiAuctionType.PVM }
+                { name: 'Linear Regression PVM', id: ApiAuctionType.PVM }
               ],
               validator: VueFormGenerator.validators.required
             },
@@ -367,14 +367,6 @@ export default Vue.extend({
           title: 'PVM Configuration',
           validation: false,
           fields: [
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Number of Bids in Initial Round',
-              model: 'pvmConfig.initialRoundBids',
-              default: 5,
-              validator: [VueFormGenerator.validators.required]
-            },
             {
               type: 'select',
               label: 'Payment Rule',

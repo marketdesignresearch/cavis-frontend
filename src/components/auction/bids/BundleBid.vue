@@ -1,7 +1,9 @@
 <template>
   <div class="d-flex flex-column">
     <div v-if="selectedGoods.length > 0 && (bidsLeft || (!bidsLeft && alreadyBid)) && bidsAllowed">
-      <div class="text-left"><small>Bid:</small></div>
+      <div class="text-left">
+        <small>Bid:</small>
+      </div>
       <form class="input-group btn-group" @submit.enter.prevent>
         <input v-model="bid" type="text" class="form-control w-75" placeholder="Your Bid" :disabled="bidEditable" />
         <button
@@ -21,10 +23,23 @@
     <div class="py-4">
       <strategy-selector v-if="selectedGoods.length > 0 && bidsAllowed" class="pt-2 mb-2" :auctionId="auctionId" />
 
-      <div v-if="selectedGoods.length > 0 && !bidsAllowed" class="alert alert-warning text-center">
+      <!-- PVM Specific Errors -->
+      <div v-if="isPVM && !bidsAllowed" class="alert alert-warning text-center">
+        <div v-if="pvmQueriedBundle">
+          <div>
+            You can discover values for all bundles, but the auctioneer queries bundle
+            <good-badge :goods="pvmQueriedBundle" />. Thus, you can only bid on this bundle.
+          </div>
+          <button class="btn mt-2 btn-sm btn-success" @click="selectQueriedBundle">Select queried bundle</button>
+        </div>
+        <div v-else>The auctioneer queries no bundles for this bidder.</div>
+      </div>
+
+      <!-- Explain why bidding is not possible -->
+      <div v-if="!isPVM && selectedGoods.length > 0 && !bidsAllowed" class="alert alert-warning text-center">
         Bids on this bundle are not allowed in this round.
       </div>
-      <div v-if="!bidsLeft && !alreadyBid" class="alert alert-warning text-center">
+      <div v-if="!isPVM && !bidsLeft && !alreadyBid" class="alert alert-warning text-center">
         You have reached the maximum number of bids. If you want to add a bid, you need to remove one first.
       </div>
     </div>
@@ -33,20 +48,14 @@
 
 <script lang="ts">
 import Vue from 'vue'
-import auction, {
-  ApiAuctionType,
-  ApiAuction,
-  ApiBid,
-  ApiBidder,
-  ApiBundleEntry,
-  ApiBundleEntryWrapper
-} from '../../../store/modules/auction'
+import auction, { ApiAuctionType, ApiAuction, ApiBid, ApiBidder, ApiBundleEntry, ApiBundleEntryWrapper } from '@/store/modules/auction'
 import BidderService from '@/services/bidder'
 import GoodsService from '@/services/goods'
-import selection from '../../../store/modules/selection'
+import selection from '@/store/modules/selection'
 import { mapGetters } from 'vuex'
-import hashBundle from '../../../services/bundleHash'
+import hashBundle from '@/services/bundleHash'
 import BigNumber from 'bignumber.js'
+import pvmService from '@/services/pvm'
 
 export default Vue.extend({
   props: ['auctionId'],
@@ -61,6 +70,17 @@ export default Vue.extend({
   },
   computed: {
     ...mapGetters('selection', ['selectedGoods', 'selectedBidder', 'selectedBundle']),
+    pvmQueriedBundle(): ApiBundleEntryWrapper | null {
+      if (pvmService.queriedBundle(auction.auctionById()(this.$props.auctionId), selection.selectedBidder()!).length > 0) {
+        return pvmService.queriedBundle(auction.auctionById()(this.$props.auctionId), selection.selectedBidder()!)[0] // right now we always query 1 bundle
+      }
+
+      return null
+    },
+    isPVM(): boolean {
+      const currentAuction = auction.auctionById()(this.$props.auctionId)
+      return currentAuction ? currentAuction.auctionType.startsWith('PVM') : false
+    },
     bidEditable: function() {
       const auctionInstance = auction.auctionById()(this.$props.auctionId)
       return auctionInstance.auction.currentRoundType && auctionInstance.auction.currentRoundType === 'Clock Round'
@@ -130,6 +150,9 @@ export default Vue.extend({
     }
   },
   methods: {
+    selectQueriedBundle() {
+      pvmService.selectQueriedBundle(auction.auctionById()(this.$props.auctionId))
+    },
     invalidInput(bid: string) {
       return new BigNumber(bid).isNaN()
     },

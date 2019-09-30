@@ -1,27 +1,16 @@
 <template>
   <div class="small">
-    <div v-if="rounds.length > 0">
+    <div v-if="rounds.length > 0 && !finished">
       Current Round: <b>{{ rounds[rounds.length - 1].roundNumber + 1 }}</b>
-      <!--
-      <nav class="d-inline-flex">
-        <span class="round" :class="{ active: rounds.length === 0 }">
-          <a href="#" v-if="rounds.length > 0" @click="resetRound(0)">1</a>
-          <span v-if="rounds.length === 0">1</span>
-        </span>
-        <span v-if="rounds.length >= 15">&nbsp;/&nbsp;...</span>
-        <span class="round" v-for="(round, index) in rounds" :key="round.roundNumber" :class="{ active: index === rounds.length - 1 }">
-          <span v-if="index > rounds.length - 4 || rounds.length < 15">
-            <span>&nbsp;/&nbsp;</span>
-            <a href="#" v-if="index < rounds.length - 1" @click="resetRound(round.roundNumber)">{{ round.roundNumber + 1 }}</a>
-            <span v-if="index === rounds.length - 1 && !finished">{{ round.roundNumber + 1 }}</span>
-            <span v-if="index === rounds.length - 1 && finished">END</span>
-          </span>
-        </span>
-      </nav>
-      -->
     </div>
+    <div v-else-if="!finished">Current Round: <b>1</b></div>
 
-    <button class="btn mt-2 btn-success btn-sm" @click="nextRound()" v-if="!finished">Next Round</button>
+    <div v-if="finished">Auction Finished ({{ rounds.length }} Rounds)</div>
+
+    <b-dropdown v-if="!finished" class="mt-2" right size="sm" variant="success" split text="Next Round" @click="advanceRound">
+      <b-dropdown-item @click="advancePhase">Skip Phase</b-dropdown-item>
+    </b-dropdown>
+
     <button class="btn mt-2 btn-success btn-sm" @click="showAuctionResults()" v-if="finished">Show Auction Result</button>
   </div>
 </template>
@@ -45,7 +34,7 @@ export default Vue.extend({
         case ApiAuctionType.CCA:
           return 'Combinatorial Clock Auction (CCA)'
         case ApiAuctionType.PVM:
-          return 'PVM Auction'
+          return 'Linear Regression PVM'
         default:
           return ''
       }
@@ -67,6 +56,12 @@ export default Vue.extend({
     async resetRound(round: number) {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: round })
       selection.commitUnselectAll()
+    },
+    advancePhase() {
+      auction.dispatchAdvancePhase({ auctionId: this.$props.auction.id })
+    },
+    advanceRound() {
+      auction.dispatchAdvanceRound({ auctionId: this.$props.auction.id })
     }
   }
 })

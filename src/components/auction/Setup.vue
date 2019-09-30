@@ -42,7 +42,7 @@ export default Vue.extend({
               { name: 'Simultaneous Second Price Auction', id: ApiAuctionType.SIMULTANEOUS_SECOND_PRICE },
               { name: 'VCG Auction', id: ApiAuctionType.VCG },
               { name: 'Combinatorial Clock Auction (CCA)', id: ApiAuctionType.CCA },
-              { name: 'PVM Auction', id: ApiAuctionType.PVM }
+              { name: 'Linear Regression PVM', id: ApiAuctionType.PVM }
             ],
             validator: VueFormGenerator.validators.required
           },

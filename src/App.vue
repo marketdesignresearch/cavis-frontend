@@ -74,10 +74,29 @@
 import Vue from 'vue'
 import store from '@/store'
 import { mapGetters, mapActions } from 'vuex'
+import api from './services/api'
+import { AxiosError } from 'axios'
 
 export default Vue.extend({
   computed: {
     ...mapGetters(['oidcIsAuthenticated', 'oidcUser'])
+  },
+  beforeCreate() {
+    api.registerResponseErrorHandler((error: AxiosError) => {
+      if (error && !error.response) {
+        this.$bvModal.msgBoxOk('We had some problems reaching the server. Check your internet connection or try again later.', {
+          centered: true,
+          title: 'Oops.'
+        })
+      }
+
+      if (error && error.response && error.response.status === 500) {
+        this.$bvModal.msgBoxOk('Something went wrong. Please try again.', {
+          centered: true,
+          title: 'Oops.'
+        })
+      }
+    })
   },
   mounted() {
     window.addEventListener('vuexoidc:userUnloaded', this.userUnloaded)

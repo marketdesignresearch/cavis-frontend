@@ -5,11 +5,27 @@
         <span>Auctioneer's Knowledge / Belief</span>
       </div>
       <div class="row">
-        <div class="col">Reported Value:</div>
-        <div class="col">Predicted Value:</div>
-        <div class="w-100"></div>
+        <div class="col" v-b-tooltip.hover :title="pvmReportedValueDescription">
+          Reported Value:
+          <font-awesome-icon :icon="['fas', 'info-circle']" />
+        </div>
+        <div class="col" v-b-tooltip.hover :title="pvmPredictedValueDescription">
+          Predicted Value:
+          <font-awesome-icon :icon="['fas', 'info-circle']" />
+        </div>
+      </div>
+      <div class="row" v-if="isFirstRound">
+        <div class="col">No data yet</div>
+        <div class="col">No data yet</div>
+      </div>
+      <div class="row" v-else>
         <div class="col">{{ reportedValue }}</div>
         <div class="col">{{ predictedValue }}</div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <button class="btn btn-sm my-2 text-white btn-success" @click="selectQueriedBundle">Select queried bundle</button>
+        </div>
       </div>
     </div>
   </div>
@@ -19,7 +35,8 @@
 import Vue from 'vue'
 import selection from '@/store/modules/selection'
 import auction from '@/store/modules/auction'
-import api from '../../../services/api'
+import api from '@/services/api'
+import pvmService from '@/services/pvm'
 import { mapGetters } from 'vuex'
 
 export default Vue.extend({
@@ -39,6 +56,16 @@ export default Vue.extend({
   },
   computed: {
     ...mapGetters('selection', ['selectedGoods', 'selectedBidder']),
+    pvmReportedValueDescription(): string {
+      return 'This value has been reported for the bundle by the bidder.'
+    },
+    pvmPredictedValueDescription(): string {
+      return 'This is the value the PVM algorithm predicts.'
+    },
+    isFirstRound(): boolean {
+      const auctionInstance = auction.auctionById()(this.$props.auctionId)
+      return auctionInstance.auction.rounds.length === 0
+    },
     reportedValue(): number | string {
       const selectedBundle = selection.selectedBundle().hash
       const selectedBidder = selection.selectedBidder()
@@ -79,6 +106,9 @@ export default Vue.extend({
 
       const { data: valueQueryResult } = await api.post(`/auctions/${this.$props.auctionId}/inferredvaluequery`, valueQuery)
       this.$data.proposedBundleValue = (valueQueryResult.inferredValues as number[]).pop()
+    },
+    selectQueriedBundle() {
+      pvmService.selectQueriedBundle(auction.auctionById()(this.$props.auctionId))
     }
   }
 })
@@ -104,6 +134,7 @@ export default Vue.extend({
   position: absolute;
   right: -75px;
   top: -50px;
+  width: 300px;
 
   font-size: 0.8rem;
   background: #563d7c;

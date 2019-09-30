@@ -1,5 +1,5 @@
 <template>
-  <div class="status-bar-container">
+  <div class="status-bar-container" v-if="auction">
     <div class="status-bar shadow-lg d-flex">
       <auction-static-information
         :auction="auction"

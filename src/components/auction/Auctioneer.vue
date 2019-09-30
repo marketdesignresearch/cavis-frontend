@@ -10,9 +10,9 @@
       >
         <img src="../../assets/auctioneer2.png" class="logo mt-3" v-b-toggle.collapse-auctioneer />
         <p>
-          <b-button v-b-toggle.collapse-auctioneer size="sm" class="mt-3">
-            {{ isAuctioneerVisible ? 'Hide Auctioneer View' : 'Show Auctioneer View' }}
-          </b-button>
+          <b-button v-b-toggle.collapse-auctioneer size="sm" class="mt-3">{{
+            isAuctioneerVisible ? 'Hide Auctioneer View' : 'Show Auctioneer View'
+          }}</b-button>
         </p>
       </div>
       <div
@@ -33,18 +33,12 @@
       <h4>Rounds</h4>
 
       <b-tabs content-class="mt-3" v-model="selectedRound">
-        <b-tab
-          v-for="round in rounds"
-          style="position: relative"
-          :title="round.roundNumber === rounds.length ? `${rounds.length} (Current Round)` : '' + round.roundNumber"
-          :key="round.roundNumber"
-        >
+        <b-tab v-for="round in rounds" style="position: relative" :title="currentRoundTitle(round, rounds.length)" :key="round.roundNumber">
           <div class="right py-3">
             <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">
               Reset to Round #{{ round.roundNumber }}
             </button>
             <button v-if="rounds.length > 1" @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
-            <button v-if="isMultiPhase" @click="advancePhase" class="btn ml-2 btn-success btn-sm">Skip Phase</button>
           </div>
 
           <table class="table table-bordered table-bidder">
@@ -52,7 +46,8 @@
               <tr>
                 <th class="w-25" scope="col">Bidder</th>
                 <th scope="col">Bids</th>
-                <th scope="col" v-if="isMultiRound">Interim Allocation</th>
+                <th scope="col" v-if="isMultiRound && !isPVM">Interim Allocation</th>
+                <th scope="col" v-if="isPVM">Inferred Allocation</th>
                 <th scope="col" v-if="isMultiRound">Payment</th>
               </tr>
             </thead>
@@ -63,14 +58,20 @@
                   <div class="row">
                     <div class="col" v-for="(bids, index) in bidsByBidderChunked(bidder, round)" :key="'chunked-' + index">
                       <div v-for="bid in bids" :key="bid.id">
-                        {{ bid.amount | formatNumber }} for <good-badge :ids="bid.bundle.entries.map(obj => obj.good)" />
+                        {{ bid.amount | formatNumber }} for
+                        <good-badge :ids="bid.bundle.entries.map(obj => obj.good)" />
                       </div>
                     </div>
                   </div>
                 </td>
-                <td v-if="isMultiRound">
+                <td v-if="isMultiRound && !isPVM">
                   <good-badge :ids="allocationForBidder(bidder, round)" />
                 </td>
+
+                <td v-if="isPVM">
+                  <good-badge :ids="inferredAllocationForBidder(bidder, round)" />
+                </td>
+
                 <td v-if="isMultiRound">{{ paymentForGoods(bidder, round) | formatNumber }}</td>
               </tr>
             </tbody>
@@ -78,8 +79,6 @@
         </b-tab>
       </b-tabs>
     </b-collapse>
-
-    <hr class="py-3" />
   </div>
 </template>
 
@@ -151,6 +150,9 @@ export default Vue.extend({
       const multiPhaseAuctions = [ApiAuctionType.CCA, ApiAuctionType.PVM]
       return multiPhaseAuctions.includes(this.$props.auction.auctionType as ApiAuctionType)
     },
+    isPVM(): boolean {
+      return (this.$props.auction.auctionType as ApiAuctionType).startsWith('PVM')
+    },
     isMultiRound(): boolean {
       const multiRoundAuctions = [
         ApiAuctionType.SEQUENTIAL_FIRST_PRICE,
@@ -199,6 +201,10 @@ export default Vue.extend({
     }
   },
   methods: {
+    currentRoundTitle(round: ApiRound, length: number) {
+      const isFinished: boolean = this.$props.auction.auction.finished
+      return round.roundNumber === length ? `${length}` + (!isFinished ? ` (Current Round)` : '') : '' + round.roundNumber
+    },
     allocate() {
       auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
     },
@@ -234,6 +240,15 @@ export default Vue.extend({
         return { good: entry.good, amount: entry.amount }
       })
     },
+    inferredAllocationForBidder(bidder: ApiBidder, round: ApiRound): ApiBundleEntry[] {
+      if (!round.pvm || !round.pvm.inferredOptimalAllocation[bidder.id!]) {
+        return []
+      }
+
+      return round.pvm.inferredOptimalAllocation[bidder.id!].bundle.entries.map(entry => {
+        return { good: entry.good, amount: entry.amount }
+      })
+    },
     paymentForGoods(bidder: ApiBidder, round: ApiRound): number | null {
       if (!round.outcome || !round.outcome.payments[bidder.id!]) {
         return null
@@ -264,12 +279,6 @@ export default Vue.extend({
       Object.keys(valueQueryResult).forEach(bidderId => {
         this.bundleValues[bidderId] = valueQueryResult[bidderId]
       })
-    },
-    advanceRound() {
-      auction.dispatchAdvanceRound({ auctionId: this.$props.auction.id })
-    },
-    advancePhase() {
-      auction.dispatchAdvancePhase({ auctionId: this.$props.auction.id })
     },
     resetAuction() {
       auction.dispatchResetAuctionToRound({ auctionId: this.$props.auction.id, round: 0, standardBids: true })

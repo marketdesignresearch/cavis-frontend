@@ -5,11 +5,13 @@
       'Great! You have entered the auction room. Imagine this view as the room with a big table, where the auctioneer sits on top and the bidders sit around this table. The goods to be auctioned off are placed on the table.'
     "
   >
-    <div class="container">
-      <Auctioneer v-if="activeAuction" :auction="activeAuction" />
+    <div class="bg-light">
+      <div class="container py-3">
+        <Auctioneer v-if="activeAuction" :auction="activeAuction" />
+      </div>
     </div>
 
-    <div class="auction-view">
+    <div class="auction-view pt-4">
       <div class="container">
         <div class="row">
           <div class="col">
@@ -104,12 +106,16 @@
                       </div>
 
                       <div class="col d-flex flex-column justify-content-center">
-                        <div class="small"><b>Selected Bundle:</b></div>
+                        <div class="small">
+                          <b>Selected Bundle:</b>
+                        </div>
                         <good-badge :ids="selectedGoods" />
                       </div>
 
                       <div class="col d-flex flex-column justify-content-center">
-                        <div class="small"><b>Value:</b></div>
+                        <div class="small">
+                          <b>Value for Bundle:</b>
+                        </div>
                         {{ valueForGoods | formatNumber }}
                       </div>
                     </div>

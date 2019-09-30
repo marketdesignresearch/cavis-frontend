@@ -64,7 +64,7 @@ export default Vue.extend({
         case ApiAuctionType.CCA:
           return 'Combinatorial Clock Auction (CCA)'
         case ApiAuctionType.PVM:
-          return 'PVM Auction'
+          return 'Linear Regression PVM'
         default:
           return ''
       }

@@ -94,7 +94,6 @@ export interface ApiAuctionConfig {
     maxRounds: number
   }
   pvmConfig?: {
-    initialRoundBid: number
     paymentRule: ApiAuctionPaymentRule
     maxRounds: number
   }
@@ -155,6 +154,17 @@ export interface ApiRound {
     [x: string]: number
   }
   outcome?: ApiAuctionAllocation
+  pvm?: {
+    inferredOptimalAllocation: {
+      [x: string]: {
+        value: number
+        bundle: ApiBundleEntryWrapper
+      }
+    }
+    queriedBundles: {
+      [x: string]: ApiBundleEntryWrapper[]
+    }
+  }
 }
 
 export interface ApiBidder {
