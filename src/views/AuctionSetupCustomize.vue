@@ -75,7 +75,7 @@ export default Vue.extend({
       // mock creation using store
       const auctionObj: ApiAuctionCreateDTO = {
         domain: {
-          type: model.domainType,
+          type: model.domainConfig.type,
           bidders: [],
           goods: []
         },
@@ -98,28 +98,28 @@ export default Vue.extend({
         auctionObj.auctionConfig.pvmConfig = model.pvmConfig
       }
 
-      switch (model.domainType) {
+      switch (model.domainConfig.type) {
         case 'llg':
-          auctionObj.domain.interestingCase = model.llgConfig.interestingCase
-          auctionObj.domain.maxLocalValue = model.llgConfig.maxLocalValue
+          auctionObj.domain.interestingCase = model.domainConfig.interestingCase
+          auctionObj.domain.maxLocalValue = model.domainConfig.maxLocalValue
           break
         case 'gsvm':
-          auctionObj.domain.numberOfNationalBidders = model.gsvmConfig.numberOfNationalBidders
-          auctionObj.domain.numberOfRegionalBidders = model.gsvmConfig.numberOfRegionalBidders
+          auctionObj.domain.numberOfNationalBidders = model.domainConfig.numberOfNationalBidders
+          auctionObj.domain.numberOfRegionalBidders = model.domainConfig.numberOfRegionalBidders
           break
         case 'lsvm':
-          auctionObj.domain.numberOfNationalBidders = model.lsvmConfig.numberOfNationalBidders
-          auctionObj.domain.numberOfRegionalBidders = model.lsvmConfig.numberOfRegionalBidders
+          auctionObj.domain.numberOfNationalBidders = model.domainConfig.numberOfNationalBidders
+          auctionObj.domain.numberOfRegionalBidders = model.domainConfig.numberOfRegionalBidders
           break
         case 'synergy':
-          auctionObj.domain.synergy = model.bidder.synergy
+          auctionObj.domain.synergy = model.domainConfig.synergy
         default:
           for (let i = 0; i < model.numberOfBidders; i++) {
             auctionObj.domain.bidders.push({
               name: `${i + 1}`,
               defaultStrategy: model.defaultStrategy,
-              min: model.bidder.min,
-              max: model.bidder.max
+              min: model.domainConfig.minBidder,
+              max: model.domainConfig.maxBidder
             })
           }
           break

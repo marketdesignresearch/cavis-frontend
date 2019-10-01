@@ -70,17 +70,17 @@ export default Vue.extend({
         case 'strategySchema':
           return false
         case 'llgDomainSchema':
-          return (this.model as any).domainType.indexOf('llg') !== -1
+          return (this.model as any).domainConfig.type.indexOf('llg') !== -1
         case 'defaultDomainSchema':
           return (
-            (this.model as any).domainType.indexOf('additive') !== -1 ||
-            (this.model as any).domainType.indexOf('unitDemand') !== -1 ||
-            (this.model as any).domainType.indexOf('synergy') !== -1
+            (this.model as any).domainConfig.type.indexOf('additive') !== -1 ||
+            (this.model as any).domainConfig.type.indexOf('unitDemand') !== -1 ||
+            (this.model as any).domainConfig.type.indexOf('synergy') !== -1
           )
         case 'gsvmSchema':
-          return (this.model as any).domainType.indexOf('gsvm') !== -1
+          return (this.model as any).domainConfig.type.indexOf('gsvm') !== -1
         case 'lsvmSchema':
-          return (this.model as any).domainType.indexOf('lsvm') !== -1
+          return (this.model as any).domainConfig.type.indexOf('lsvm') !== -1
         case 'ccaSchema':
           return (this.model as any).auctionType === ApiAuctionType.CCA
         case 'pvmSchema':
@@ -129,7 +129,7 @@ export default Vue.extend({
             {
               type: 'select',
               label: 'Domain',
-              model: 'domainType',
+              model: 'domainConfig.type',
               default: 'additiveValue',
               selectOptions: {
                 hideNoneSelectedText: true
@@ -214,7 +214,7 @@ export default Vue.extend({
               type: 'input',
               inputType: 'number',
               label: 'Min Value of Bidders',
-              model: 'bidder.min',
+              model: 'domainConfig.minBidder',
               default: 0,
               validator: [VueFormGenerator.validators.required]
             },
@@ -222,7 +222,7 @@ export default Vue.extend({
               type: 'input',
               inputType: 'number',
               label: 'Max Value of Bidders',
-              model: 'bidder.max',
+              model: 'domainConfig.maxBidder',
               default: 1000,
               validator: [VueFormGenerator.validators.required]
             },
@@ -230,10 +230,10 @@ export default Vue.extend({
               type: 'input',
               inputType: 'number',
               label: 'Synergy factor',
-              model: 'bidder.synergy',
+              model: 'domainConfig.synergy',
               default: 0.2,
               step: 0.01,
-              visible: (model: any) => model.domainType.indexOf('synergy') !== -1,
+              visible: (model: any) => model.domainConfig.type.indexOf('synergy') !== -1,
               hint:
                 'A factor for the synergy among multiple goods. Positive means they are complements, negative means they are subsitute.',
               validator: [VueFormGenerator.validators.required]
@@ -247,7 +247,7 @@ export default Vue.extend({
             {
               type: 'checkbox',
               label: 'Interesting Case',
-              model: 'llgConfig.interestingCase',
+              model: 'domainConfig.interestingCase',
               default: true,
               validator: [VueFormGenerator.validators.required]
             },
@@ -255,7 +255,7 @@ export default Vue.extend({
               type: 'input',
               inputType: 'number',
               label: 'Maximum Value of Local Bidders',
-              model: 'llgConfig.maxLocalValue',
+              model: 'domainConfig.maxLocalValue',
               default: 100,
               validator: [VueFormGenerator.validators.required, VueFormGenerator.validators.integer]
             }
@@ -269,14 +269,14 @@ export default Vue.extend({
               type: 'input',
               inputType: 'number',
               label: '# of National GSVM Bidders',
-              model: 'gsvmConfig.numberOfNationalBidders',
+              model: 'domainConfig.numberOfNationalBidders',
               default: 1
             },
             {
               type: 'input',
               inputType: 'number',
               label: '# of Regional GSVM Bidders',
-              model: 'gsvmConfig.numberOfRegionalBidders',
+              model: 'domainConfig.numberOfRegionalBidders',
               default: 6
             }
           ]
@@ -289,14 +289,14 @@ export default Vue.extend({
               type: 'input',
               inputType: 'number',
               label: '# of National LSVM Bidders',
-              model: 'lsvmConfig.numberOfNationalBidders',
+              model: 'domainConfig.numberOfNationalBidders',
               default: 1
             },
             {
               type: 'input',
               inputType: 'number',
               label: '# of Regional LSVM Bidders',
-              model: 'lsvmConfig.numberOfRegionalBidders',
+              model: 'domainConfig.numberOfRegionalBidders',
               default: 5
             }
           ]
