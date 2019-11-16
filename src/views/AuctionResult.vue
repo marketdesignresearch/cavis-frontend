@@ -242,16 +242,16 @@ export default Vue.extend({
   },
   async mounted() {
     await this.fetchResults()
-    if (!this.$cookies.isKey('auctionResultIntro')) {
-      setTimeout(
-        () =>
-          this.$intro()
-            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
-            .start(),
-        1000
-      )
-      this.$cookies.set('auctionResultIntro', true)
-    }
+    // if (!this.$cookies.isKey('auctionResultIntro')) {
+    //   setTimeout(
+    //     () =>
+    //       this.$intro()
+    //         .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+    //         .start(),
+    //     1000
+    //   )
+    //   this.$cookies.set('auctionResultIntro', true)
+    // }
   }
 })
 </script>

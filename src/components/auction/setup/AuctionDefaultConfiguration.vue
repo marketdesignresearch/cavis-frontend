@@ -17,7 +17,8 @@
     </div>
 
     <div class="text-right py-2">
-      <button class="btn btn-lg btn-success ml-1" @click.prevent="submit">Create</button>
+      <router-link class="btn btn-lg btn-secondary ml-1" to="/" tag="button">Cancel</router-link>
+      <button class="btn btn-lg btn-success ml-1" @click.prevent="submit">Create Auction</button>
     </div>
   </form>
 </template>
@@ -106,13 +107,13 @@ export default Vue.extend({
           fields: [
             {
               type: 'select',
-              label: 'Auction',
+              label: 'Auction Mechanism',
               model: 'auctionType',
               default: ApiAuctionType.VCG,
               selectOptions: {
                 hideNoneSelectedText: true
               },
-              help: helpIconGenerator('http://localhost:1234/docs/#/auction-setup?id=auction-types'),
+              help: helpIconGenerator('http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=auction-types'),
               values: [
                 { name: 'Single-Item First Price Auction', id: ApiAuctionType.SINGLE_ITEM_FIRST_PRICE },
                 { name: 'Single-Item Second Price Auction', id: ApiAuctionType.SINGLE_ITEM_SECOND_PRICE },
@@ -134,7 +135,7 @@ export default Vue.extend({
               selectOptions: {
                 hideNoneSelectedText: true
               },
-              help: helpIconGenerator('http://localhost:1234/docs/#/auction-setup?id=domains'),
+              help: helpIconGenerator('http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=domains'),
               values: [
                 { name: 'Unit Demand Value', id: 'unitDemandValue' },
                 { name: 'Additive Value', id: 'additiveValue' },
@@ -185,7 +186,7 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: '# of Goods',
+              label: 'Number of Goods',
               model: 'numberOfGoods',
               default: 3,
               disabled: (model: any) => {
@@ -202,7 +203,7 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: '# of Bidders',
+              label: 'Number of Bidders',
               model: 'numberOfBidders',
               tooltip: 'This is a tooltip',
               default: 3,
@@ -417,7 +418,7 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: 'Seed',
+              label: 'Seed (optional)',
               model: 'seed'
             }
           ]

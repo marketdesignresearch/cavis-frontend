@@ -43,8 +43,8 @@
             <div class="card-body">
               <h5 class="card-title">Swiss December 2000</h5>
               <p class="card-text">
-                A configuration based on a spectrum auction (called "Swiss Wireless Local Loop (WLL)") that took place in Switzerland in
-                March 2000, which pointed out a potential problem with a sequential second-price auction.
+                A configuration based on the Swiss auction for UMTS licenses that took place in December 2000 in the format of a
+                simultaneous second-price auction, which failed to generate much revenue.
               </p>
             </div>
           </div>

@@ -235,16 +235,16 @@ export default Vue.extend({
   async mounted() {
     const { data } = await api.get('/auctions/')
     this.$data.auctions = data
-    if (!this.$cookies.isKey('auctionListIntro')) {
-      setTimeout(
-        () =>
-          this.$intro()
-            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
-            .start(),
-        1000
-      )
-      this.$cookies.set('auctionListIntro', true)
-    }
+    // if (!this.$cookies.isKey('auctionListIntro')) {
+    //   setTimeout(
+    //     () =>
+    //       this.$intro()
+    //         .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+    //         .start(),
+    //     1000
+    //   )
+    //   this.$cookies.set('auctionListIntro', true)
+    // }
   }
 })
 </script>

@@ -21,7 +21,7 @@ RUN npm run build
 FROM nginx:1-alpine
 
 COPY --from=build /app/dist /usr/share/nginx/html
-RUN printf "presenter:\$apr1\$rmlaxwj8\$FSmjA1lvIXWqp1brFyn4d1\n" >> /etc/nginx/.htpasswd
+RUN printf "economics:\$apr1\$/1zZddbM\$ygnEBcBZBM3lEiIWasgpb1\n" >> /etc/nginx/.htpasswd
 COPY nginx.conf /etc/nginx/nginx.conf
 
 EXPOSE 80

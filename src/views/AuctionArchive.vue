@@ -111,17 +111,17 @@ export default Vue.extend({
     }
   },
   async mounted() {
-    (this as any).fetchAuctions()
-    if (!this.$cookies.isKey('auctionArchiveIntro')) {
-      setTimeout(
-        () =>
-          this.$intro()
-            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
-            .start(),
-        1000
-      )
-      this.$cookies.set('auctionArchiveIntro', true)
-    }
+    ;(this as any).fetchAuctions()
+    // if (!this.$cookies.isKey('auctionArchiveIntro')) {
+    //   setTimeout(
+    //     () =>
+    //       this.$intro()
+    //         .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+    //         .start(),
+    //     1000
+    //   )
+    //   this.$cookies.set('auctionArchiveIntro', true)
+    // }
   }
 })
 </script>
