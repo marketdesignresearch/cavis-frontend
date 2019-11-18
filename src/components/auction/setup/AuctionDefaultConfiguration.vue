@@ -245,7 +245,7 @@ export default Vue.extend({
               visible: (model: any) => model.domainConfig.type.indexOf('synergy') !== -1,
               help: helpIconGenerator(null, 'help-text as :after element'),
               hint:
-                'A factor for the synergy among multiple goods. Positive means they are complements, negative means they are subsitute.',
+                'A factor for the synergy among multiple goods. Positive means they are complements, negative means they are substitutes.',
               validator: [VueFormGenerator.validators.required]
             }
           ]
