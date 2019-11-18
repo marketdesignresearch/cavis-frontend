@@ -99,6 +99,38 @@ $body-bg: white;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+.help:hover {
+  svg {
+    fill: theme-color('primary');
+  }
+
+  .help-popover {
+    display: inline-block;
+  }
+}
+
+.help {
+  .helpText > a {
+    position: relative;
+    text-decoration: none;
+  }
+
+  .help-popover {
+    display: none;
+    position: absolute;
+    background: theme-color('primary');
+    border-radius: 5px;
+    color: white;
+    padding: 5px;
+    font-size: 0.8em;
+    left: 20px;
+  }
+}
+
+.hint {
+  font-size: 0.8em;
+}
+
 //.introjs-helperLayer {
 //    background: transparent;
 //}

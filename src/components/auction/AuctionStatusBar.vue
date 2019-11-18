@@ -6,20 +6,21 @@
       <div class="text-center flex-grow-1">
         <!-- given no round type, its a standard bidding round -->
         <div v-if="!auction.auction.currentRoundType">
-          <span class="text-bolder">Bidding Round</span>
+          <span class="text-bolder">
+            Auction Phase:
+            <b>Bidding Round</b>
+          </span>
           <br />
           <span class="small">Change existing or submit additional bids.</span>
         </div>
 
         <!-- roundType -->
         <div v-if="auction.auction.currentRoundType">
-          <span class="text-bolder">{{ auction.auction.currentRoundType }}</span>
+          <b>{{ auction.auction.currentRoundType }}</b>
           <br />
 
           <!-- PVM & Initial Round -->
-          <span class="small">
-            In this round, a initial set of bids is collected from all bidders.
-          </span>
+          <span class="small">In this round, a initial set of bids is collected from all bidders.</span>
         </div>
       </div>
 

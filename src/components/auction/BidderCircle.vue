@@ -58,6 +58,7 @@ export default Vue.extend({
   height: 70px;
   width: 70px;
   border-radius: 35px;
+  transition: 0.25s ease-in-out;
 
   .badges {
     position: relative;
@@ -69,6 +70,7 @@ export default Vue.extend({
   &.selected,
   &:hover {
     background-color: theme-color('success');
+    transform: scale(1.2);
   }
 }
 
