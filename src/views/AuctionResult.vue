@@ -21,11 +21,10 @@
 
     <div class="d-flex" v-if="results.length > 0 && auctions.length > 0">
       <div class="bidders">
-        <div class="header header-cell">
-          &nbsp;
-        </div>
+        <div class="header header-cell">&nbsp;</div>
         <div class="bidder content-cell" v-for="bidderId in auctions[0].auction.domain.bidders" :key="bidderId">
-          Bidder {{ getBidder(bidderId).name }}<br />
+          Bidder {{ getBidder(bidderId).name }}
+          <br />
           <span class="badge badge-secondary badge-sm">{{ getBidder(bidderId).shortDescription }}</span>
         </div>
       </div>
@@ -43,9 +42,10 @@
           </div>
           <div class="flex-grow-1 text-right content-cell" v-for="bidderId in efficientAuction.auction.domain.bidders" :key="bidderId">
             <div v-if="efficientAllocationOf(bidderId, efficientAuction)">
-              <good-badge :ids="efficientAllocationOf(bidderId, efficientAuction).bundle.entries"></good-badge><br />
-              <span class="badge badge-primary">
-                Value: {{ efficientAllocationOf(bidderId, efficientAuction).trueValue | formatNumber }}</span
+              <good-badge :ids="efficientAllocationOf(bidderId, efficientAuction).bundle.entries"></good-badge>
+              <br />
+              <span class="badge badge-primary"
+                >Value: {{ efficientAllocationOf(bidderId, efficientAuction).trueValue | formatNumber }}</span
               >
             </div>
           </div>
@@ -56,11 +56,15 @@
           <div class="auction d-flex flex-column flex-grow-1" v-for="(auction, index) in auctions" :key="auction.id">
             <div class="header d-flex flex-column justify-content-end">
               <div class="auction-results text-center">
-                {{ auction.name || auction.id }}<br />
+                {{ auction.name || auction.id }}
+                <br />
 
                 <auction-static-information :auction="auction" :roundTypeShown="false" />
 
-                <a @click="calculateEfficiency(auction.id)" class="badge badge-pill badge-success mr-1 text-white" v-if="!efficiency(index)"
+                <a
+                  @click="calculateEfficiency(auction.id)"
+                  class="badge badge-pill badge-success mr-1 text-white cursor-pointer"
+                  v-if="!efficiency(index)"
                   >Calculate Efficiency</a
                 >
                 <span
@@ -68,38 +72,34 @@
                   v-if="efficiency(index)"
                   v-intro="'The efficiency compares the auction\'s resulting social welfare with the efficient social welfare.'"
                   v-intro-if="index === 0"
+                  >Efficiency: {{ efficiency(index) | formatNumber }}%</span
                 >
-                  Efficiency: {{ efficiency(index) | formatNumber }}%
-                </span>
                 <span
                   class="badge badge-pill badge-secondary mr-1"
                   v-intro="'The social welfare is the sum over the winner\'s values for their allocations.'"
                   v-intro-if="index === 0"
+                  >Social Welfare: {{ results[index].socialWelfare | formatNumber }}</span
                 >
-                  Social Welfare: {{ results[index].socialWelfare | formatNumber }}
-                </span>
                 <span
                   class="badge badge-pill badge-secondary mr-1"
                   v-intro="'The revenue is simply the sum of all the payments.'"
                   v-intro-if="index === 0"
+                  >Revenue: {{ results[index].revenue | formatNumber }}</span
                 >
-                  Revenue: {{ results[index].revenue | formatNumber }}
-                </span>
                 <span
                   class="badge badge-pill badge-secondary mr-1"
                   v-intro="
                     'At a glance, you\'re also shown how many rounds were run. For some auction formats, you\'ll also see information about the number of value/demand queries.'
                   "
                   v-intro-if="index === 0"
+                  ># of Rounds: {{ auction.auction.rounds.length }}</span
                 >
-                  # of Rounds: {{ auction.auction.rounds.length }}
-                </span>
-                <span class="badge badge-pill text-white bg-pvm mr-1" v-if="isPVM(auction)">
-                  # of Value Queries: {{ auction.auction.rounds.length }}
-                </span>
-                <span class="badge badge-pill badge-secondary mr-1" v-if="isCCA(auction)">
-                  # of Demand Queries: {{ ccaDemandQueries(auction) }}
-                </span>
+                <span class="badge badge-pill text-white bg-pvm mr-1" v-if="isPVM(auction)"
+                  ># of Value Queries: {{ auction.auction.rounds.length }}</span
+                >
+                <span class="badge badge-pill badge-secondary mr-1" v-if="isCCA(auction)"
+                  ># of Demand Queries: {{ ccaDemandQueries(auction) }}</span
+                >
               </div>
               <div class="bidder-header d-flex">
                 <div
@@ -132,13 +132,12 @@
             >
               <div class="flex-fill-same text-right border-right content-cell">
                 <div v-if="results[index].allocation[bidderId]">
-                  <good-badge :ids="results[index].allocation[bidderId].bundle.entries"></good-badge><br />
+                  <good-badge :ids="results[index].allocation[bidderId].bundle.entries"></good-badge>
+                  <br />
                   <span class="badge badge-primary">Value: {{ results[index].allocation[bidderId].trueValue | formatNumber }}</span>
                 </div>
               </div>
-              <div class="flex-fill-same text-right border-right content-cell">
-                {{ results[index].payments[bidderId] | formatNumber }}
-              </div>
+              <div class="flex-fill-same text-right border-right content-cell">{{ results[index].payments[bidderId] | formatNumber }}</div>
               <div class="flex-fill-same text-right border-right content-cell">
                 {{ results[index].winnerUtilities[bidderId] | formatNumber }}
               </div>
@@ -242,22 +241,26 @@ export default Vue.extend({
   },
   async mounted() {
     await this.fetchResults()
-    if (!this.$cookies.isKey('auctionResultIntro')) {
-      setTimeout(
-        () =>
-          this.$intro()
-            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
-            .start(),
-        1000
-      )
-      this.$cookies.set('auctionResultIntro', true)
-    }
+    // if (!this.$cookies.isKey('auctionResultIntro')) {
+    //   setTimeout(
+    //     () =>
+    //       this.$intro()
+    //         .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+    //         .start(),
+    //     1000
+    //   )
+    //   this.$cookies.set('auctionResultIntro', true)
+    // }
   }
 })
 </script>
 
 <style scoped lang="scss">
 @import '../custom.scss';
+
+.cursor-pointer {
+  cursor: pointer;
+}
 
 .header-cell {
   padding: 0.5rem;

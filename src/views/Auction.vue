@@ -86,9 +86,18 @@
                     <over-demand-chart :rounds="apiRounds" :goodIds="selectedGoods" />
                   </b-modal>
 
-                  <div class="pb-3 mt-4">
+                  <div class="pb-3 mt-2">
+                    <div class="small pb-2" v-if="selectedGoods.length === 0 && !isFinished">
+                      Click on a good to add it to a bundle and enter a bid
+                    </div>
+
+                    <div class="small pb-2" v-if="selectedGoods.length > 0 && !selectedBidder && !isFinished">
+                      Click on a bidder to enter a bid for this bundle
+                    </div>
+
                     <span v-if="selectedGoods.length > 0">
                       <button class="btn btn-outline-secondary btn-sm mx-1" @click="deselect">Deselect All</button>
+
                       <button
                         v-if="isCCA"
                         class="btn btn-outline-success btn-sm mx-1"
@@ -119,7 +128,7 @@
                     v-intro-step="17"
                   >
                     <div class="row">
-                      <div class="col d-flex align-items-center">
+                      <div class="col d-flex align-items-center" @click="selectBidder(selectedBidder.id)">
                         <bidder-circle :bidder="selectedBidder" class="float-right selected" />
                       </div>
 
@@ -129,7 +138,6 @@
                         </div>
                         <good-badge :ids="selectedGoods" />
                       </div>
-
                       <div class="col d-flex flex-column justify-content-center">
                         <div class="small">
                           <b>Value for Bundle:</b>
@@ -138,7 +146,7 @@
                       </div>
                     </div>
                     <div class="row justify-content-center">
-                      <div class="col-8 d-flex justify-content-center pt-2">
+                      <div class="col-8 d-flex justify-content-end pt-2 ml-5">
                         <component :is="'component-bid-' + auctionType" :auctionId="auctionId" />
                       </div>
                     </div>
@@ -300,6 +308,10 @@ export default Vue.extend({
     isPVM(): boolean {
       const currentAuction = auction.auctionById()(this.$route.params.id)
       return currentAuction ? currentAuction.auctionType.startsWith('PVM') : false
+    },
+    isFinished(): boolean {
+      const currentAuction = auction.auctionById()(this.$route.params.id)
+      return currentAuction ? currentAuction.auction.finished : false
     },
     auctionType(): string {
       const currentAuction = auction.auctionById()(this.$route.params.id)

@@ -1,13 +1,17 @@
 <template>
   <div class="small">
     <div v-if="rounds.length > 0 && !finished">
-      Current Round: <b>{{ rounds[rounds.length - 1].roundNumber + 1 }}</b>
+      Current Round:
+      <b>{{ rounds[rounds.length - 1].roundNumber + 1 }}</b>
     </div>
-    <div v-else-if="!finished">Current Round: <b>1</b></div>
+    <div v-else-if="!finished">
+      Current Round:
+      <b>1</b>
+    </div>
 
     <div v-if="finished">Auction Finished ({{ rounds.length }} Rounds)</div>
 
-    <b-dropdown v-if="!finished" class="mt-2" right size="sm" variant="success" split text="Next Round" @click="advanceRound">
+    <b-dropdown v-if="!finished" class="mt-2" right size="sm" variant="success" split text="Next Round" @click="nextRound">
       <b-dropdown-item @click="advancePhase">Skip Phase</b-dropdown-item>
     </b-dropdown>
 
@@ -59,10 +63,13 @@ export default Vue.extend({
     },
     advancePhase() {
       auction.dispatchAdvancePhase({ auctionId: this.$props.auction.id })
-    },
-    advanceRound() {
-      auction.dispatchAdvanceRound({ auctionId: this.$props.auction.id })
     }
+    /*
+     * This does not apply bids!
+    async advanceRound() {
+      await auction.dispatchAdvanceRound({ auctionId: this.$props.auction.id })
+    }
+    */
   }
 })
 </script>

@@ -1,5 +1,9 @@
 <template>
   <div class="bidder-control" v-if="selectedBidder">
+    <h4>Bidder {{ selectedBidder.name }}'s Values and Bids</h4>
+
+    <p>This table shows the values for bundles you have previously selected in this round and all bids this bidder is about to submit.</p>
+
     <div
       v-intro="
         'The main purpose of this table is to give, for a specific bidder, an overview over<br>\
@@ -16,10 +20,13 @@
           <thead>
             <tr>
               <th @click="sortBy('entriesString')" class="parentHover" v-intro="'You can sort by bundle size, ...'" v-intro-step="82">
-                Bundle <sort-marker :sortable="sort" :property="'entriesString'"></sort-marker>
+                Bundle
+                <sort-marker :sortable="sort" :property="'entriesString'"></sort-marker>
               </th>
               <th @click="sortBy('value')" class="parentHover" v-intro="'... the bidder\'s value, ...'" v-intro-step="83">
-                Value <font-awesome-icon icon="coins" /> <sort-marker :sortable="sort" :property="'value'"></sort-marker>
+                Value
+                <font-awesome-icon icon="coins" />
+                <sort-marker :sortable="sort" :property="'value'"></sort-marker>
               </th>
               <th
                 @click="sortBy('price')"
@@ -28,7 +35,9 @@
                 v-intro="'... the bundle\'s price, ...'"
                 v-intro-step="84"
               >
-                Price <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'price'"></sort-marker>
+                Price
+                <font-awesome-icon icon="dollar-sign" />
+                <sort-marker :sortable="sort" :property="'price'"></sort-marker>
               </th>
               <th
                 @click="sortBy('utility')"
@@ -37,7 +46,9 @@
                 v-intro="'... the bidder\'s utility, ...'"
                 v-intro-step="85"
               >
-                Utility <font-awesome-icon icon="wrench" /> <sort-marker :sortable="sort" :property="'utility'"></sort-marker>
+                Utility
+                <font-awesome-icon icon="wrench" />
+                <sort-marker :sortable="sort" :property="'utility'"></sort-marker>
               </th>
               <th
                 @click="sortBy('bid')"
@@ -47,7 +58,9 @@
                 "
                 v-intro-step="86"
               >
-                Bid <font-awesome-icon icon="dollar-sign" /> <sort-marker :sortable="sort" :property="'bid'"></sort-marker>
+                Bid
+                <font-awesome-icon icon="dollar-sign" />
+                <sort-marker :sortable="sort" :property="'bid'"></sort-marker>
               </th>
               <th class="w-12-5"></th>
             </tr>
@@ -59,16 +72,16 @@
               :class="{ active: bundle.hash === selectedBundle.hash, disabled: !isAllowed(bundle) }"
               @click="selectGoods(bundle)"
             >
-              <td><good-badge :ids="bundle.entries" /></td>
+              <td>
+                <good-badge :ids="bundle.entries" />
+              </td>
               <td>{{ bundle.value | formatNumber }}</td>
               <td v-if="pricedAuction">{{ bundle.price | formatNumber }}</td>
               <td v-if="pricedAuction">{{ bundle.utility | formatNumber }}</td>
-              <td>
-                {{ bundle.bid | formatNumber }}
-              </td>
+              <td>{{ bundle.bid | formatNumber }}</td>
               <td class="text-right">
                 <button v-if="bundle.bid !== null" class="btn btn-outline-danger btn-sm" @click="removeBid(bundle)">
-                  <font-awesome-icon icon="times" /> Remove Bid
+                  <font-awesome-icon icon="times" />Remove Bid
                 </button>
               </td>
             </tr>
@@ -145,7 +158,7 @@ export default Vue.extend({
             return {
               hash: obj.hash,
               entries: obj.entries,
-              entriesString: obj.entries.map(entry => entry.good).join(),
+              entriesString: obj.entries.map(entry => entry.good).join().length,
               value: value,
               price: price,
               utility: value! - price!,

@@ -3,7 +3,8 @@
     <div class="good" :class="{ selected: isSelected, disabled: !isAllowed }">
       <div class="name">{{ good.name }}</div>
       <span class="badge badge-success badge-pill badge-price" v-if="priceForGood">
-        {{ priceForGood | formatNumber }} <font-awesome-icon icon="dollar-sign" />
+        {{ priceForGood | formatNumber }}
+        <font-awesome-icon icon="dollar-sign" />
       </span>
       <div class="proposedValue" v-if="showProposedValue">
         {{ proposedBundleValue > 0 ? '+' : '' }}{{ proposedBundleValue | formatNumber }}
@@ -121,6 +122,7 @@ export { AuctionGoodComponent }
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  transition: 0.25s ease-in-out;
 
   .name {
     position: absolute;
@@ -132,6 +134,7 @@ export { AuctionGoodComponent }
 
   &:hover {
     background-image: url('../../assets/card-blank-selected.png');
+    transform: scale(1.2);
   }
 
   &.selected {

@@ -2,17 +2,15 @@
   <div>
     <div class="container">
       <h2>Set up an Auction</h2>
-
+      <p>
+        This is the configuration screen for an auction. If you have selected a historic auction example, the form is pre-filled to match
+        the setting of this auction. You can configure various aspects of an auction. To get more information on the individual options,
+        hover over the icon next to its label. Clicking on it will bring you to the corresponding paragraph in the documentation.
+      </p>
       <hr />
 
       <div class="row">
-        <div
-          class="col"
-          v-intro="
-            'This is the configuration screen for an auction. If you have selected a historic auction example, the form is pre-filled to match the setting of this auction.\
-            You can configure various aspects of an auction. To get more information on the individual options, hover over the icon next to its label. Clicking on it will bring you to the corresponding paragraph in the documentation.'
-          "
-        >
+        <div class="col">
           <AuctionSetup @createAuction="createAuction" :modelValue="modelValue" />
         </div>
       </div>
@@ -86,6 +84,7 @@ export default Vue.extend({
         seed: model.seed,
         auctionConfig: {
           maxBids: model.maxBids,
+          manualBids: model.manualBids,
           demandQueryTimeLimit: model.demandQueryTimeLimit
         }
       }
@@ -176,13 +175,13 @@ export default Vue.extend({
           value: {
             numberOfBidders: 6,
             numberOfGoods: 5,
-            domainType: 'unitDemandValue',
+            domainConfig: {
+              type: 'unitDemandValue',
+              minBidder: 100000,
+              maxBidder: 1000000
+            },
             auctionType: ApiAuctionType.SIMULTANEOUS_SECOND_PRICE,
-            defaultStrategy: ApiBidderStrategy.TRUTHFUL,
-            bidder: {
-              min: 0,
-              max: 100000
-            }
+            defaultStrategy: ApiBidderStrategy.TRUTHFUL
           },
           title: 'New Zealand (1990)',
           description: ''
@@ -190,15 +189,15 @@ export default Vue.extend({
         {
           id: 'swiss-march-2000',
           value: {
-            numberOfBidders: 6,
+            numberOfBidders: 5,
             numberOfGoods: 2,
-            domainType: 'unitDemandValue',
+            domainConfig: {
+              type: 'unitDemandValue',
+              minBidder: 100000,
+              maxBidder: 1000000
+            },
             auctionType: ApiAuctionType.SEQUENTIAL_SECOND_PRICE,
-            defaultStrategy: ApiBidderStrategy.TRUTHFUL,
-            bidder: {
-              min: 100000,
-              max: 1000000
-            }
+            defaultStrategy: ApiBidderStrategy.TRUTHFUL
           },
           title: 'Swiss Wireless-Local-Loop Auction (March 2000)'
         },
@@ -207,13 +206,13 @@ export default Vue.extend({
           value: {
             numberOfBidders: 4,
             numberOfGoods: 4,
-            domainType: 'unitDemandValue',
+            domainConfig: {
+              type: 'unitDemandValue',
+              minBidder: 100000,
+              maxBidder: 1000000
+            },
             auctionType: ApiAuctionType.SIMULTANEOUS_SECOND_PRICE,
-            defaultStrategy: ApiBidderStrategy.TRUTHFUL,
-            bidder: {
-              min: 100000,
-              max: 1000000
-            }
+            defaultStrategy: ApiBidderStrategy.TRUTHFUL
           },
           title: 'Swiss UMTS Auction (December 2000)'
         }

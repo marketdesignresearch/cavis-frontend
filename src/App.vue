@@ -30,6 +30,17 @@
             "
             v-intro-step="98"
           >
+            <button
+              class="btn btn-primary btn-tutorial mr-2"
+              v-intro="
+                'You can activate the tutorial anytime with this button; it will be explaining the component you see on your screen at that moment.'
+              "
+              v-intro-step="99"
+              v-intro-position="'left'"
+              @click="showTutorial"
+            >
+              Tutorial
+            </button>
             <b-nav-item :to="{ name: 'faq' }">
               FAQ
             </b-nav-item>
@@ -59,18 +70,6 @@
         </b-collapse>
       </div>
     </b-navbar>
-
-    <button
-      class="btn btn-outline-primary btn-tutorial"
-      v-intro="
-        'You can activate the tutorial anytime with this button; it will be explaining the component you see on your screen at that moment.'
-      "
-      v-intro-step="99"
-      v-intro-position="'left'"
-      @click="showTutorial"
-    >
-      Tutorial
-    </button>
 
     <router-view />
   </div>
@@ -132,13 +131,13 @@ export default Vue.extend({
 <style lang="scss" scoped>
 @import 'custom.scss';
 
-.btn-tutorial {
-  z-index: 100;
-  position: fixed;
-  right: 30px;
-  bottom: 30px;
-  background-color: white;
-}
+//.btn-tutorial {
+//  z-index: 100;
+//  position: fixed;
+//  right: 30px;
+//  bottom: 30px;
+//  background-color: white;
+//}
 
 .user-avatar {
   margin-top: 5px;

@@ -17,7 +17,8 @@
     </div>
 
     <div class="text-right py-2">
-      <button class="btn btn-lg btn-success ml-1" @click.prevent="submit">Create</button>
+      <router-link class="btn btn-lg btn-secondary ml-1" to="/" tag="button">Cancel</router-link>
+      <button class="btn btn-lg btn-success ml-1" @click.prevent="submit">Create Auction</button>
     </div>
   </form>
 </template>
@@ -28,10 +29,15 @@ import VueFormGenerator from 'vue-form-generator'
 import { ApiBidderStrategy, ApiAuctionType, ApiAuctionPaymentRule } from '@/store/modules/auction'
 import store from '@/store'
 
-const helpIconGenerator = (link: string) => {
-  return `<a href="${link}" target="_blank">
-    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="info-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-info-circle fa-w-16"><path data-v-01a4068c="" d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z" class="" fill=""></path></svg>
-  </a>`
+const helpIconGenerator = (link: string | null, helpText?: string) => {
+  const returnPreString = `<a href="${link ? link : 'javascript:;'}" ${link ? 'target="_blank"' : ''}>`
+  const returnPostString = '</a>'
+  const helpTextString = helpText ? `<div class="help-popover">${helpText}</div>` : ''
+
+  return `${returnPreString}
+    ${helpTextString}
+    <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="info-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="ml-1 svg-inline--fa fa-info-circle fa-w-16"><path data-v-01a4068c="" d="M256 8C119.043 8 8 119.083 8 256c0 136.997 111.043 248 248 248s248-111.003 248-248C504 119.083 392.957 8 256 8zm0 110c23.196 0 42 18.804 42 42s-18.804 42-42 42-42-18.804-42-42 18.804-42 42-42zm56 254c0 6.627-5.373 12-12 12h-88c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h12v-64h-12c-6.627 0-12-5.373-12-12v-24c0-6.627 5.373-12 12-12h64c6.627 0 12 5.373 12 12v100h12c6.627 0 12 5.373 12 12v24z" class="" fill=""></path></svg>
+  ${returnPostString}`
 }
 
 export default Vue.extend({
@@ -106,13 +112,16 @@ export default Vue.extend({
           fields: [
             {
               type: 'select',
-              label: 'Auction',
+              label: 'Auction Mechanism',
               model: 'auctionType',
               default: ApiAuctionType.VCG,
               selectOptions: {
                 hideNoneSelectedText: true
               },
-              help: helpIconGenerator('http://localhost:1234/docs/#/auction-setup?id=auction-types'),
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=auction-types',
+                'Click here to get an overview on the supported Market Mechanisms.'
+              ),
               values: [
                 { name: 'Single-Item First Price Auction', id: ApiAuctionType.SINGLE_ITEM_FIRST_PRICE },
                 { name: 'Single-Item Second Price Auction', id: ApiAuctionType.SINGLE_ITEM_SECOND_PRICE },
@@ -134,7 +143,10 @@ export default Vue.extend({
               selectOptions: {
                 hideNoneSelectedText: true
               },
-              help: helpIconGenerator('http://localhost:1234/docs/#/auction-setup?id=domains'),
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=domains',
+                'A domain consists of specific types and numbers of bidders / goods. Click for an overview on the available domains.'
+              ),
               values: [
                 { name: 'Unit Demand Value', id: 'unitDemandValue' },
                 { name: 'Additive Value', id: 'additiveValue' },
@@ -149,7 +161,11 @@ export default Vue.extend({
               type: 'input',
               inputType: 'text',
               label: 'Name (optional)',
-              model: 'name'
+              model: 'name',
+              help: helpIconGenerator(
+                null,
+                'If you give the auction a name, it will be easier for you to find it in the list of active auctions.'
+              )
             },
             {
               type: 'vueMultiSelect',
@@ -165,7 +181,11 @@ export default Vue.extend({
                 }
               },
               default: [],
-              model: 'tags'
+              model: 'tags',
+              help: helpIconGenerator(
+                null,
+                'Tags can help you to categorize your auctions. You can select existing tags or just write a new one.'
+              )
             },
             {
               disabled: () => {
@@ -174,7 +194,11 @@ export default Vue.extend({
               type: 'checkbox',
               label: 'Private (only accessible if logged-in)',
               model: 'private',
-              default: false
+              default: false,
+              help: helpIconGenerator(
+                null,
+                'Private auctions cannot be seen nor changed by other users, so they are safe for demonstration purposes.'
+              )
             }
           ]
         },
@@ -185,7 +209,7 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: '# of Goods',
+              label: 'Number of Goods',
               model: 'numberOfGoods',
               default: 3,
               disabled: (model: any) => {
@@ -202,9 +226,8 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: '# of Bidders',
+              label: 'Number of Bidders',
               model: 'numberOfBidders',
-              tooltip: 'This is a tooltip',
               default: 3,
               min: 0,
               max: 20,
@@ -213,17 +236,19 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: 'Min Value of Bidders',
+              label: 'Minimal Value of Bidders',
               model: 'domainConfig.minBidder',
               default: 0,
+              help: helpIconGenerator(null, "The bidders' values are drawn uniformly between the minimal and maximal value set here."),
               validator: [VueFormGenerator.validators.required]
             },
             {
               type: 'input',
               inputType: 'number',
-              label: 'Max Value of Bidders',
+              label: 'Maximal Value of Bidders',
               model: 'domainConfig.maxBidder',
               default: 1000,
+              help: helpIconGenerator(null, "The bidders' values are drawn uniformly between the minimal and maximal value set here."),
               validator: [VueFormGenerator.validators.required]
             },
             {
@@ -234,8 +259,10 @@ export default Vue.extend({
               default: 0.2,
               step: 0.01,
               visible: (model: any) => model.domainConfig.type.indexOf('synergy') !== -1,
-              hint:
-                'A factor for the synergy among multiple goods. Positive means they are complements, negative means they are subsitute.',
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=synergy-domain',
+                'A factor for the synergy among multiple goods. Positive means they are complements, negative means they are substitutes. Click for more information.'
+              ),
               validator: [VueFormGenerator.validators.required]
             }
           ]
@@ -249,6 +276,10 @@ export default Vue.extend({
               label: 'Interesting Case',
               model: 'domainConfig.interestingCase',
               default: true,
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=local-local-global-llg-domain',
+                'Click here for more information about what an interesting case in LLG is.'
+              ),
               validator: [VueFormGenerator.validators.required]
             },
             {
@@ -268,14 +299,14 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: '# of National GSVM Bidders',
+              label: 'Number of National GSVM Bidders',
               model: 'domainConfig.numberOfNationalBidders',
               default: 1
             },
             {
               type: 'input',
               inputType: 'number',
-              label: '# of Regional GSVM Bidders',
+              label: 'Number of Regional GSVM Bidders',
               model: 'domainConfig.numberOfRegionalBidders',
               default: 6
             }
@@ -288,14 +319,14 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: '# of National LSVM Bidders',
+              label: 'Number of National LSVM Bidders',
               model: 'domainConfig.numberOfNationalBidders',
               default: 1
             },
             {
               type: 'input',
               inputType: 'number',
-              label: '# of Regional LSVM Bidders',
+              label: 'Number of Regional LSVM Bidders',
               model: 'domainConfig.numberOfRegionalBidders',
               default: 5
             }
@@ -315,6 +346,7 @@ export default Vue.extend({
               default: ApiBidderStrategy.TRUTHFUL,
               values: [{ name: 'Truthful', id: ApiBidderStrategy.TRUTHFUL }],
               required: true,
+              help: helpIconGenerator(null, 'Currently, the only supported default strategy is the truthful strategy.'),
               validator: VueFormGenerator.validators.required
             }
           ]
@@ -326,23 +358,35 @@ export default Vue.extend({
             {
               type: 'input',
               inputType: 'number',
-              label: '# of Supplementary Bids',
+              label: 'Number of Supplementary Bids',
               model: 'ccaConfig.supplementaryBids',
-              default: 10
+              default: 10,
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=combinatorial-clock-auction-cca',
+                'Defines how many bids bidders can submit in the last round right after the clock phase. Click for more information.'
+              )
             },
             {
               type: 'input',
               inputType: 'text',
               label: 'Price Updates',
               model: 'ccaConfig.priceUpdate',
-              default: 0.1
+              default: 0.1,
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=combinatorial-clock-auction-cca',
+                'If you set this to e.g. 0.1, the prices of over-demanded items will be raised by 10%. Click for more information.'
+              )
             },
             {
               type: 'input',
               inputType: 'number',
               label: 'Initial Price Update if Price equals 0',
               model: 'ccaConfig.initialPriceUpdateIfPriceEqualsZero',
-              default: 1
+              default: 1,
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=combinatorial-clock-auction-cca',
+                "Since we're updating the prices relatively, a zero-price would never be raised. In this case, this setting defines what the initial price update will be instead. Click for more information."
+              )
             },
             {
               type: 'select',
@@ -352,14 +396,22 @@ export default Vue.extend({
                 hideNoneSelectedText: true
               },
               default: ApiAuctionPaymentRule.VCG,
-              values: [{ name: 'VCG', id: ApiAuctionPaymentRule.VCG }, { name: 'CCG', id: ApiAuctionPaymentRule.CCG }]
+              values: [{ name: 'VCG', id: ApiAuctionPaymentRule.VCG }, { name: 'CCG', id: ApiAuctionPaymentRule.CCG }],
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=combinatorial-clock-auction-cca',
+                'Defines how the prices will be determined based on the collected bids.'
+              )
             },
             {
               type: 'input',
               inputType: 'number',
               label: 'Maximum number of Rounds',
               model: 'ccaConfig.maxRounds',
-              default: 100
+              default: 100,
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=combinatorial-clock-auction-cca',
+                'In theory, CCA could go on for a long time. With this setting, you can limit the duration to a certain number of rounds.'
+              )
             }
           ]
         },
@@ -375,14 +427,22 @@ export default Vue.extend({
                 hideNoneSelectedText: true
               },
               default: ApiAuctionPaymentRule.VCG,
-              values: [{ name: 'VCG', id: ApiAuctionPaymentRule.VCG }, { name: 'CCG', id: ApiAuctionPaymentRule.CCG }]
+              values: [{ name: 'VCG', id: ApiAuctionPaymentRule.VCG }, { name: 'CCG', id: ApiAuctionPaymentRule.CCG }],
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=pvm-auction',
+                'Defines how the prices will be determined based on the collected bids.'
+              )
             },
             {
               type: 'input',
               inputType: 'number',
               label: 'Maximum Number of Rounds',
               model: 'pvmConfig.maxRounds',
-              default: 100
+              default: 100,
+              help: helpIconGenerator(
+                'http://cavis.marketdesignresearch.org/docs/#/auction-setup?id=pvm-auction',
+                'In theory, PVM could go on for a long time. With this setting, you can limit the duration to a certain number of rounds.'
+              )
             }
           ]
         },
@@ -396,7 +456,11 @@ export default Vue.extend({
               label: 'Maximum number of bids per bidder & round',
               model: 'maxBids',
               default: 20,
-              validator: [VueFormGenerator.validators.required]
+              validator: [VueFormGenerator.validators.required],
+              help: helpIconGenerator(
+                null,
+                'Setting this may be part of the auction rules, and a lower number will also result in faster determination of bid propositions.'
+              )
             },
             {
               type: 'input',
@@ -404,21 +468,30 @@ export default Vue.extend({
               label: 'Number of bids reserved for user',
               model: 'manualBids',
               default: 5,
-              validator: [VueFormGenerator.validators.required]
+              validator: [VueFormGenerator.validators.required],
+              help: helpIconGenerator(
+                null,
+                'You can prevent us to propose the maximum number of bids, such that you can manually add some bids in each round without having to delete a proposed bid first.'
+              )
             },
+            // TODO: This currently does not do anything due to the pool filling mode in GSVM / LSVM... Leaving it out for now
+            //{
+            //  type: 'input',
+            //  inputType: 'number',
+            //  label: 'Timelimit for Demand Queries (in seconds)',
+            //  model: 'demandQueryTimeLimit',
+            //  default: 5,
+            //  validator: [VueFormGenerator.validators.required]
+            //},
             {
               type: 'input',
               inputType: 'number',
-              label: 'Timelimit for Demand Queries (in seconds)',
-              model: 'demandQueryTimeLimit',
-              default: 5,
-              validator: [VueFormGenerator.validators.required]
-            },
-            {
-              type: 'input',
-              inputType: 'number',
-              label: 'Seed',
-              model: 'seed'
+              label: 'Seed (optional)',
+              model: 'seed',
+              help: helpIconGenerator(
+                null,
+                'There are always some distributions involved when creating a domain. With this setting, you can fix the seed to create identical domains and, e.g., compare auction mechanisms.'
+              )
             }
           ]
         }

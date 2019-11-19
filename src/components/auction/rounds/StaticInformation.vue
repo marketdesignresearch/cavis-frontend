@@ -1,13 +1,12 @@
 <template>
   <div>
     <div class="small">
-      Type: <b>{{ auctionType }}</b>
-    </div>
-    <div class="small">
-      Outcome Rule: <b>{{ paymentRule }}</b>
+      Auction Mechanism:
+      <b>{{ auctionType }}</b>
     </div>
     <div class="small" v-if="roundTypeShown">
-      Type of Round: <b>{{ currentRoundType ? currentRoundType : 'Single-Round Auction' }}</b>
+      Type of Round:
+      <b>{{ currentRoundType ? currentRoundType : 'Single-Round Auction' }}</b>
     </div>
   </div>
 </template>

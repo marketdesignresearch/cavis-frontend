@@ -5,21 +5,28 @@
       <auction-static-information :auction="auction" />
       <div class="text-center flex-grow-1">
         <!-- given no round type, its a standard bidding round -->
-        <div v-if="!auction.auction.currentRoundType">
-          <span class="text-bolder">Bidding Round</span>
+        <div v-if="!auction.auction.currentRoundType && !isFinished">
+          <span class="text-bolder">
+            Auction Phase:
+            <b>Bidding Round</b>
+          </span>
           <br />
           <span class="small">Change existing or submit additional bids.</span>
         </div>
 
         <!-- roundType -->
-        <div v-if="auction.auction.currentRoundType">
-          <span class="text-bolder">{{ auction.auction.currentRoundType }}</span>
+        <div v-if="auction.auction.currentRoundType && !isFinished">
+          <b>{{ auction.auction.currentRoundType }}</b>
           <br />
 
           <!-- PVM & Initial Round -->
-          <span class="small">
-            In this round, a initial set of bids is collected from all bidders.
-          </span>
+          <span class="small">In this round, a initial set of bids is collected from all bidders.</span>
+        </div>
+
+        <div v-if="isFinished">
+          <b>Auction is finished</b>
+          <br />
+          <span class="small">Get the results or reset the auction in the Auctioneer's view</span>
         </div>
       </div>
 
@@ -45,6 +52,10 @@ const AuctionStatusBarComponent = Vue.extend({
     },
     roundType(): string {
       return 'component-round-' + this.auction.auctionType
+    },
+    isFinished(): boolean {
+      const currentAuction = this.auction
+      return currentAuction ? currentAuction.auction.finished : false
     }
   }
 })
