@@ -33,7 +33,10 @@ export default Vue.extend({
   },
   methods: {
     async getAuctionResults() {
-      const result = await auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      const currentAuction = auction.auctionById()(this.$route.params.id)
+      if (!currentAuction.auction.finished) {
+        const result = await auction.dispatchPlaceBids({ auctionId: this.$props.auction.id })
+      }
       selection.commitUnselectAll()
       this.$router.push({ name: 'auction-result', query: { auctions: [this.$props.auction.id] } })
     }

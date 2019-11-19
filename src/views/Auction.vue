@@ -87,9 +87,11 @@
                   </b-modal>
 
                   <div class="pb-3 mt-2">
-                    <div class="small pb-2" v-if="selectedGoods.length === 0">Click on a good to add it to a bundle and enter a bid</div>
+                    <div class="small pb-2" v-if="selectedGoods.length === 0 && !isFinished">
+                      Click on a good to add it to a bundle and enter a bid
+                    </div>
 
-                    <div class="small pb-2" v-if="selectedGoods.length > 0 && !selectedBidder">
+                    <div class="small pb-2" v-if="selectedGoods.length > 0 && !selectedBidder && !isFinished">
                       Click on a bidder to enter a bid for this bundle
                     </div>
 
@@ -306,6 +308,10 @@ export default Vue.extend({
     isPVM(): boolean {
       const currentAuction = auction.auctionById()(this.$route.params.id)
       return currentAuction ? currentAuction.auctionType.startsWith('PVM') : false
+    },
+    isFinished(): boolean {
+      const currentAuction = auction.auctionById()(this.$route.params.id)
+      return currentAuction ? currentAuction.auction.finished : false
     },
     auctionType(): string {
       const currentAuction = auction.auctionById()(this.$route.params.id)
