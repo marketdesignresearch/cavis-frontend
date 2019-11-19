@@ -84,6 +84,7 @@ export default Vue.extend({
         seed: model.seed,
         auctionConfig: {
           maxBids: model.maxBids,
+          manualBids: model.manualBids,
           demandQueryTimeLimit: model.demandQueryTimeLimit
         }
       }

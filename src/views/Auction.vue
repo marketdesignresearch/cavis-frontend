@@ -146,7 +146,7 @@
                       </div>
                     </div>
                     <div class="row justify-content-center">
-                      <div class="col-8 d-flex justify-content-center pt-2">
+                      <div class="col-8 d-flex justify-content-end pt-2 ml-5">
                         <component :is="'component-bid-' + auctionType" :auctionId="auctionId" />
                       </div>
                     </div>
