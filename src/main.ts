@@ -95,7 +95,7 @@ Vue.use(VueIntro)
 import 'intro.js/introjs.css'
 import 'intro.js/themes/introjs-modern.css'
 
-import 'nprogress/nprogress.css'
+import 'axios-progress-bar/dist/nprogress.css'
 import './custom.scss'
 import { ApiAuctionType } from './store/modules/auction'
 

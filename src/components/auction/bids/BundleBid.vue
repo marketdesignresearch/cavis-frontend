@@ -204,6 +204,13 @@ export default Vue.extend({
         bidderId: bidderId,
         bid: bid
       })
+
+      this.$bvToast.toast(`Your bid has been saved.`, {
+        title: 'Bid saved!',
+        autoHideDelay: 3000,
+        appendToast: false,
+        variant: 'success'
+      })
     },
     removeBid(bundle: ApiBundleEntryWrapper) {
       BidderService.removeBid(selection.selectedBidder()!, bundle)

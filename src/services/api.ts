@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios'
-import NProgress from 'nprogress'
+import { loadProgressBar } from 'axios-progress-bar'
 
 interface CaVisAxiosInstance extends AxiosInstance {
   postResponseErrorHandlers: Function[]
@@ -23,22 +23,21 @@ const api: CaVisAxiosInstance = Object.assign(
   })
 )
 
+loadProgressBar({ minimum: 0.1 }, api)
+
 // before a request is made start the nprogress
 api.interceptors.request.use(
   config => {
-    NProgress.start()
     return config
   },
   error => {
     console.warn(error)
-    NProgress.done()
   }
 )
 
 // before a response is returned stop nprogress
 api.interceptors.response.use(
   response => {
-    NProgress.done()
     return response
   },
   error => {
@@ -48,7 +47,6 @@ api.interceptors.response.use(
     })
 
     console.error(error)
-    NProgress.done()
   }
 )
 
