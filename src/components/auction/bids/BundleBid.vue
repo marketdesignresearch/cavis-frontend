@@ -20,7 +20,7 @@
       </form>
     </div>
 
-    <div class="py-4">
+    <div v-if="!isFinished" class="py-4">
       <strategy-selector v-if="selectedGoods.length > 0 && bidsAllowed" class="pt-2 mb-2" :auctionId="auctionId" />
 
       <!-- PVM Specific Errors -->
@@ -130,6 +130,10 @@ export default Vue.extend({
 
       const restrictedBids = auction.auctionById()(this.$props.auctionId).auction.restrictedBids
       return !restrictedBids[bidderId] || restrictedBids[bidderId].some(value => value.hash === selectedBundle.hash)
+    },
+    isFinished(): boolean {
+      const currentAuction = auction.auctionById()(this.$route.params.id)
+      return currentAuction ? currentAuction.auction.finished : false
     },
     selectedBidderStrategy(): string | undefined {
       const bidderId = selection.selectedBidder()

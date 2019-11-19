@@ -28,7 +28,7 @@
             <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">
               Reset to Round #{{ round.roundNumber }}
             </button>
-            <button v-if="rounds.length > 1" @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
+            <button v-if="rounds.length > 1 || isFinished" @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
           </div>
 
           <table class="table table-bordered table-bidder">
@@ -142,6 +142,9 @@ export default Vue.extend({
     },
     isPVM(): boolean {
       return (this.$props.auction.auctionType as ApiAuctionType).startsWith('PVM')
+    },
+    isFinished(): boolean {
+      return this.$props.auction.auction.finished
     },
     isMultiRound(): boolean {
       const multiRoundAuctions = [

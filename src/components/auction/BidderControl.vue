@@ -2,7 +2,7 @@
   <div class="bidder-control" v-if="selectedBidder">
     <h4>Bidder {{ selectedBidder.name }}'s Values and Bids</h4>
 
-    <p>This table shows the values for all bundles you have previously selected and all bids you submitted.</p>
+    <p>This table shows the values for bundles you have previously selected in this round and all bids this bidder is about to submit.</p>
 
     <div
       v-intro="
