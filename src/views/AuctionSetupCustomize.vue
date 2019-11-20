@@ -36,18 +36,18 @@ export default Vue.extend({
     AuctionSetup: () => import('@/components/auction/setup/AuctionDefaultConfiguration.vue')
   },
   mounted() {
-    if (!this.$cookies.isKey('setupIntro')) {
-      // show introjs
-      setTimeout(
-        () =>
-          this.$intro()
-            .setOptions({ showStepNumbers: false, skipLabel: 'End' })
-            .start(),
-        1000
-      )
-
-      this.$cookies.set('setupIntro', true)
-    }
+    //if (!this.$cookies.isKey('setupIntro')) {
+    //  // show introjs
+    //  setTimeout(
+    //    () =>
+    //      this.$intro()
+    //        .setOptions({ showStepNumbers: false, skipLabel: 'End' })
+    //        .start(),
+    //    1000
+    //  )
+    //
+    //  this.$cookies.set('setupIntro', true)
+    //}
   },
   computed: {
     modelValue(): any {

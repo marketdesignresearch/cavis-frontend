@@ -27,8 +27,8 @@
       <div v-if="isPVM && !bidsAllowed" class="alert alert-warning text-center">
         <div v-if="pvmQueriedBundle">
           <div>
-            You can discover values for all bundles, but the auctioneer queries bundle
-            <good-badge :goods="pvmQueriedBundle" />. Thus, you can only bid on this bundle.
+            You can discover values for all bundles, but the auctioneer queries a specific bundle. Click here to select this bundle.<!--bundle
+            <good-badge :goods="pvmQueriedBundle" /> /* TODO: always displays Empty Bundle. Temporarily disabled this. */ Thus, you can only bid on this bundle.-->
           </div>
           <button class="btn mt-2 btn-sm btn-success" @click="selectQueriedBundle">Select queried bundle</button>
         </div>

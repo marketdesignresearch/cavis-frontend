@@ -14,7 +14,7 @@
           class="card-deck"
           v-intro="
             'To get started, you can choose a starting point for the auction you are going to create.<br>\
-              With the first three options, you can jump directly in a configuration of historic auction examples, who all in some way had a flaw.'
+              With the first options, you can jump directly in a configuration of historic auction examples, who all in some way had a flaw.'
           "
           v-intro-position="'top'"
         >
@@ -38,7 +38,7 @@
               </p>
             </div>
           </div>
-          <div class="card" @click="configureAndCreate('swiss-december-2000')">
+          <!--<div class="card" @click="configureAndCreate('swiss-december-2000')">
             <img src="../assets/ch-december.jpg" class="card-img-top" />
             <div class="card-body">
               <h5 class="card-title">Swiss December 2000</h5>
@@ -47,7 +47,7 @@
                 simultaneous second-price auction, which failed to generate much revenue.
               </p>
             </div>
-          </div>
+          </div>-->
           <div
             class="card"
             @click="configureAndCreate('custom')"
@@ -87,7 +87,7 @@ export default Vue.extend({
 
 .content {
   display: flex;
-  min-height: 80vh;
+  max-height: 40vh;
   flex-direction: column;
 }
 
