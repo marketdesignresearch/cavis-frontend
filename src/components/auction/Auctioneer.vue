@@ -25,7 +25,11 @@
       <b-tabs content-class="mt-3" v-model="selectedRound">
         <b-tab v-for="round in rounds" style="position: relative" :title="currentRoundTitle(round, rounds.length)" :key="round.roundNumber">
           <div class="right py-3">
-            <button v-if="round.roundNumber < rounds.length" @click="resetRound(round.roundNumber - 1)" class="btn ml-2 btn-danger btn-sm">
+            <button
+              v-if="round.roundNumber < rounds.length || isFinished"
+              @click="resetRound(round.roundNumber - 1)"
+              class="btn ml-2 btn-danger btn-sm"
+            >
               Reset to Round #{{ round.roundNumber }}
             </button>
             <button v-if="rounds.length > 1 || isFinished" @click="resetAuction" class="btn ml-2 btn-danger btn-sm">Reset Auction</button>
