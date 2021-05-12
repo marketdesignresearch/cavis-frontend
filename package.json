@@ -21,7 +21,7 @@
     "bootstrap": "^4.3.1",
     "bootstrap-vue": "^2.0.0-rc.27",
     "bootswatch": "^4.3.1",
-    "chart.js": "^2.8.0",
+    "chart.js": "^2.9.4",
     "color-scheme": "^1.0.1",
     "intro.js": "^2.9.3",
     "jssha": "^2.3.1",
