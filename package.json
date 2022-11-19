@@ -48,7 +48,7 @@
     "@types/numeral": "0.0.25",
     "@vue/cli-plugin-typescript": "^3.7.0",
     "@vue/cli-plugin-unit-jest": "^3.7.0",
-    "@vue/cli-service": "^3.7.0",
+    "@vue/cli-service": "^5.0.8",
     "@vue/test-utils": "1.0.0-beta.29",
     "husky": "^2.2.0",
     "prettier": "^1.17.0",
